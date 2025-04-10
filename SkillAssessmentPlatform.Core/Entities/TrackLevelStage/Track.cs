@@ -1,4 +1,5 @@
-﻿using SkillAssessmentPlatform.Core.Entities.Users;
+﻿using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Entities.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,3 +28,5 @@ namespace SkillAssessmentPlatform.Core.Entities
 
     }
 }
+
+

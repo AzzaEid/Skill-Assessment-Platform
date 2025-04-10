@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.DTOs.plan
 {
-    internal class LevelPlanDTO
+    public  class LevelPlanDTO
     {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int Order { get; set; }
     }
 }

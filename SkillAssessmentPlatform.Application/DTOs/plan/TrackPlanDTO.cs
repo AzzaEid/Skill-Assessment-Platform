@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.DTOs.plan
 {
-    internal class TrackPlanDTO
+    public class TrackPlanDTO
     {
+        public int Id {  get; set; }
+        public List<LevelPlanDTO> levels { get; set; }
     }
 }

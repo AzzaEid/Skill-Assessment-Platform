@@ -73,7 +73,7 @@ namespace SkillAssessmentPlatform.API
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<TrackService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddDbContext<AppDbContext>(...);
+           // builder.Services.AddDbContext<AppDbContext>(...);
 
 
 
