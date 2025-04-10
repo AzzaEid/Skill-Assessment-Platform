@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SkillAssessmentPlatform.Core.Entities;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
@@ -16,5 +17,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public string AssociatedSkills { get; set; }
         public bool IsActive { get; set; }
         public string Image { get; set; }
+
+        public List<Level> levels { get; set; } = new List<Level>();
     }
 }

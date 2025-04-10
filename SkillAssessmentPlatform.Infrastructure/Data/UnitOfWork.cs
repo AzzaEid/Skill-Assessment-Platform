@@ -120,5 +120,20 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
                 _disposed = true;
             }
         }
+
+        public IGenericRepository<T> Repository<T>() where T : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public TRepository GetCustomRepository<TRepository>() where TRepository : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> CompleteAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

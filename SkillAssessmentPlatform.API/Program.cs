@@ -61,8 +61,10 @@ namespace SkillAssessmentPlatform.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
             builder.Services.AddScoped<IExaminerRepository, ExaminerRepository>();
-            builder.Services.AddScoped<TrackService>();
             builder.Services.AddScoped<ITrackRepository, TrackRepository>();
+            builder.Services.AddScoped<ILevelRepository, LevelRepository>();
+            builder.Services.AddScoped<IStageRepository, StageRepository>();
+            builder.Services.AddScoped<IEvaluationCriteriaRepository, EvaluationCriteriaRepository>();
 
 
             builder.Services.AddScoped<AuthService>();
@@ -73,7 +75,7 @@ namespace SkillAssessmentPlatform.API
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<TrackService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-           // builder.Services.AddDbContext<AppDbContext>(...);
+            builder.Services.AddDbContext<AppDbContext>();
 
 
 
@@ -107,14 +109,14 @@ namespace SkillAssessmentPlatform.API
             })
             .AddJwtBearer(options =>
             {
-                options.RequireHttpsMetadata = false;  
+                options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidAudience = builder.Configuration["JWT:Audience"], 
-                    ValidIssuer = builder.Configuration["JWT:Issuer"],     
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:key"]))  
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:key"]))
                 };
             });
 

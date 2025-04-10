@@ -17,12 +17,22 @@ using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
+
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
-    public class TrackRepository : GenericRepository<Track> , ITrackRepository
+    public class TrackRepository : GenericRepository<Track>, ITrackRepository
 
     {
         //private readonly AppDbContext _context;
+
+        public async Task<Track> GetTrackWithDetailsAsync(int trackId)
+        {
+            return await _context.Tracks
+                .Include(t => t.Levels)
+                    .ThenInclude(l => l.Stages)
+                        .ThenInclude(s => s.EvaluationCriteria)
+                .FirstOrDefaultAsync(t => t.Id == trackId);
+        }
 
         public TrackRepository(AppDbContext context) : base(context)
         {
@@ -89,7 +99,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         public async Task AddAsync(Track track)
         {
-           await _context.Tracks.AddAsync(track);
+            await _context.Tracks.AddAsync(track);
             _context.SaveChanges();
         }
 
@@ -109,6 +119,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
 
         public Task RemoveExaminerAsync(int trackId, string examinerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Track> GetTrackWithLevelsAsync(int trackId)
         {
             throw new NotImplementedException();
         }
