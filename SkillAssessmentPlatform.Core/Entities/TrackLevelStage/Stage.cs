@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Core.Entities
@@ -20,6 +21,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         public int PassingScore { get; set; }
 
         // Navigation properties
+        [JsonIgnore]
         public Level Level { get; set; }
         public ICollection<EvaluationCriteria> EvaluationCriteria { get; set; }
         public ICollection<StageProgress> StageProgresses { get; set; }

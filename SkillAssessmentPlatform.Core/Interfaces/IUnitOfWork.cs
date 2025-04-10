@@ -17,7 +17,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         Task<int> SaveChangesAsync();
         Task<IDbContextTransaction> BeginTransactionAsync();
         #region repos
-        IGenericRepository<T> Repository<T> () where T : class;
+        IGenericRepository<T> Repository<T>() where T : class;
         TRepository GetCustomRepository<TRepository>() where TRepository : class;
         IAuthRepository AuthRepository { get; }
         IUserRepository UserRepository { get; }
@@ -26,7 +26,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         #endregion
 
         #region methods
-      //  Task<IDbContextTransaction> BeginTransactionAsync();
+        //  Task<IDbContextTransaction> BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
         Task<int> CompleteAsync();

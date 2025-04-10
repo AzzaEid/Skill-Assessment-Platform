@@ -20,12 +20,12 @@ using SkillAssessmentPlatform.Infrastructure.Data;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
-    public class TrackRepository : GenericRepository<Track> , ITrackRepository
+    public class TrackRepository : GenericRepository<Track>, ITrackRepository
 
     {
         //private readonly AppDbContext _context;
 
-        public async Task<Track> GetTrackWithLevelsAsync(int trackId)
+        public async Task<Track> GetTrackWithDetailsAsync(int trackId)
         {
             return await _context.Tracks
                 .Include(t => t.Levels)
@@ -40,68 +40,68 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         #region IGenericRepository<Track> Members
 
-      /*  public async Task<Track> GetByIdAsync(int id)
-        {
-            return await _context.Tracks
-                .Include(t => t.Levels)
-                .FirstOrDefaultAsync(t => t.Id == id);
-        }
-      */
-        // لاستخدام GetByIdAsync(string id) نرفع استثناء أو نتركه غير مدعوم لأن المفتاح int
-      /*  public Task<Track> GetByIdAsync(string id)
-        {
-            throw new NotSupportedException("Track primary key is of type int.");
-        }
-      */
-      /*
-        public async Task<IEnumerable<Track>> GetAllAsync()
-        {
-            return await _context.Tracks
-                .Include(t => t.Levels)
-                .ToListAsync();
-        }
-        /*
-        public async Task<int> GetCount()
-        {
-            return await _context.Tracks.CountAsync();
-        }*//*
-        // important
-        public async Task<IEnumerable<Track>> GetPagedAsync(int page, int pageSize)
-        {
-            return await _context.Tracks
-                .OrderBy(t => t.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-
-        public async Task<Track> UpdateAsync(Track entity)
-        {
-            _context.Tracks.Update(entity);
-            await _context.SaveChangesAsync();
-            return entity;
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var track = await GetByIdAsync(id);
-            if (track == null)
-                return false;
-            _context.Tracks.Remove(track);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public Task<bool> DeleteAsync(string id)
-        {
-            throw new NotSupportedException("Track primary key is of type int.");
-        }
-
-        public async Task<int> GetTotalCountAsync()
-        {
-            return await _context.Tracks.CountAsync();
-        }
+        /*  public async Task<Track> GetByIdAsync(int id)
+          {
+              return await _context.Tracks
+                  .Include(t => t.Levels)
+                  .FirstOrDefaultAsync(t => t.Id == id);
+          }
         */
+        // لاستخدام GetByIdAsync(string id) نرفع استثناء أو نتركه غير مدعوم لأن المفتاح int
+        /*  public Task<Track> GetByIdAsync(string id)
+          {
+              throw new NotSupportedException("Track primary key is of type int.");
+          }
+        */
+        /*
+          public async Task<IEnumerable<Track>> GetAllAsync()
+          {
+              return await _context.Tracks
+                  .Include(t => t.Levels)
+                  .ToListAsync();
+          }
+          /*
+          public async Task<int> GetCount()
+          {
+              return await _context.Tracks.CountAsync();
+          }*//*
+          // important
+          public async Task<IEnumerable<Track>> GetPagedAsync(int page, int pageSize)
+          {
+              return await _context.Tracks
+                  .OrderBy(t => t.Id)
+                  .Skip((page - 1) * pageSize)
+                  .Take(pageSize)
+                  .ToListAsync();
+          }
+
+          public async Task<Track> UpdateAsync(Track entity)
+          {
+              _context.Tracks.Update(entity);
+              await _context.SaveChangesAsync();
+              return entity;
+          }
+
+          public async Task<bool> DeleteAsync(int id)
+          {
+              var track = await GetByIdAsync(id);
+              if (track == null)
+                  return false;
+              _context.Tracks.Remove(track);
+              await _context.SaveChangesAsync();
+              return true;
+          }
+
+          public Task<bool> DeleteAsync(string id)
+          {
+              throw new NotSupportedException("Track primary key is of type int.");
+          }
+
+          public async Task<int> GetTotalCountAsync()
+          {
+              return await _context.Tracks.CountAsync();
+          }
+          */
         #endregion
 
         #region ITrackRepository Members
@@ -165,7 +165,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         public async Task AddAsync(Track track)
         {
-           await _context.Tracks.AddAsync(track);
+            await _context.Tracks.AddAsync(track);
             _context.SaveChanges();
         }
 
@@ -185,6 +185,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
 
         public Task RemoveExaminerAsync(int trackId, string examinerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Track> GetTrackWithLevelsAsync(int trackId)
         {
             throw new NotImplementedException();
         }

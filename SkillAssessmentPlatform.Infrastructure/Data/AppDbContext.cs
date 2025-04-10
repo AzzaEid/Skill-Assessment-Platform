@@ -53,6 +53,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
+
             builder.Entity<IdentityRole>().HasData(
             new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.Admin.ToString(), NormalizedName = Actors.Admin.ToString().ToUpper() },
             new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.Examiner.ToString(), NormalizedName = Actors.Examiner.ToString().ToUpper() },
