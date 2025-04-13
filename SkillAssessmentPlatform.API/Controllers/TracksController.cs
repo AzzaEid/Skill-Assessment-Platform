@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.Application.Services;
 using SkillAssessmentPlatform.API.Common;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 
@@ -72,4 +73,18 @@ public class TracksController : ControllerBase
         await _trackService.DeActivateTrackAsync(id);
         return _responseHandler.Deleted();
     }
+
+
+    [HttpPost("{trackId}/levels")]
+    public async Task<IActionResult> CreateLevel(int trackId, [FromBody] CreateLevelDTO dto)
+    {
+        var created = await _trackService.CreateLevelAsync(trackId, dto);
+        if (created == null)
+            return NotFound(new { message = "Track not found" });
+
+        return _responseHandler.Success(created, "Level created successfully");
+    }
+
+
+
 }

@@ -21,6 +21,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         [JsonIgnore]
         public Track Track { get; set; }
         public ICollection<Stage> Stages { get; set; }
+
         public ICollection<LevelProgress> LevelProgresses { get; set; }
     }
 }

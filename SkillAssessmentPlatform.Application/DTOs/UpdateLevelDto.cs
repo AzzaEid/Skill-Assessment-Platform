@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
-    public class EvaluationCriteriaDTO
+    public class UpdateLevelDto
     {
-        public int Id { get; set; }
         public string Name { get; set; }
+      //  public string StageName { get; set; }
         public string Description { get; set; }
-        public float Weight { get; set; }
+        public int Order { get; set; }
+        public bool IsActive { get; set; }
     }
 
 }
