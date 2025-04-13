@@ -19,6 +19,8 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<TrackDto> GetTrackByIdAsync(int id)
         {
             var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(id);
+          //  var levels = await _unitOfWork.LevelRepository.GetLevelsByTrackIdAsync(id);
+
             if (track == null) return null;
 
             return new TrackDto
@@ -31,9 +33,26 @@ namespace SkillAssessmentPlatform.Application.Services
                 AssociatedSkills = track.AssociatedSkills,
                 IsActive = track.IsActive,
                 Image = track.Image,
-                levels = track.Levels.ToList()
+                Levels = track.Levels.Select(level => new LevelDto
+                {
+                    Id = level.Id,
+                    TrackId = level.TrackId,
+                    Name = level.Name,
+                    Description = level.Description,
+                    Order = level.Order,
+                    IsActive = level.IsActive,
+                    Stages = level.Stages?.Select(stage => new StageDTO
+                    {
+                        Name = stage.Name,
+                        Description = stage.Description,
+                        Type = stage.Type,
+                        Order = stage.Order,
+                        PassingScore = stage.PassingScore
+                    }).ToList()
+                }).ToList()
             };
-        }
+        } // Done
+
 
 
         public async Task<IEnumerable<TrackDto>> GetAllTracksAsync()
