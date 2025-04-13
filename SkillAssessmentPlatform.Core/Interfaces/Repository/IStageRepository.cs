@@ -10,6 +10,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
     public interface IStageRepository : IGenericRepository<Stage>
     {
         Task<IEnumerable<Stage>> GetStagesByLevelIdAsync(int levelId);
+        Task AddAsync(Stage stage);
     }
 
 }

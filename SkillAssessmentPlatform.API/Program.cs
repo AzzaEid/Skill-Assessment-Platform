@@ -53,7 +53,7 @@ public class Program
         builder.Services.AddScoped<ILevelRepository, LevelRepository>();
         builder.Services.AddScoped<IStageRepository, StageRepository>();
         builder.Services.AddScoped<IEvaluationCriteriaRepository, EvaluationCriteriaRepository>();
-        
+
 
 
         // Services

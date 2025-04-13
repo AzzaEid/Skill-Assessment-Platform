@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
@@ -52,9 +53,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 }).ToList()
             };
         } // Done
-
-
-
         public async Task<IEnumerable<TrackDto>> GetAllTracksAsync()
         {
             var tracks = await _unitOfWork.TrackRepository.GetAllAsync();
@@ -71,9 +69,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 Image = t.Image
             });
         }
-
-
-
         public async Task<CreateTrackDTO> CreateTrackAsync(CreateTrackDTO trackDto)
         {
             var track = new Track
@@ -94,9 +89,6 @@ namespace SkillAssessmentPlatform.Application.Services
             trackDto.Id = track.Id;
             return trackDto;
         }
-
-
-
         public async Task<CreateTrackDTO> UpdateTrackAsync(CreateTrackDTO trackDto)
         {
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackDto.Id);
@@ -114,7 +106,6 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return trackDto;
         }
-
         public async Task<bool> DeActivateTrackAsync(int id)
         {
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(id);
@@ -123,6 +114,26 @@ namespace SkillAssessmentPlatform.Application.Services
             track.IsActive = false;
             await _unitOfWork.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<CreateLevelDTO> CreateLevelAsync(int trackId, [FromBody] CreateLevelDTO dto)
+        {
+            var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackId);
+            var level = new Level
+            {
+
+                TrackId = trackId,
+                Name = dto.Name,
+                Description = dto.Description,
+                Order = dto.Order,
+                IsActive = dto.IsActive
+            };
+
+            await _unitOfWork.LevelRepository.AddAsync(level);
+            await _unitOfWork.SaveChangesAsync();
+
+            dto.Id = level.Id; 
+            return dto;
         }
 
     }

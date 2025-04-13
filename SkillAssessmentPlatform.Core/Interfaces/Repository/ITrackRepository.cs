@@ -13,8 +13,11 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<IEnumerable<Track>> GetAllAsync();
         Task<Track> GetByIdAsync(int id);
         Task<Track> GetTrackWithDetailsAsync(int id);
+        Task AddAsync(Level level);
 
         Task AddAsync(Track track);
+      //  Task AddAsync(Level level);
+
         Task UpdateAsync(Track track);
         Task DeleteAsync(int id);
 

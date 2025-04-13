@@ -1,4 +1,5 @@
-﻿using SkillAssessmentPlatform.Application.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Interfaces;
 using System;
@@ -13,7 +14,7 @@ namespace SkillAssessmentPlatform.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public LevelService (IUnitOfWork unitOfWork)
+        public LevelService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -85,6 +86,8 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return level.Stages.Select(stage => new StageDTO
             {
+                Id = stage.Id,
+
                 Name = stage.Name,
                 Description = stage.Description,
                 Type = stage.Type,
@@ -93,22 +96,40 @@ namespace SkillAssessmentPlatform.Application.Services
             }).ToList();
         }
 
+        [HttpPost("{levelId}/stages")]
+        public async Task<CreateStageDTO> CreateStage(int levelId, [FromBody] CreateStageDTO dto)
+        {
 
-        /* public async Task<List<StageDTO>> GetStagesByLevelIdAsync(int levelId)
-         {
-             var level = await _unitOfWork.LevelRepository.GetLevelWithStagesAsync(levelId);
-             if (level == null || level.Stages == null)
-                 return null;
+            var level = await _unitOfWork.LevelRepository.GetByIdAsync(levelId);
 
-             return level.Stages.Select(stage => new StageDTO
-             {
-                 Name = stage.Name,
-                 Description = stage.Description,
-                 Type = stage.Type,
-                 Order = stage.Order,
-                 PassingScore = stage.PassingScore
-             }).ToList();
-         }*/
+            var stage = new Stage
+            {
+                LevelId = levelId,
+                Name = dto.Name,
+                Description = dto.Description,
+                Type = dto.Type,
+                Order = dto.Order,
+                PassingScore = dto.PassingScore,
+                IsActive = true
+            };
+
+            await _unitOfWork.StageRepository.AddAsync(stage);
+            await _unitOfWork.SaveChangesAsync();
+
+            dto.Id = stage.Id;
+            return dto;
+        }
+
+        public async Task<bool> DeleteLevelAsync(int id)
+        {
+            var level = await _unitOfWork.LevelRepository.GetByIdAsync(id);
+            if (level == null) return false;
+
+            await _unitOfWork.LevelRepository.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
 
 
 

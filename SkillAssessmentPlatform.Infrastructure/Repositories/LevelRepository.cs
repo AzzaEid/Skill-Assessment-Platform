@@ -34,24 +34,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .FirstOrDefaultAsync(l => l.Id == levelId);
         }
 
+        public async Task AddAsync(Level level)
+        {
+            await _context.Levels.AddAsync(level);
+            _context.SaveChanges();
+        }
 
-        /*    public async Task<Level> GetStageByLevelId(int levelId)
-            {
-                return await _context.Levels
-                    .Include(l => l.Stages)
-                    .FirstOrDefaultAsync(l => l.Id == levelId);
-            }
-
-
-            Task<Level> ILevelRepository.GetLevelWithStagesAsync(int levelId)
-            {
-                throw new NotImplementedException();
-            }
-
-            Task<IEnumerable<Level>> ILevelRepository.GetStagesByLevelIdAsync(int trackId)
-            {
-                throw new NotImplementedException();
-            }*/
+       
     }
 
 }

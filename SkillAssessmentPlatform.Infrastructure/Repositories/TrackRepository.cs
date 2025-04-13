@@ -23,7 +23,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
     public class TrackRepository : GenericRepository<Track>, ITrackRepository
 
     {
-        //private readonly AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public async Task<Track> GetTrackWithDetailsAsync(int trackId)
         {
@@ -88,6 +88,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
 
         public Task<Track> GetTrackWithLevelsAsync(int trackId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddAsync(Level level)
         {
             throw new NotImplementedException();
         }
