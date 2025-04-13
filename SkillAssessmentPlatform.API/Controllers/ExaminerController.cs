@@ -46,24 +46,24 @@ namespace SkillAssessmentPlatform.API.Controllers
             var updatedExaminer = await _examinerService.UpdateExaminerAsync(id, examinerDto);
             return _responseHandler.Success(updatedExaminer, "Examiner updated successfully");
         }
-        /*
+        
         [HttpGet("{examinerId}/tracks")]
         public async Task<IActionResult> GetTracks(
             string examinerId,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
-            var result = await _examinerService.GetExaminerTracksAsync(examinerId, page, pageSize);
+            var result = await _examinerService.GetExaminerTracksAsync(examinerId);
             return _responseHandler.Success(result);
         }
 
         [HttpPost("{examinerId}/tracks")]
         public async Task<IActionResult> AddTrack(
             string examinerId,
-            [FromBody] AddTrackDTO trackDto)
+            [FromBody] TrackDto trackDto)
         {
             await _examinerService.AddTrackToExaminerAsync(examinerId, trackDto);
-            return _responseHandler.Success(null, "Track added to examiner");
+            return _responseHandler.Success("Track added to examiner",null);
         }
 
         [HttpGet("{examinerId}/workload")]
@@ -72,14 +72,14 @@ namespace SkillAssessmentPlatform.API.Controllers
             var workload = await _examinerService.GetExaminerWorkloadAsync(examinerId);
             return _responseHandler.Success(workload);
         }
-        */
+        
         [HttpDelete("{examinerId}/tracks/{trackId}")]
         public async Task<IActionResult> RemoveTrack(
             string examinerId,
             int trackId)
         {
             await _examinerService.RemoveTrackFromExaminerAsync(examinerId, trackId);
-            return _responseHandler.Success(null, "Track removed from examiner");
+            return _responseHandler.Success("Track removed from examiner", null) ;
         }
     }
 

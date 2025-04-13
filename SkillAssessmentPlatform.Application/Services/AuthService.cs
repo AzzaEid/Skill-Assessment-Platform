@@ -58,7 +58,7 @@ namespace SkillAssessmentPlatform.Application.Services
             return await _unitOfWork.AuthRepository.RegisterApplicantAsync(user, dto.Password);
         }
 
-        public async Task<string> RegisterExaminerAsync(UserRegisterDTO dto)
+        public async Task<string> RegisterExaminerAsync(ExaminerRegisterDTO dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Password))
             {

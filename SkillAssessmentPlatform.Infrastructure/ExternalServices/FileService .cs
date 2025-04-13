@@ -25,6 +25,9 @@ namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("No file provided");
+            _logger.LogInformation("WebRootPath: " + _environment.WebRootPath);
+            if (string.IsNullOrEmpty(_environment.WebRootPath))
+                throw new InvalidOperationException("WebRootPath is not set. Ensure wwwroot folder exists in the project.");
 
             try
             {
@@ -43,7 +46,8 @@ namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
                 }
 
                 // Return the relative path
-                return Path.Combine(folderPath, fileName);
+                //return Path.Combine(folderPath, fileName);
+                return Path.Combine(folderPath, fileName).Replace("\\", "/");
             }
             catch (Exception ex)
             {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
+using SkillAssessmentPlatform.Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,10 +19,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IUserRepository _userRepository;
         private readonly IApplicantRepository _applicantRepository;
         private readonly IExaminerRepository _examinerRepository;
+        private readonly IExaminerLoadRepository _examinerLoadRepository;
         private readonly ITrackRepository _trackRepository;
         private readonly ILevelRepository _levelRepository;
         private readonly IStageRepository _stageRepository;
         private readonly IEvaluationCriteriaRepository _evaluationCriteriaRepository;
+        private readonly IEnrollmentRepository _enrollmentRepository;
+        private readonly ILevelProgressRepository _levelProgressRepository;
+        private readonly IStageProgressRepository _stageProgressRepository;
 
         public UnitOfWork(
             AppDbContext context,
@@ -32,17 +37,27 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             ITrackRepository trackRepository,
             ILevelRepository levelRepository,
             IStageRepository stageRepository,
-            IEvaluationCriteriaRepository evaluationCriteriaRepository)
+            IEvaluationCriteriaRepository evaluationCriteriaRepository,
+            IExaminerLoadRepository examinerLoadRepository,
+            IEnrollmentRepository enrollmentRepository,
+            ILevelProgressRepository levelProgressRepository,
+            IStageProgressRepository stageProgressRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
             _userRepository = userRepository;
             _applicantRepository = applicantRepository;
             _examinerRepository = examinerRepository;
+            _examinerLoadRepository = examinerLoadRepository;
             _trackRepository = trackRepository;
             _levelRepository = levelRepository;
             _stageRepository = stageRepository;
             _evaluationCriteriaRepository = evaluationCriteriaRepository;
+            _enrollmentRepository = enrollmentRepository;
+            _levelProgressRepository = levelProgressRepository;
+            _stageProgressRepository = stageProgressRepository;
+
+
         }
 
         // Custom Repositories exposed
@@ -50,11 +65,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IUserRepository UserRepository => _userRepository;
         public IApplicantRepository ApplicantRepository => _applicantRepository;
         public IExaminerRepository ExaminerRepository => _examinerRepository;
-
+        public IExaminerLoadRepository ExaminerLoadRepository => _examinerLoadRepository;
         public ITrackRepository TrackRepository => _trackRepository;
         public ILevelRepository LevelRepository => _levelRepository;
         public IStageRepository StageRepository => _stageRepository;
         public IEvaluationCriteriaRepository EvaluationCriteriaRepository => _evaluationCriteriaRepository;
+
+        public IEnrollmentRepository EnrollmentRepository => _enrollmentRepository;
+        public ILevelProgressRepository LevelProgressRepository => _levelProgressRepository;
+        public IStageProgressRepository StageProgressRepository => _stageProgressRepository;
+
+
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

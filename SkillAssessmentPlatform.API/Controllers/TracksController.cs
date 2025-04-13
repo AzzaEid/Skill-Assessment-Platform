@@ -24,7 +24,23 @@ public class TracksController : ControllerBase
         var track = await _trackService.GetTrackByIdAsync(id);
         return _responseHandler.Success(track);
     }
-
+    [HttpPost("structure")]
+    public async Task<IActionResult> CreateTrackStructure([FromBody] TrackStructureDTO structureDTO)
+    {
+        try
+        {
+            var result = await _trackService.CreateTrackStructureAsync(structureDTO);
+            return _responseHandler.Success<string>("Track structure created successfully");
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return _responseHandler.NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return _responseHandler.BadRequest($" errors in creating {ex.Message}");
+        }
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAllTracksAsync()

@@ -13,7 +13,7 @@ namespace SkillAssessmentPlatform.API.Common
         IActionResult Deleted();
         IActionResult Unauthorized();
         IActionResult BadRequest(string message = "Bad Request", List<string> errors = null);
-        IActionResult BadRequest(string message = "Bad Request", HttpStatusCode httpStatusCode = HttpStatusCode.BadRequest, List<string> errors = null);
+      //  IActionResult BadRequest(string message = "Bad Request", HttpStatusCode httpStatusCode = HttpStatusCode.BadRequest, List<string> errors = null);
         IActionResult NotFound(string message = "Not Found");
     }
     

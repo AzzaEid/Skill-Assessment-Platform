@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Folder Include="DependencyInjections\" />
+    <Folder Include="wwwroot\profile-images\" />
   </ItemGroup>
 
 </Project>

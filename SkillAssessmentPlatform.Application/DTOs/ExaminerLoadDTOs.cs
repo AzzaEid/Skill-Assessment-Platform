@@ -13,4 +13,16 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public int MaxWorkLoad { get; set; }
         public int CurrWorkLoad { get; set; }
     }
+    public class UpdateWorkLoadDTO
+    {
+        public int WorkLoad { get; set; }
+    }
+
+    public class CreateExaminerLoadDTO
+    {
+        public string ExaminerID { get; set; }
+        public string Type { get; set; }
+        public int MaxWorkLoad { get; set; }
+        public int CurrWorkLoad { get; set; } = 0;
+    }
 }

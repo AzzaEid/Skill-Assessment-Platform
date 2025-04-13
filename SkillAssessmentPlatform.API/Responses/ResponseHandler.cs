@@ -47,10 +47,10 @@ namespace SkillAssessmentPlatform.API.Bases
           {
               return new BadRequestObjectResult(new Response<string>(message, HttpStatusCode.BadRequest) { Errors = errors });
           }
-          public IActionResult BadRequest(string message = "Bad Request", HttpStatusCode httpStatusCode = HttpStatusCode.BadRequest, List<string> errors = null)
-          {
-              return new BadRequestObjectResult(new Response<string>(message, httpStatusCode) { Errors = errors });
-          }
+          //public IActionResult BadRequest(string message = "Bad Request", HttpStatusCode httpStatusCode = HttpStatusCode.BadRequest, List<string> errors = null)
+          //{
+            //  return new BadRequestObjectResult(new Response<string>(message, httpStatusCode) { Errors = errors });
+          //}
           public IActionResult NotFound(string message = "Not Found")
           {
               return new NotFoundObjectResult(new Response<string>(message, HttpStatusCode.NotFound));

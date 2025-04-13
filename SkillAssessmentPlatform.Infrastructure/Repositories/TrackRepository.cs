@@ -129,5 +129,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
 
         #endregion
+
+        public async Task<List<Track>> GetByExaminerIdAsync(string examinerId)
+        {
+            return await _context.Tracks
+                .Where(t => t.Examiners.Any(e=> e.Id == examinerId))  // the relation is M-M
+                .ToListAsync();
+        }
+
     }
 }

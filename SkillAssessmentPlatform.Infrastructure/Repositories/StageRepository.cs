@@ -26,6 +26,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .OrderBy(s => s.Order)
                 .ToListAsync();
         }
+        public async Task<Stage> GetFirstStageByLevelIdAsync(int levelId)
+        {
+            return await _context.Stages
+                .FirstOrDefaultAsync(s => s.LevelId == levelId && s.Order == 1);
+        }
+
     }
 
 }

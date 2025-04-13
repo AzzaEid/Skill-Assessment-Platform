@@ -20,6 +20,7 @@ using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 using SkillAssessmentPlatform.Infrastructure.Repositories;
 using System.Data;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace SkillAssessmentPlatform.API
 {
@@ -65,6 +66,10 @@ namespace SkillAssessmentPlatform.API
             builder.Services.AddScoped<ILevelRepository, LevelRepository>();
             builder.Services.AddScoped<IStageRepository, StageRepository>();
             builder.Services.AddScoped<IEvaluationCriteriaRepository, EvaluationCriteriaRepository>();
+            builder.Services.AddScoped<IExaminerLoadRepository, ExaminerLoadRepository>();
+            builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+            builder.Services.AddScoped<ILevelProgressRepository, LevelProgressRepository>();
+            builder.Services.AddScoped<IStageProgressRepository, StageProgressRepository>();
 
 
             builder.Services.AddScoped<AuthService>();
@@ -72,11 +77,15 @@ namespace SkillAssessmentPlatform.API
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<ApplicantService>();
             builder.Services.AddScoped<ExaminerService>();
+            builder.Services.AddScoped<ExaminerLoadsService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<TrackService>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddDbContext<AppDbContext>();
+            builder.Services.AddScoped<EnrollmentService>();
+            builder.Services.AddScoped<StageProgressService>();
+            builder.Services.AddScoped<LevelProgressService>();
 
+            builder.Services.AddDbContext<AppDbContext>();
+           
 
 
 
@@ -86,6 +95,11 @@ namespace SkillAssessmentPlatform.API
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddScoped<EmailServices>();
 
+            builder.Services.AddControllers()
+                            .AddJsonOptions(options =>
+                            {
+                                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

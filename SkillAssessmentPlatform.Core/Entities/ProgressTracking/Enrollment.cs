@@ -1,4 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Entities.Users;
+using SkillAssessmentPlatform.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         public string ApplicantId { get; set; }
         public int TrackId { get; set; }
         public DateTime EnrollmentDate { get; set; }
-        public string Status { get; set; }
+        public EnrollmentStatus Status { get; set; }
 
 
         public Applicant Applicant { get; set; }

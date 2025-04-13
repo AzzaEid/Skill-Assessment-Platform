@@ -1,5 +1,6 @@
 ﻿using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         public int LevelId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Type { get; set; }  // "Exam", "Task", "Interview"
+        public StageType Type { get; set; }  // "Exam", "Task", "Interview"
         public int Order { get; set; }
         public bool IsActive { get; set; }
         public int PassingScore { get; set; }

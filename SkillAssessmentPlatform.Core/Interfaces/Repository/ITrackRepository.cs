@@ -24,5 +24,6 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task AssignExaminerAsync(int trackId, string examinerId);
         Task RemoveExaminerAsync(int trackId, string examinerId);
         Task<Track> GetTrackWithLevelsAsync(int trackId);
+        Task<List<Track>> GetByExaminerIdAsync(string examinerId);
     }
 }
