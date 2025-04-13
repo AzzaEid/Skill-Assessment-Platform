@@ -1,5 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
+using SkillAssessmentPlatform.Core.Interfaces.Repository;
+using SkillAssessmentPlatform.Infrastructure.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 using System;
@@ -25,6 +35,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Where(c => c.StageId == stageId)
                 .ToListAsync();
         }
+
+        public async Task AddAsync(EvaluationCriteria evaluationCriteria)
+        {
+            await _context.EvaluationCriteria.AddAsync(evaluationCriteria);
+            _context.SaveChanges();
+        }
+
     }
+   
 
 }

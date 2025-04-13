@@ -66,6 +66,8 @@ public class Program
         builder.Services.AddSingleton<IFileService, FileService>();
         builder.Services.AddScoped<EmailServices>();
         builder.Services.AddScoped<LevelService>();
+        builder.Services.AddScoped<StageService>();
+
 
 
         builder.Services.AddAutoMapper(typeof(MappingProfile));

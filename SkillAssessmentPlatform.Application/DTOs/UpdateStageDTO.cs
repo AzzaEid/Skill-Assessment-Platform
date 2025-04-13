@@ -6,17 +6,14 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
-    public class StageDTO
+    public class UpdateStageDTO
     {
-        public int Id { get; set; }
-
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Type { get; set; } // or use Enum
+        public string Type { get; set; }  // "Task", "Exam", "Interview"
         public int Order { get; set; }
+        public int PassingScore { get; set; }
         public bool IsActive { get; set; }
-        public double PassingScore { get; set; }
-        public List<EvaluationCriteriaDTO> EvaluationCriteria { get; set; }
     }
 
 }

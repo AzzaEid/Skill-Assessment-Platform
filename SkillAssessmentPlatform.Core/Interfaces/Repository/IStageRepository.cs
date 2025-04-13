@@ -11,6 +11,9 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
     {
         Task<IEnumerable<Stage>> GetStagesByLevelIdAsync(int levelId);
         Task AddAsync(Stage stage);
+
+        Task<Stage> GetByIdWithCriteriaAsync(int stageId);
+
     }
 
 }

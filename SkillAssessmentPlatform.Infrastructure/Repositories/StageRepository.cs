@@ -33,6 +33,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             _context.SaveChanges();
         }
 
+        public async Task<Stage> GetByIdWithCriteriaAsync(int stageId)
+        {
+            return await _context.Stages
+                .Include(s => s.EvaluationCriteria)
+                .FirstOrDefaultAsync(s => s.Id == stageId);
+        }
+
         Task<IEnumerable<Stage>> IStageRepository.GetStagesByLevelIdAsync(int levelId)
         {
             throw new NotImplementedException();
