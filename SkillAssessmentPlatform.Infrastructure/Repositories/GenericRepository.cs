@@ -20,6 +20,25 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             _context = context;
             _dbSet = context.Set<T>();
         }
+        public virtual async Task<T> AddAsync(T entity)
+        {
+            try
+            {
+                var result = await _dbSet.AddAsync(entity);
+                var changes = await _context.SaveChangesAsync();
+
+                if (changes == 0)
+                {
+                    throw new Exception($"Failed to create {typeof(T).Name}");
+                }
+
+                return result.Entity;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to create {typeof(T).Name}: {ex.Message}", ex);
+            }
+        }
 
         public virtual async Task<T> GetByIdAsync(string id)
         {
@@ -34,7 +53,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public virtual async Task<int> GetCount()
+        public virtual async Task<int> GetTotalCountAsync()
         {
             return await _dbSet.CountAsync();
         }
@@ -73,9 +92,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
-        public virtual async Task<int> GetTotalCountAsync()
-        {
-            return await _dbSet.CountAsync();
-        }
+        
     }
 }

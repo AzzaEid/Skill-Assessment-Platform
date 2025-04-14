@@ -34,7 +34,7 @@ namespace SkillAssessmentPlatform.Application.Services
             //var totalCount = await _applicantRepository.CountAsync();
 
             var applicants = await _unitOfWork.ApplicantRepository.GetPagedAsync(page, pageSize);
-            var totalCount = await _unitOfWork.ApplicantRepository.GetCount();
+            var totalCount = await _unitOfWork.ApplicantRepository.GetTotalCountAsync();
             return new PagedResponse<ApplicantDTO>(
                 _mapper.Map<List<ApplicantDTO>>(applicants),
                 page,

@@ -44,6 +44,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             throw new NotImplementedException();
         }
+        public async Task<Stage> GetFirstStageByLevelIdAsync(int levelId)
+        {
+            return await _context.Stages
+                .FirstOrDefaultAsync(s => s.LevelId == levelId && s.Order == 1);
+        }
+
     }
 
 }

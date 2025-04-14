@@ -212,7 +212,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
         [HttpPost("register/examiner")]
        // [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RegisterExaminer([FromBody] UserRegisterDTO dto)
+        public async Task<IActionResult> RegisterExaminer([FromBody] ExaminerRegisterDTO dto)
         {
             if (!ModelState.IsValid)
             {

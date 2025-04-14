@@ -39,4 +39,5 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public string TrackName { get; set; }
      //   public List<LevelDTO> Levels { get; set; }
     }
+    
 }

@@ -1,4 +1,5 @@
-﻿using SkillAssessmentPlatform.Core.Entities.Users;
+﻿using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Entities.Users;
 
 namespace SkillAssessmentPlatform.Core.Entities
 {
@@ -24,3 +25,5 @@ namespace SkillAssessmentPlatform.Core.Entities
 
     }
 }
+
+

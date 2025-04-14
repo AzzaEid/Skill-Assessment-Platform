@@ -14,8 +14,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         ILevelRepository LevelRepository { get; }
         IStageRepository StageRepository { get; }
         IEvaluationCriteriaRepository EvaluationCriteriaRepository { get; }
-        Task<int> SaveChangesAsync();
-        Task<IDbContextTransaction> BeginTransactionAsync();
+        
         #region repos
         IGenericRepository<T> Repository<T>() where T : class;
         TRepository GetCustomRepository<TRepository>() where TRepository : class;
@@ -23,10 +22,16 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IUserRepository UserRepository { get; }
         IApplicantRepository ApplicantRepository { get; }
         IExaminerRepository ExaminerRepository { get; }
+         IExaminerLoadRepository ExaminerLoadRepository { get; }
+        IEnrollmentRepository EnrollmentRepository { get; }
+        ILevelProgressRepository LevelProgressRepository { get; }
+        IStageProgressRepository StageProgressRepository { get; }
         #endregion
 
         #region methods
         //  Task<IDbContextTransaction> BeginTransactionAsync();
+        Task<int> SaveChangesAsync();
+        Task<IDbContextTransaction> BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
         Task<int> CompleteAsync();

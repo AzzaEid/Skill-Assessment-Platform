@@ -14,6 +14,6 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public DateTime? DateOfBirth { get; set; }
         public string UserType { get; set; }
         public string Image { get; set; }
-        public string Gendar { get; set; }
+        public string Gender { get; set; }
     }
 }

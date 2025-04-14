@@ -59,7 +59,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
             return applicant;
         }
-
+    
         public async Task<Applicant> UpdateStatusAsync(string id, ApplicantStatus status)
         {
             var applicant = await GetByIdAsync(id);
@@ -112,7 +112,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 ApplicantId = applicantId,
                 TrackId = trackId,
                 EnrollmentDate = DateTime.Now,
-                Status = "Active"
+                Status = EnrollmentStatus.Active
             };
 
             await _context.Enrollments.AddAsync(enrollment);

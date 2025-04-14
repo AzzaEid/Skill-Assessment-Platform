@@ -12,11 +12,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
     public class LevelRepository : GenericRepository<Level>, ILevelRepository
     {
-        private readonly AppDbContext _context;
+       // private readonly AppDbContext _context;
+
 
         public LevelRepository(AppDbContext context) : base(context)
         {
-            _context = context;
+            //_context = context;
         }
 
         public async Task<IEnumerable<Level>> GetLevelsByIdAsync(int levelId)
@@ -40,7 +41,16 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             _context.SaveChanges();
         }
 
-       
+        public async Task<Level> GetFirstLevelByTrackIdAsync(int trackId)
+        {
+            return await _context.Levels
+                .FirstOrDefaultAsync(l => l.TrackId == trackId && l.Order == 1);
+        }
+
+        public Task<IEnumerable<Level>> GetLevelsByTrackIdAsync(int trackId)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

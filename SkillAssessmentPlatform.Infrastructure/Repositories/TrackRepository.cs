@@ -23,7 +23,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
     public class TrackRepository : GenericRepository<Track>, ITrackRepository
 
     {
-        private readonly AppDbContext _context;
 
         public TrackRepository(AppDbContext context) : base(context)
         {
@@ -52,7 +51,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-      
+
 
         public async Task AddAsync(Track track)
         {

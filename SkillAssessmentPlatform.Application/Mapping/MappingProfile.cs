@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.Auth;
+using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using System;
 using System.Collections.Generic;
@@ -21,13 +22,15 @@ namespace SkillAssessmentPlatform.Application.Mapping
                     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
            
             CreateMap<UserDTO, User>().ReverseMap();
+            CreateMap<ExaminerRegisterDTO, User>() .ReverseMap();
             CreateMap<Examiner,ExaminerDTO>().ReverseMap();
+            CreateMap<ExaminerLoadDTO, ExaminerLoad>() .ReverseMap();
             CreateMap<Applicant,ApplicantDTO>().ReverseMap();
-            // Examiner
-            //   CreateMap<AuthDTO, Examiner>();
+            CreateMap<UpdateExaminerDTO, Examiner>().ReverseMap();
+            /////////////test updating 
+            CreateMap<ExaminerDTO, User>() .ReverseMap();
 
-            // Applicant
-            //  CreateMap<ApplicantRegistrationDTO, Applicant>();
+            CreateMap<TrackDto, Track>() .ReverseMap();
         }
     }
 }

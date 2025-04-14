@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
-    public interface ITrackRepository
+    public interface ITrackRepository 
     {
         Task<IEnumerable<Track>> GetAllAsync();
         Task<Track> GetByIdAsync(int id);

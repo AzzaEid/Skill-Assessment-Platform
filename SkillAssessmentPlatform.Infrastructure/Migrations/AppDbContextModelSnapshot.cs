@@ -66,25 +66,25 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0a8bd976-c7a5-43cf-996f-c4c14da4ac1c",
+                            Id = "f52f0eb3-149e-49ba-b6f0-c9ffc918e3db",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "2c442c60-5fd2-4051-a706-7cd15b6ab9e5",
+                            Id = "2559a1b5-de86-4ec1-8c90-3ff00df02c70",
                             Name = "Examiner",
                             NormalizedName = "EXAMINER"
                         },
                         new
                         {
-                            Id = "e9686f29-e4e1-4def-9b1d-1722f3bf7ce3",
+                            Id = "df121f77-d94f-424a-ada3-ee873900db49",
                             Name = "SeniorExaminer",
                             NormalizedName = "SENIOREXAMINER"
                         },
                         new
                         {
-                            Id = "cce6b340-fbc8-42fd-b66d-e3a29fdd0b05",
+                            Id = "a988fe4d-de6a-4872-9470-9673ddc79b96",
                             Name = "Applicant",
                             NormalizedName = "APPLICANT"
                         });
@@ -278,9 +278,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("TrackId")
                         .HasColumnType("int");
@@ -478,9 +477,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Property<int>("PassingScore")
                         .HasColumnType("int");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -999,11 +997,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasIndex("UserId");
-
                     b.ToTable("Examiners", (string)null);
                 });
 
@@ -1408,12 +1401,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .HasForeignKey("SkillAssessmentPlatform.Core.Entities.Users.Examiner", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("SkillAssessmentPlatform.Core.Entities.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Enrollment", b =>

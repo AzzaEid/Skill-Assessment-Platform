@@ -63,13 +63,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
         public override async Task<Examiner> UpdateAsync(Examiner entity)
         {
-            //User ex = entity;
-             _context.Examiners.Update(entity);
-            //var result =  await _userManager.UpdateAsync(ex);
-            //if  (!result.Succeeded)
-            //{
-            //    throw new BadRequestException($"problem", result.Errors);
-            //}
+            var result =  await _userManager.UpdateAsync(entity);
+            if  (!result.Succeeded)   
+            {
+                throw new BadRequestException($"problem", result.Errors);
+            }
             return  await GetByIdAsync(entity.Id);
             
         }
