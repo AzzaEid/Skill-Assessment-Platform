@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkillAssessmentPlatform.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Type { get; set; }  // "Task", "Exam", "Interview"
+        public StageType Type { get; set; }  // "Task", "Exam", "Interview"
         public int Order { get; set; }
         public int PassingScore { get; set; }
         public bool IsActive { get; set; }

@@ -22,9 +22,22 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
         public virtual async Task<T> AddAsync(T entity)
         {
-            await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
-            return entity;
+            try
+            {
+                var result = await _dbSet.AddAsync(entity);
+                var changes = await _context.SaveChangesAsync();
+
+                if (changes == 0)
+                {
+                    throw new Exception($"Failed to create {typeof(T).Name}");
+                }
+
+                return result.Entity;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to create {typeof(T).Name}: {ex.Message}", ex);
+            }
         }
 
         public virtual async Task<T> GetByIdAsync(string id)

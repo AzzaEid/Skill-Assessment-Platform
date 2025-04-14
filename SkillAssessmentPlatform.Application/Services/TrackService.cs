@@ -94,7 +94,7 @@ namespace SkillAssessmentPlatform.Application.Services
                                 PassingScore = stageDTO.PassingScore
                             };
 
-                       //     await _unitOfWork.StageRepository.AddAsync(stage);
+                            await _unitOfWork.StageRepository.AddAsync(stage);
                             await _unitOfWork.SaveChangesAsync();
 
                             // إضافة معايير التقييم لكل مرحلة
@@ -108,7 +108,7 @@ namespace SkillAssessmentPlatform.Application.Services
                                     Weight = criteriaDTO.Weight
                                 };
 
-                             //   await _unitOfWork.EvaluationCriteriaRepository.AddAsync(criteria);
+                               await _unitOfWork.EvaluationCriteriaRepository.AddAsync(criteria);
                             }
                             await _unitOfWork.SaveChangesAsync();
                         }
@@ -121,10 +121,10 @@ namespace SkillAssessmentPlatform.Application.Services
                 {
                     await transaction.RollbackAsync();
                     //_logger.LogError(ex, "Error creating track structure for track ID {TrackId}", structureDTO.TrackId);
-                    throw new Exception("Failed to create track structure", ex);
+                    throw new Exception("Failed to create track structure, ", ex);
                 }
             }
-        }
+        
         } // Done
         public async Task<IEnumerable<TrackDto>> GetAllTracksAsync()
         {

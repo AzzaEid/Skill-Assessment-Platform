@@ -2,25 +2,25 @@
 
 using SkillAssessmentPlatform.Core.Enums;
 
-public class LevelDTO
+public class LevelStructureDTO
 {
     public string Name { get; set; }
     public string Description { get; set; }
     public int Order { get; set; }
-    public List<StageDTO> Stages { get; set; }
+    public List<StageStructureDTO> Stages { get; set; }
 }
 
-public class StageDTO
+public class StageStructureDTO
 {
     public string Name { get; set; }
     public string Description { get; set; }
     public StageType Type { get; set; }
     public int Order { get; set; }
     public int PassingScore { get; set; }
-    public List<EvaluationCriteriaDTO> EvaluationCriteria { get; set; }
+    public List<EvaluationStructureCriteriaDTO> EvaluationCriteria { get; set; }
 }
 
-public class EvaluationCriteriaDTO
+public class EvaluationStructureCriteriaDTO
 {
     public string Name { get; set; }
     public string Description { get; set; }

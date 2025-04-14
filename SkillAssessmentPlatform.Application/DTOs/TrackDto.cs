@@ -18,7 +18,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public bool IsActive { get; set; }
         public string Image { get; set; }
 
-        //  public List<Level> levels { get; set; } = new List<Level>();
+        // public List<Level> levels { get; set; } = new List<Level>();
         public List<LevelDto> Levels { get; set; }
 
     }
