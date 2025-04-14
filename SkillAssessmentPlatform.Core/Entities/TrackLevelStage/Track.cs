@@ -12,6 +12,8 @@ namespace SkillAssessmentPlatform.Core.Entities
         public string AssociatedSkills { get; set; }
         public bool IsActive { get; set; }
         public string Image { get; set; }
+       
+
         public DateTime CreatedAt { get; set; }
 
         // Navigation properties

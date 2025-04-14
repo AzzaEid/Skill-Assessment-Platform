@@ -106,17 +106,14 @@ public class Program
             };
         });
 
-        // ✅ Build the app only once
         var app = builder.Build();
 
-        // ✅ Use correct middleware order
         app.UseCors("AllowFrontend");
         app.UseHttpsRedirection();
         app.UseMiddleware<ErrorHandlerMiddleware>();
         app.UseAuthentication();
         app.UseAuthorization();
 
-        // ✅ Swagger only in development
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -159,11 +156,11 @@ public class Program
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminUser, Actors.Admin.ToString());
-                logger.LogInformation("✅ Admin created!");
+                logger.LogInformation(" Admin created!");
             }
             else
             {
-                logger.LogError("❌ Seed admin failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                logger.LogError(" Seed admin failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
             }
         }
     }

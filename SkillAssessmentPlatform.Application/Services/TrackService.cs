@@ -1,27 +1,26 @@
-
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Infrastructure.Data;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
     public class TrackService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFileService _fileService;
 
-        public TrackService(IUnitOfWork unitOfWork)
+        public TrackService(IUnitOfWork unitOfWork, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
+            _fileService = fileService;
         }
 
         public async Task<TrackDto> GetTrackByIdAsync(int id)
         {
             var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(id);
-          //  var levels = await _unitOfWork.LevelRepository.GetLevelsByTrackIdAsync(id);
-
             if (track == null) return null;
 
             return new TrackDto
@@ -52,7 +51,8 @@ namespace SkillAssessmentPlatform.Application.Services
                     }).ToList()
                 }).ToList()
             };
-        } // Done
+        }
+
         public async Task<IEnumerable<TrackDto>> GetAllTracksAsync()
         {
             var tracks = await _unitOfWork.TrackRepository.GetAllAsync();
@@ -69,8 +69,14 @@ namespace SkillAssessmentPlatform.Application.Services
                 Image = t.Image
             });
         }
+
         public async Task<CreateTrackDTO> CreateTrackAsync(CreateTrackDTO trackDto)
         {
+            string imagePath = "default-track.png";
+
+            if (trackDto.ImageFile != null && trackDto.ImageFile.Length > 0)
+                imagePath = await _fileService.UploadFileAsync(trackDto.ImageFile, "track-images");
+
             var track = new Track
             {
                 SeniorExaminerID = trackDto.SeniorExaminerID,
@@ -79,7 +85,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Objectives = trackDto.Objectives,
                 AssociatedSkills = trackDto.AssociatedSkills,
                 IsActive = trackDto.IsActive,
-                Image = trackDto.Image,
+                Image = imagePath,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -89,23 +95,34 @@ namespace SkillAssessmentPlatform.Application.Services
             trackDto.Id = track.Id;
             return trackDto;
         }
+
+
         public async Task<CreateTrackDTO> UpdateTrackAsync(CreateTrackDTO trackDto)
         {
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackDto.Id);
             if (track == null) return null;
 
-            track.SeniorExaminerID = trackDto.SeniorExaminerID;
             track.Name = trackDto.Name;
             track.Description = trackDto.Description;
             track.Objectives = trackDto.Objectives;
             track.AssociatedSkills = trackDto.AssociatedSkills;
+            track.SeniorExaminerID = trackDto.SeniorExaminerID;
             track.IsActive = trackDto.IsActive;
-            track.Image = trackDto.Image;
+
+            if (trackDto.ImageFile != null && trackDto.ImageFile.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(track.Image) && track.Image != "default-track.png")
+                    await _fileService.DeleteFileAsync(track.Image);
+
+                var newImagePath = await _fileService.UploadFileAsync(trackDto.ImageFile, "track-images");
+                track.Image = newImagePath;
+            }
 
             await _unitOfWork.SaveChangesAsync();
-
             return trackDto;
         }
+
+
         public async Task<bool> DeActivateTrackAsync(int id)
         {
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(id);
@@ -121,7 +138,6 @@ namespace SkillAssessmentPlatform.Application.Services
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackId);
             var level = new Level
             {
-
                 TrackId = trackId,
                 Name = dto.Name,
                 Description = dto.Description,
@@ -132,9 +148,8 @@ namespace SkillAssessmentPlatform.Application.Services
             await _unitOfWork.LevelRepository.AddAsync(level);
             await _unitOfWork.SaveChangesAsync();
 
-            dto.Id = level.Id; 
+            dto.Id = level.Id;
             return dto;
         }
-
     }
 }

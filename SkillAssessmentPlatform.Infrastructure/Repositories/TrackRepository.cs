@@ -25,25 +25,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
     {
         private readonly AppDbContext _context;
 
+        public TrackRepository(AppDbContext context) : base(context)
+        {
+            _context = context; 
+        }
+
         public async Task<Track> GetTrackWithDetailsAsync(int trackId)
         {
             return await _context.Tracks
                 .Include(t => t.Levels)
                     .ThenInclude(l => l.Stages)
-                      //  .ThenInclude(s => s.EvaluationCriteria)
                 .FirstOrDefaultAsync(t => t.Id == trackId);
         }
-
-        public TrackRepository(AppDbContext context) : base(context)
-        {
-        }
-
-        #region IGenericRepository<Track> Members
-
-    
-        #endregion
-
-        #region ITrackRepository Members
 
         public async Task<IEnumerable<Level>> GetLevelsByTrackIdAsync(int trackId)
         {
@@ -66,37 +59,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.Tracks.AddAsync(track);
             _context.SaveChanges();
         }
-
-        Task ITrackRepository.UpdateAsync(Track track)
-        {
-            return UpdateAsync(track);
-        }
-
-        Task ITrackRepository.DeleteAsync(int id)
-        {
-            return DeleteAsync(id);
-        }
-
-        public Task AssignExaminerAsync(int trackId, string examinerId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RemoveExaminerAsync(int trackId, string examinerId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Track> GetTrackWithLevelsAsync(int trackId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task AddAsync(Level level)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+      
     }
 }

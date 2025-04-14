@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.Application.Services;
 using SkillAssessmentPlatform.API.Common;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
-
-
+using SkillAssessmentPlatform.Application.DTOs;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -26,7 +23,6 @@ public class TracksController : ControllerBase
         return _responseHandler.Success(track);
     }
 
-
     [HttpGet]
     public async Task<IActionResult> GetAllTracksAsync()
     {
@@ -34,21 +30,13 @@ public class TracksController : ControllerBase
         return _responseHandler.Success(result);
     }
 
-
-
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTrackDTO dto)
-    {
-        var created = await _trackService.CreateTrackAsync(dto);
-        return _responseHandler.Created(created);
-    }
+    public async Task<IActionResult> Create([FromForm] CreateTrackDTO dto) =>
+     _responseHandler.Created(await _trackService.CreateTrackAsync(dto));
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] CreateTrackDTO dto)
-    {
-        var updated = await _trackService.UpdateTrackAsync(dto);
-        return _responseHandler.Success(updated, "Track updated successfully");
-    }
+    public async Task<IActionResult> Update([FromForm] CreateTrackDTO dto) =>
+        _responseHandler.Success(await _trackService.UpdateTrackAsync(dto), "Track updated successfully");
 
 
     [HttpDelete("{id}")]
@@ -57,7 +45,6 @@ public class TracksController : ControllerBase
         await _trackService.DeActivateTrackAsync(id);
         return _responseHandler.Deleted();
     }
-
 
     [HttpPost("{trackId}/levels")]
     public async Task<IActionResult> CreateLevel(int trackId, [FromBody] CreateLevelDTO dto)
@@ -68,7 +55,4 @@ public class TracksController : ControllerBase
 
         return _responseHandler.Success(created, "Level created successfully");
     }
-
-
-
 }
