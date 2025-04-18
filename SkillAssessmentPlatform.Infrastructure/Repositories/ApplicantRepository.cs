@@ -130,7 +130,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 {
                     EnrollmentId = enrollment.Id,
                     LevelId = firstLevel.Id,
-                    Status = "InProgress",
+                    Status = ProgressStatus.InProgress,
                     StartDate = DateTime.Now
                 };
 
@@ -146,9 +146,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                     // Create stage progress
                     var stageProgress = new StageProgress
                     {
-                        EnrollmentId = enrollment.Id,
+                        //EnrollmentId = enrollment.Id,
                         StageId = firstStage.Id,
-                        Status = "InProgress",
+                        Status = ProgressStatus.InProgress,
                         StartDate = DateTime.Now,
                         Attempts = 1
                     };

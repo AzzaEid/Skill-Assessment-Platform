@@ -31,6 +31,13 @@ namespace SkillAssessmentPlatform.Application.Mapping
             CreateMap<ExaminerDTO, User>() .ReverseMap();
 
             CreateMap<TrackDto, Track>() .ReverseMap();
+
+
+            ///tracking
+            CreateMap<Enrollment, EnrollmentDTO>() .ReverseMap();
+            CreateMap<Enrollment, EnrollmentCreateDTO>().ReverseMap();
+            CreateMap<LevelProgressDTO, LevelProgress>() .ReverseMap();
+            CreateMap<StageProgressDTO, StageProgress>() .ReverseMap();
         }
     }
 }

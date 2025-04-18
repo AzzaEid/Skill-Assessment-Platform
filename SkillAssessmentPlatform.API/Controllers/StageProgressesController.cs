@@ -33,17 +33,23 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Success(stageProgress);
         }
 
-        [HttpGet("enrollment/{enrollmentId}")]
-        public async Task<IActionResult> GetByEnrollmentId(int enrollmentId)
+        [HttpGet("level-progress/{levelprogressId}")]
+        public async Task<IActionResult> GetBylevelprogressIdd(int levelprogressId)
         {
-            var stageProgresses = await _stageProgressService.GetByEnrollmentIdAsync(enrollmentId);
+            var stageProgresses = await _stageProgressService.GetByLevelProgressIdAsync(levelprogressId);
             return _responseHandler.Success(stageProgresses);
+        }
+        [HttpGet("level-progress/{levelprogressId}/current")]
+        public async Task<IActionResult> GetCurrentStageProgress(int levelprogressId)
+        {
+            var currentStageProgress = await _stageProgressService.GetCurrentStageProgressAsync(levelprogressId);
+            return _responseHandler.Success(currentStageProgress);
         }
 
         [HttpGet("enrollment/{enrollmentId}/current")]
-        public async Task<IActionResult> GetCurrentStageProgress(int enrollmentId)
+        public async Task<IActionResult> GetCurrentStageProgressbyEnrollment(int enrollmentId)
         {
-            var currentStageProgress = await _stageProgressService.GetCurrentStageProgressAsync(enrollmentId);
+            var currentStageProgress = await _stageProgressService.GetByCurrEnrollmentIdAsync(enrollmentId);
             return _responseHandler.Success(currentStageProgress);
         }
 
@@ -91,20 +97,20 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Created(newAttempt, "New attempt created successfully");
         }
 
-        [HttpGet("enrollment/{enrollmentId}/stage/{stageId}/attempts")]
-        public async Task<IActionResult> GetAttemptCount(int enrollmentId, int stageId)
+        [HttpGet("stage/{stageId}/attempts")]
+        public async Task<IActionResult> GetAttemptCount(int stageId)
         {
-            var attemptCount = await _stageProgressService.GetAttemptCountAsync(enrollmentId, stageId);
+            var attemptCount = await _stageProgressService.GetAttemptCountAsync(stageId);
             return _responseHandler.Success(new { attemptCount });
         }
-
+        /*
         [HttpPost("enrollment/{enrollmentId}/stage/{currentStageId}/next")]
         public async Task<IActionResult> CreateNextStageProgress(int enrollmentId, int currentStageId)
         {
             var nextStageProgress = await _stageProgressService.CreateNextStageProgressAsync(enrollmentId, currentStageId);
             return _responseHandler.Created(nextStageProgress, "Next stage progress created successfully");
         }
-
+        /*/
         [HttpPut("{id}/examiner")]
         public async Task<IActionResult> AssignExaminer(
             int id,

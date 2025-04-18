@@ -10,6 +10,6 @@ namespace SkillAssessmentPlatform.Core.Enums
     {
         Active,
         Completed,
-        Dropped
+        Dropped 
     }
 }

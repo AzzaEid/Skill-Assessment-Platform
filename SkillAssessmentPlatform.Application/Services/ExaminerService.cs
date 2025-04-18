@@ -85,11 +85,10 @@ namespace SkillAssessmentPlatform.Application.Services
             return _mapper.Map<List<TrackDto>>(tracks);
             
         }
-        // + dto have to change to AddTrackdto
-        public async Task<bool> AddTrackToExaminerAsync(string examinerId, TrackDto trackDto)
+        public async Task<bool> AddTrackToExaminerAsync(string examinerId, int trackId)
         {
             var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(examinerId);
-            var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackDto.Id);
+            var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackId);
 
             examiner.WorkingTracks.Add(track);
             await _unitOfWork.ExaminerRepository.UpdateAsync(examiner);

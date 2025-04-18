@@ -8,7 +8,7 @@ namespace SkillAssessmentPlatform.Core.Entities.Users
 {
     public enum Actors
     {
-         Admin ,
+         Admin,
          Examiner,
          Applicant ,
          SeniorExaminer 

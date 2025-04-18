@@ -20,9 +20,9 @@ namespace SkillAssessmentPlatform.Core.Entities
         public int Order { get; set; }
         public bool IsActive { get; set; }
         public int PassingScore { get; set; }
+        public int NoOfattempts { get; set; } = 3;
 
         // Navigation properties
-        [JsonIgnore]
         public Level Level { get; set; }
         public ICollection<EvaluationCriteria> EvaluationCriteria { get; set; }
         public ICollection<StageProgress> StageProgresses { get; set; }

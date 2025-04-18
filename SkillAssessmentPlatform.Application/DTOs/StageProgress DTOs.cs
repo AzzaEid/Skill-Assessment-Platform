@@ -10,11 +10,11 @@ namespace SkillAssessmentPlatform.Application.DTOs
     public class StageProgressDTO
     {
         public int Id { get; set; }
-        public int EnrollmentId { get; set; }
+        public int LevelProgressId { get; set; }
         public int StageId { get; set; }
         public string StageName { get; set; }
         public StageType StageType { get; set; }
-        public string Status { get; set; }
+        public ProgressStatus Status { get; set; }
         public int Score { get; set; }
         public string ExaminerId { get; set; }
         public DateTime StartDate { get; set; }
@@ -24,7 +24,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
 
     public class UpdateStageStatusDTO
     {
-        public string Status { get; set; }
+        public ProgressStatus Status { get; set; }
         public int Score { get; set; }
     }
 

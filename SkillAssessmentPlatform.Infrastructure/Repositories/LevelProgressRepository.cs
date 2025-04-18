@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 using System;
@@ -33,12 +34,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<LevelProgress> GetCurrentLevelProgressAsync(int enrollmentId)
         {
             return await _context.LevelProgresses
-                .Where(lp => lp.EnrollmentId == enrollmentId && lp.Status == "InProgress")
+                .Where(lp => lp.EnrollmentId == enrollmentId && lp.Status == ProgressStatus.InProgress)
                 .Include(lp => lp.Level)
                 .FirstOrDefaultAsync();
         }
-
-        public async Task<LevelProgress> UpdateStatusAsync(int levelProgressId, string status)
+        public async Task<IEnumerable<LevelProgress>> GetCompletedLevelsByEnrollmentIdAsync(int enrollmentId)
+        {
+            return await _context.LevelProgresses
+                .Where(sp => sp.EnrollmentId == enrollmentId && sp.Status == ProgressStatus.Successful)
+                .Include(sp => sp.Level)
+                .ToListAsync();
+        }
+        public async Task<LevelProgress> UpdateStatusAsync(int levelProgressId, ProgressStatus status)
         {
             var levelProgress = await _context.LevelProgresses.FindAsync(levelProgressId);
 
@@ -47,13 +54,22 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
             levelProgress.Status = status;
 
-            if (status == "Successful" || status == "Failed")
+            if (status == ProgressStatus.Successful || status == ProgressStatus.Failed)
                 levelProgress.CompletionDate = DateTime.Now;
 
             _context.LevelProgresses.Update(levelProgress);
             await _context.SaveChangesAsync();
 
             return levelProgress;
+        }
+        public async Task<LevelProgress> GetLatestActiveLPAsync(string applicantId)
+        {
+            
+            return await _context.LevelProgresses
+                .Where(e => e.Enrollment.ApplicantId == applicantId && e.Status == ProgressStatus.InProgress)
+                .Include(e => e.Level)
+                .OrderByDescending(e => e.StartDate)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<LevelProgress> CreateNextLevelProgressAsync(int enrollmentId, int currentLevelId)
@@ -76,7 +92,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             {
                 EnrollmentId = enrollmentId,
                 LevelId = nextLevel.Id,
-                Status = "InProgress",
+                Status = ProgressStatus.InProgress,
                 StartDate = DateTime.Now
             };
 
@@ -93,9 +109,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 // Create progress for the first stage
                 var stageProgress = new StageProgress
                 {
-                    EnrollmentId = enrollmentId,
+                    //EnrollmentId = enrollmentId,
                     StageId = firstStage.Id,
-                    Status = "InProgress",
+                    Status = ProgressStatus.InProgress ,
                     StartDate = DateTime.Now,
                     Attempts = 1
                 };

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
-    public class StageProgressRepository : GenericRepository<StageProgress>, IStageProgressRepository
+    public class StageProgressRepository : GenericRepository<StageProgress> , IStageProgressRepository
     {
         private readonly ILogger<StageProgressRepository> _logger;
 
@@ -23,23 +24,30 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             _logger = logger;
         }
 
-        public async Task<IEnumerable<StageProgress>> GetByEnrollmentIdAsync(int enrollmentId)
+        public async Task<IEnumerable<StageProgress>> GetByLevelProgressIdAsync(int levelProgressId)
         {
             return await _context.StageProgresses
-                .Where(sp => sp.EnrollmentId == enrollmentId)
+                .Where(sp => sp.LevelProgressId == levelProgressId)
                 .Include(sp => sp.Stage)
                 .ToListAsync();
         }
 
-        public async Task<StageProgress> GetCurrentStageProgressAsync(int enrollmentId)
+        public async Task<StageProgress> GetCurrentStageProgressAsync(int levelProgressId)
         {
             return await _context.StageProgresses
-                .Where(sp => sp.EnrollmentId == enrollmentId && sp.Status == "InProgress")
+                .Where(sp => sp.LevelProgressId == levelProgressId && sp.Status ==ProgressStatus.InProgress)
+                .Include(sp => sp.Stage)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<StageProgress> GetCurrentStageProgressByEnrollmentAsync(int enrollmentId)
+        {
+            return await _context.StageProgresses
+                .Where(sp => sp.LevelProgress.EnrollmentId == enrollmentId && sp.Status == ProgressStatus.InProgress)
                 .Include(sp => sp.Stage)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<StageProgress> UpdateStatusAsync(int stageProgressId, string status, int score = 0)
+        public async Task<StageProgress> UpdateStatusAsync(int stageProgressId, ProgressStatus status, int score = 0)
         {
             var stageProgress = await _context.StageProgresses.FindAsync(stageProgressId);
 
@@ -49,7 +57,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             stageProgress.Status = status;
             stageProgress.Score = score;
 
-            if (status == "Successful" || status == "Failed")
+            if (status == ProgressStatus.Successful || status == ProgressStatus.Failed)
                 stageProgress.CompletionDate = DateTime.Now;
 
             _context.StageProgresses.Update(stageProgress);
@@ -73,7 +81,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return stageProgress;
         }
 
-        public async Task<StageProgress> CreateNextStageProgressAsync(int enrollmentId, int currentStageId)
+        public async Task<StageProgress> CreateNextStageProgressAsync(int levelProgressId, int currentStageId,string freeExaminerId)
         {
             // Get the current stage
             var currentStage = await _context.Stages.FindAsync(currentStageId);
@@ -91,11 +99,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             // Create progress for the next stage
             var stageProgress = new StageProgress
             {
-                EnrollmentId = enrollmentId,
+                LevelProgressId = levelProgressId,
                 StageId = nextStage.Id,
-                Status = "InProgress",
+                Status = ProgressStatus.InProgress,
                 StartDate = DateTime.Now,
-                Attempts = 1
+                Attempts = 1,
+                ExaminerId = freeExaminerId
             };
 
             await _context.StageProgresses.AddAsync(stageProgress);
@@ -104,30 +113,31 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return stageProgress;
         }
 
-        public async Task<int> GetAttemptCountAsync(int enrollmentId, int stageId)
+        public async Task<int> GetAttemptCountAsync( int stageId)
         {
             return await _context.StageProgresses
-                .CountAsync(sp => sp.EnrollmentId == enrollmentId && sp.StageId == stageId);
+                .CountAsync(sp => sp.StageId == stageId);
         }
-
-        public async Task<StageProgress> CreateNewAttemptAsync(int enrollmentId, int stageId)
+        public async Task<int> GetLevelProgressIdofStageAsync(int stageId)
         {
-            // Check if there is an existing attempt in progress
-            var existingAttempt = await _context.StageProgresses
-                .FirstOrDefaultAsync(sp => sp.EnrollmentId == enrollmentId && sp.StageId == stageId && sp.Status == "InProgress");
+            var sp =  await _context.StageProgresses
+               .Where(sp => sp.StageId == stageId).FirstAsync();
+            return sp.LevelProgressId;
+        }
+        public async Task<StageProgress> CreateNewAttemptAsync(int levelProgressId, int stageId, string freeExaminerId)
+        {
+     
 
-            if (existingAttempt != null)
-                throw new BadRequestException("There is already an attempt in progress for this stage");
-
-            var attemptCount = await GetAttemptCountAsync(enrollmentId, stageId);
+            var attemptCount = await GetAttemptCountAsync(stageId);
 
             var stageProgress = new StageProgress
             {
-                EnrollmentId = enrollmentId,
+                LevelProgressId = levelProgressId,
                 StageId = stageId,
-                Status = "InProgress",
+                Status = ProgressStatus.InProgress,
                 StartDate = DateTime.Now,
-                Attempts = attemptCount + 1
+                Attempts = attemptCount + 1,
+                ExaminerId = freeExaminerId
             };
 
             await _context.StageProgresses.AddAsync(stageProgress);
@@ -135,10 +145,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
             return stageProgress;
         }
-        public async Task<IEnumerable<StageProgress>> GetCompletedStagesByEnrollmentIdAsync(int enrollmentId)
+        public async Task<IEnumerable<StageProgress>> GetCompletedStagesLPIdAsync(int levelProgress)
         {
             return await _context.StageProgresses
-                .Where(sp => sp.EnrollmentId == enrollmentId && sp.Status == "Successful")
+                .Where(sp => sp.LevelProgressId == levelProgress && sp.Status == ProgressStatus.Successful)
                 .Include(sp => sp.Stage)
                 .ToListAsync();
         }
@@ -146,10 +156,20 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<IEnumerable<StageProgress>> GetFailedStagesByEnrollmentIdAsync(int enrollmentId)
         {
             return await _context.StageProgresses
-                .Where(sp => sp.EnrollmentId == enrollmentId && sp.Status == "Failed")
+                .Where(sp => sp.LevelProgress.EnrollmentId == enrollmentId && sp.Status == ProgressStatus.Failed)
                 .Include(sp => sp.Stage)
                 .ToListAsync();
         }
+        public async Task<StageProgress> GetLatestSPinLPAsync(int levelProgressId)
+        {
+            return await _context.StageProgresses
+                .Where(sp => sp.LevelProgressId == levelProgressId )
+                .Include(sp => sp.Stage)
+                .OrderByDescending(e => e.StartDate)
+                .FirstOrDefaultAsync();
+        }
+
+
     }
 }
     

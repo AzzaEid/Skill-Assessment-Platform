@@ -6,12 +6,7 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
-    public class TrackStructureDTO
-    {
-        public int TrackId { get; set; }
-        public List<LevelCreateDTO> Levels { get; set; }
-    }
-
+   
     public class LevelCreateDTO
     {
         public string Name { get; set; }

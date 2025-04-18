@@ -151,8 +151,8 @@ namespace SkillAssessmentPlatform.Application.Services
                 Description = trackDto.Description,
                 Objectives = trackDto.Objectives,
                 AssociatedSkills = trackDto.AssociatedSkills,
-                IsActive = trackDto.IsActive,
-                Image = trackDto.Image,
+                //IsActive = trackDto.IsActive,
+               // Image = trackDto.Image,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -173,7 +173,7 @@ namespace SkillAssessmentPlatform.Application.Services
             track.Objectives = trackDto.Objectives;
             track.AssociatedSkills = trackDto.AssociatedSkills;
             track.IsActive = trackDto.IsActive;
-            track.Image = trackDto.Image;
+          //  track.Image = trackDto.Image;
 
             await _unitOfWork.SaveChangesAsync();
 

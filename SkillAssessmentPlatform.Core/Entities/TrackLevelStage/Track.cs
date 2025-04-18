@@ -12,8 +12,8 @@ namespace SkillAssessmentPlatform.Core.Entities
         public string Objectives { get; set; }
         public string AssociatedSkills { get; set; }
         public bool IsActive { get; set; }
-        public string Image { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public string? Image { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         // Navigation properties
         public Examiner SeniorExaminer { get; set; }

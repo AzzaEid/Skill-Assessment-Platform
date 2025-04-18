@@ -1,4 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
+using SkillAssessmentPlatform.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         public int Id { get; set; }
         public int EnrollmentId { get; set; }
         public int LevelId { get; set; }
-        public string Status { get; set; } 
+        public ProgressStatus Status { get; set; } 
         public DateTime StartDate { get; set; }
         public DateTime CompletionDate { get; set; }
 

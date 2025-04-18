@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -45,17 +48,33 @@ namespace SkillAssessmentPlatform.Application.Services
             var levelProgress = await _unitOfWork.LevelProgressRepository.UpdateStatusAsync(levelProgressId, updateDto.Status);
 
             // If level completed successfully, create progress for next level
-            if (updateDto.Status == "Successful")
+            if (updateDto.Status == ProgressStatus.Successful)
             {
-                await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
+                var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
                     levelProgress.EnrollmentId,
                     levelProgress.LevelId);
+                if (result == null)  //// No next level, track completed
+                {
+                    await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
+                    /* >>> ---
+                     * / Create certificate 
+                    var certificate = new Certificate
+                    {
+                        ApplicantId = enrollment.ApplicantId,
+                        LevelProgressID = levelProgress.Id,
+                        IssueDate = DateTime.UtcNow,
+                        VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
+                    };
+
+                    await _context.Certificates.AddAsync(certificate);
+                    /*/
+                }
             }
 
             return _mapper.Map<LevelProgressDTO>(levelProgress);
         }
-
-        public async Task<IEnumerable<LevelProgressDTO>> GetByApplicantIdAsync(string applicantId)
+        
+    public async Task<IEnumerable<LevelProgressDTO>> GetByApplicantIdAsync(string applicantId)
         {
             // Get all enrollments for this applicant
             var enrollments = await _unitOfWork.EnrollmentRepository.GetByApplicantIdAsync(applicantId);

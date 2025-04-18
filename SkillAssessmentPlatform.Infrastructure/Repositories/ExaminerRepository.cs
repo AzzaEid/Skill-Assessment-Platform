@@ -159,6 +159,22 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return true;
         }
 
+        public async Task<string?> GetAvailableExaminerAsync(StageType stageType)
+        {
+            return await _context.Examiners
+                .Where(e => _context.ExaminerLoads
+                    .Any(l => l.ExaminerID == e.Id &&
+                              l.Type == stageType &&
+                              l.CurrWorkLoad < l.MaxWorkLoad))
+                .OrderBy(e => _context.ExaminerLoads
+                    .Where(l => l.ExaminerID == e.Id && l.Type == stageType)
+                    .Select(l => l.CurrWorkLoad)
+                    .FirstOrDefault())
+                .Select(e => e.Id)
+                .FirstOrDefaultAsync();
+        }
+
+
     }
-   
+
 }

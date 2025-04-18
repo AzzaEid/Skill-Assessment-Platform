@@ -15,11 +15,11 @@ namespace SkillAssessmentPlatform.Core.Entities.Users
         // Navigation properties
         //public User User { get; set; }
         public ICollection<ExaminerLoad> ExaminerLoads { get; set; }
-        public ICollection<Track> ManagedTracks { get; set; }
-        public ICollection<Track> WorkingTracks { get; set; }
-        public ICollection<StageProgress> SupervisedStages { get; set; }
-        public ICollection<Appointment> Appointments { get; set; }
-        public ICollection<Feedback> Feedbacks { get; set; }
+        public ICollection<Track> ManagedTracks { get; set; } = new HashSet<Track>();
+        public ICollection<Track> WorkingTracks { get; set; } = new HashSet<Track>();
+        public ICollection<StageProgress> SupervisedStages { get; set; } = new HashSet<StageProgress>();
+        public ICollection<Appointment> Appointments { get; set; } = new HashSet<Appointment>();
+        public ICollection<Feedback> Feedbacks { get; set; } = new HashSet<Feedback>();
     }
 
 }

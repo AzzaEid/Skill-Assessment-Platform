@@ -117,22 +117,34 @@ public class Program
 
 
         builder.Services.AddAutoMapper(typeof(MappingProfile));
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+       
 
 
         // CORS setup for HTTPS frontend
+        //builder.Services.AddCors(options =>
+        //{
+        //    options.AddPolicy("AllowFrontend", policy =>
+        //    {
+        //        policy.WithOrigins("https://localhost:7160")
+        //              .AllowAnyHeader()
+        //              .AllowAnyMethod();
+        //    });
+        //});
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("AllowFrontend", policy =>
+            options.AddPolicy("AllowAll", policy =>
             {
-                policy.WithOrigins("https://localhost:7160")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod();
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
             });
         });
 
-        // ✅ Move Authentication before Build
+        //  Move Authentication before Build
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -152,11 +164,11 @@ public class Program
             };
         });
 
-        // ✅ Build the app only once
+        //  Build the app only once
         var app = builder.Build();
-
-        // ✅ Use correct middleware order
-        app.UseCors("AllowFrontend");
+        app.UseCors("AllowAll");
+        //  Use correct middleware order
+    //    app.UseCors("AllowFrontend");
         app.UseHttpsRedirection();
         app.UseMiddleware<ErrorHandlerMiddleware>();
         app.UseAuthentication();
@@ -205,11 +217,11 @@ public class Program
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminUser, Actors.Admin.ToString());
-                logger.LogInformation("✅ Admin created!");
+                logger.LogInformation("Admin created!");
             }
             else
             {
-                logger.LogError("❌ Seed admin failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                logger.LogError("Seed admin failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
             }
         }
     }

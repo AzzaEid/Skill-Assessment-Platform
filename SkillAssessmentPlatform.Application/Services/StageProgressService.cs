@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
 using System;
@@ -7,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -26,23 +29,57 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<StageProgressDTO> GetByIdAsync(int id)
         {
             var stageProgress = await _unitOfWork.StageProgressRepository.GetByIdAsync(id);
+            if (stageProgress == null)
+            {
+                throw new KeyNotFoundException($"KeyNotFoundException : There is no stage progress with id = {id} ");
+            }
             return _mapper.Map<StageProgressDTO>(stageProgress);
         }
 
-        public async Task<IEnumerable<StageProgressDTO>> GetByEnrollmentIdAsync(int enrollmentId)
+        public async Task<IEnumerable<StageProgressDTO>> GetByLevelProgressIdAsync(int levelprogressId)
         {
-            var stageProgresses = await _unitOfWork.StageProgressRepository.GetByEnrollmentIdAsync(enrollmentId);
+            var stageProgresses = await _unitOfWork.StageProgressRepository.GetByLevelProgressIdAsync(levelprogressId);
+            if (stageProgresses == null)
+            {
+                throw new KeyNotFoundException($"There is no stage progresses in level with id = {levelprogressId} ");
+            }
             return _mapper.Map<IEnumerable<StageProgressDTO>>(stageProgresses);
         }
-
-        public async Task<StageProgressDTO> GetCurrentStageProgressAsync(int enrollmentId)
+        public async Task<StageProgressDTO> GetByCurrEnrollmentIdAsync(int enrollmentId)
         {
-            var stageProgress = await _unitOfWork.StageProgressRepository.GetCurrentStageProgressAsync(enrollmentId);
-            return _mapper.Map<StageProgressDTO>(stageProgress);
+            var stageProgresses = await _unitOfWork.StageProgressRepository.GetCurrentStageProgressByEnrollmentAsync(enrollmentId);
+            if (stageProgresses == null)
+            {
+                throw new KeyNotFoundException($"There is no stage progresses in level with id = {enrollmentId} ");
+            }
+            return _mapper.Map<StageProgressDTO>(stageProgresses);
         }
 
+        public async Task<StageProgressDTO> GetCurrentStageProgressAsync(int levelprogressId)
+        {
+            var stageProgress = await _unitOfWork.StageProgressRepository.GetCurrentStageProgressAsync(levelprogressId);
+            if(stageProgress == null)
+            {
+                throw new KeyNotFoundException($"There is no <In progress> stage in level with id = {levelprogressId} ");
+            }
+            return _mapper.Map<StageProgressDTO>(stageProgress);
+        }
+        //==> this method may be it can be combined with other endpoint (after examiner give thw applicant score)
         public async Task<StageProgressDTO> UpdateStatusAsync(int stageProgressId, UpdateStageStatusDTO updateDto)
         {
+            var stagePById = await _unitOfWork.StageProgressRepository.GetByIdAsync(stageProgressId);
+            var latestStage = await _unitOfWork.StageProgressRepository.GetLatestSPinLPAsync(stagePById.LevelProgressId);
+            
+            if (stagePById.Status != ProgressStatus.InProgress)
+            {
+                throw new BadRequestException($"can not update this stage progress status");
+            }
+            
+            if (latestStage.Id != stageProgressId) 
+            {
+                throw new BadRequestException($"can not update this stage progress, it's not the latest ");
+            }
+
             var stageProgress = await _unitOfWork.StageProgressRepository.UpdateStatusAsync(
                 stageProgressId,
                 updateDto.Status,
@@ -51,28 +88,52 @@ namespace SkillAssessmentPlatform.Application.Services
             var stage = await _unitOfWork.StageRepository.GetByIdAsync(stageProgress.StageId);
 
             // If stage completed successfully and score meets passing criteria
-            if (updateDto.Status == "Successful" && updateDto.Score >= stage.PassingScore)
+            if (updateDto.Status == ProgressStatus.Successful && updateDto.Score >= stage.PassingScore)
             {
-                // Create progress for next stage
-                var nextStageProgress = await _unitOfWork.StageProgressRepository.CreateNextStageProgressAsync(
-                    stageProgress.EnrollmentId,
-                    stageProgress.StageId);
+                var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(stage.Type);
+                if (freeExaminerId == null)
+                    throw new InvalidOperationException("No available examiner found for this stage");
 
+                //Create progress for next stage
+                var nextStageProgress = await _unitOfWork.StageProgressRepository.CreateNextStageProgressAsync(
+                    stageProgress.LevelProgressId,
+                    stageProgress.StageId,
+                    freeExaminerId); 
+               
                 // If no next stage, level is completed
                 if (nextStageProgress == null)
                 {
-                    // Get current level progress
-                    var levelProgress = await _unitOfWork.LevelProgressRepository.GetCurrentLevelProgressAsync(stageProgress.EnrollmentId);
+                    //Update level status to successful
+                    var levelProgressId = stageProgress.LevelProgressId;
+                    var levelProgress = await _unitOfWork.LevelProgressRepository.GetByIdAsync(levelProgressId);
+                    await _unitOfWork.LevelProgressRepository.UpdateStatusAsync(levelProgressId, ProgressStatus.Successful);
 
-                    // Update level status to successful
-                    await _unitOfWork.LevelProgressRepository.UpdateStatusAsync(levelProgress.Id, "Successful");
+                    // add next level in level progress
+                   var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
+                   levelProgress.EnrollmentId,
+                   levelProgress.LevelId);
+                   if (result == null)  //// No next level, track completed
+                   {
+                        await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
+                        /* >>> ---
+                         * / Create certificate 
+                        var certificate = new Certificate
+                        {
+                            ApplicantId = enrollment.ApplicantId,
+                            LevelProgressID = levelProgress.Id,
+                            IssueDate = DateTime.UtcNow,
+                            VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
+                        };
+
+                        await _context.Certificates.AddAsync(certificate);
+                        /*/
+                   }
+
                 }
             }
-            // If stage failed but retries are possible
-            else if (updateDto.Status == "Failed")
+            else if (updateDto.Status == ProgressStatus.Failed)
             {
-                // Can create a new attempt if needed
-                // This would depend on business rules
+               
             }
 
             return _mapper.Map<StageProgressDTO>(stageProgress);
@@ -125,15 +186,41 @@ namespace SkillAssessmentPlatform.Application.Services
             if (enrollment == null)
                 throw new BadRequestException("No active enrollment found for the applicant");
 
+            var levelprogress = await _unitOfWork.LevelProgressRepository
+                .GetCurrentLevelProgressAsync(enrollment.Id);
+            if (levelprogress == null)
+                throw new BadRequestException("No active level found for the applicant");
+
             var currentStage = await _unitOfWork.StageProgressRepository
-                .GetCurrentStageProgressAsync(enrollment.Id);
+                .GetCurrentStageProgressAsync(levelprogress.Id);
 
             if (currentStage == null)
                 throw new BadRequestException("No current stage progress found for the enrollment");
 
             return _mapper.Map<StageProgressDTO>(currentStage);
         }
+        public async Task<IEnumerable<StageProgressDTO>> GetByApplicantIdAsync(string applicantId)
+        {
+            var enrollments = await _unitOfWork.EnrollmentRepository
+                .GetByApplicantIdAsync(applicantId);
 
+            var result = new List<StageProgressDTO>();
+
+            foreach (var enrollment in enrollments)
+            {
+                var levels = await _unitOfWork.LevelProgressRepository.GetByEnrollmentIdAsync(enrollment.Id);
+
+                foreach (var lp in levels)
+                {
+                    var progresses = await _unitOfWork.StageProgressRepository
+                    .GetByLevelProgressIdAsync(lp.Id);
+
+                    result.AddRange(_mapper.Map<IEnumerable<StageProgressDTO>>(progresses));
+                }
+            }
+
+            return result;
+        }
         public async Task<IEnumerable<StageProgressDTO>> GetCompletedStagesAsync(string applicantId)
         {
             var enrollments = await _unitOfWork.EnrollmentRepository
@@ -143,10 +230,16 @@ namespace SkillAssessmentPlatform.Application.Services
 
             foreach (var enrollment in enrollments)
             {
-                var completedStages = await _unitOfWork.StageProgressRepository
-                    .GetCompletedStagesByEnrollmentIdAsync(enrollment.Id);
+                var levels = await _unitOfWork.LevelProgressRepository.GetCompletedLevelsByEnrollmentIdAsync(enrollment.Id);
 
-                result.AddRange(_mapper.Map<IEnumerable<StageProgressDTO>>(completedStages));
+                foreach (var lp in levels)
+                {
+                    var completedStages = await _unitOfWork.StageProgressRepository
+                    .GetCompletedStagesLPIdAsync(lp.Id);
+                    result.AddRange(_mapper.Map<IEnumerable<StageProgressDTO>>(completedStages));
+
+                }
+               
             }
 
             return result;
@@ -169,8 +262,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return result;
         }
-
-        // الدوال الجديدة المكملة
+        /*
         public async Task<StageProgressDTO> CreateNextStageProgressAsync(int enrollmentId, int currentStageId)
         {
             var nextStageProgress = await _unitOfWork.StageProgressRepository
@@ -181,11 +273,11 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<StageProgressDTO>(nextStageProgress);
         }
-
-        public async Task<int> GetAttemptCountAsync(int enrollmentId, int stageId)
+        */
+        public async Task<int> GetAttemptCountAsync( int stageId)
         {
             return await _unitOfWork.StageProgressRepository
-                .GetAttemptCountAsync(enrollmentId, stageId);
+                .GetAttemptCountAsync(stageId);
         }
 
         public async Task<StageProgressDTO> CreateNewAttemptAsync(int enrollmentId, int stageId)
@@ -197,40 +289,30 @@ namespace SkillAssessmentPlatform.Application.Services
             if (stage == null || enrollment == null)
                 throw new KeyNotFoundException("Enrollment or Stage not found");
 
-            // التحقق من أن المرحلة تسمح بمحاولات متعددة
-          //  if (!stage.AllowMultipleAttempts)
-           //     throw new BusinessException("This stage does not allow multiple attempts");
+            // check the no. of allowed attempts and existed attempts
+            var attempts = await _unitOfWork.StageProgressRepository.GetAttemptCountAsync(stageId);
+            if (stage.NoOfattempts <= attempts)
+                throw new BadRequestException("This stage does not allow more attempts");
 
             // التحقق من عدم وجود محاولة قيد التقدم
             var existingAttempt = await _unitOfWork.StageProgressRepository
-                .GetCurrentStageProgressAsync(enrollmentId);
-
+                .GetCurrentStageProgressByEnrollmentAsync(enrollmentId);
+            
             if (existingAttempt != null && existingAttempt.StageId == stageId)
                 throw new BadRequestException("There is already an active attempt for this stage");
+            
+            var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(stage.Type);
+            if (freeExaminerId == null)
+                throw new InvalidOperationException("No available examiner found for this stage");
 
+            // get level progress ID 
+            var levelProgressId = await _unitOfWork.StageProgressRepository.GetLevelProgressIdofStageAsync(stage.Id);
+           
             var newAttempt = await _unitOfWork.StageProgressRepository
-                .CreateNewAttemptAsync(enrollmentId, stageId);
+                .CreateNewAttemptAsync(levelProgressId, stageId, freeExaminerId);
 
             return _mapper.Map<StageProgressDTO>(newAttempt);
         }
 
-        public async Task<IEnumerable<StageProgressDTO>> GetByApplicantIdAsync(string applicantId)
-        {
-            var enrollments = await _unitOfWork.EnrollmentRepository
-                .GetByApplicantIdAsync(applicantId);
-
-            var result = new List<StageProgressDTO>();
-
-            foreach (var enrollment in enrollments)
-            {
-                var progresses = await _unitOfWork.StageProgressRepository
-                    .GetByEnrollmentIdAsync(enrollment.Id);
-
-                result.AddRange(_mapper.Map<IEnumerable<StageProgressDTO>>(progresses));
-            }
-
-            return result;
-        }
-      
 }
 }

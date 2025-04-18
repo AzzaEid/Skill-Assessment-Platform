@@ -17,6 +17,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public int Order { get; set; }
         public bool IsActive { get; set; }
         public double PassingScore { get; set; }
+        public int NoOfattempts { get; set; } 
         public List<EvaluationCriteriaDTO> EvaluationCriteria { get; set; }
     }
 

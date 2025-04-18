@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Core.Enums
 {
-    public enum StageType
+    public enum ProgressStatus
     {
-        Exam, 
-        Interview,
-        Task  
+        InProgress,
+        Successful,
+        Failed 
     }
 }

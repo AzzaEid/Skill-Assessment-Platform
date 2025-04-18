@@ -57,13 +57,13 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Success(result);
         }
 
-        [HttpPost("{examinerId}/tracks")]
+        [HttpPost("{examinerId}/tracks/{trackId}")]
         public async Task<IActionResult> AddTrack(
             string examinerId,
-            [FromBody] TrackDto trackDto)
+            int trackId)
         {
-            await _examinerService.AddTrackToExaminerAsync(examinerId, trackDto);
-            return _responseHandler.Success("Track added to examiner",null);
+            await _examinerService.AddTrackToExaminerAsync(examinerId, trackId);
+            return _responseHandler.Success<string>(null,"Track added to examiner");
         }
 
         [HttpGet("{examinerId}/workload")]
@@ -79,7 +79,7 @@ namespace SkillAssessmentPlatform.API.Controllers
             int trackId)
         {
             await _examinerService.RemoveTrackFromExaminerAsync(examinerId, trackId);
-            return _responseHandler.Success("Track removed from examiner", null) ;
+            return _responseHandler.Success<string>(null, "Track removed from examiner") ;
         }
     }
 

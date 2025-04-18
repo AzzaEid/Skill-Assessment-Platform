@@ -14,6 +14,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public StageType Type { get; set; }  // "Task", "Exam", "Interview"
         public int Order { get; set; }
         public int PassingScore { get; set; }
+        public int NoOfattempts { get; set; } = 0;
         public bool IsActive { get; set; }
     }
 

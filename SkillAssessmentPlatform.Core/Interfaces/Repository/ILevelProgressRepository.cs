@@ -1,4 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,9 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
     {
         Task<IEnumerable<LevelProgress>> GetByEnrollmentIdAsync(int enrollmentId);
         Task<LevelProgress> GetCurrentLevelProgressAsync(int enrollmentId);
-        Task<LevelProgress> UpdateStatusAsync(int levelProgressId, string status);
+        Task<LevelProgress> UpdateStatusAsync(int levelProgressId, ProgressStatus status);
         Task<LevelProgress> CreateNextLevelProgressAsync(int enrollmentId, int currentLevelId);
+        Task<LevelProgress> GetLatestActiveLPAsync(string applicantId);
+        Task<IEnumerable<LevelProgress>> GetCompletedLevelsByEnrollmentIdAsync(int enrollmentId);
     }
 }
