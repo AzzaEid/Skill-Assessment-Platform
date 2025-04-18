@@ -174,7 +174,6 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        // ✅ Swagger only in development
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
