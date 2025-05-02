@@ -17,11 +17,5 @@ namespace SkillAssessmentPlatform.API.Common
         IActionResult NotFound(string message = "Not Found");
     }
     
-    /*
-
-    public interface IResponseHandler
-    {
-        IActionResult HandleResponse<T>(Response<T> response);
-    }
-    */
+   
 }

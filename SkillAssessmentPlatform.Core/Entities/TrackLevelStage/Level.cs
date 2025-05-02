@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace SkillAssessmentPlatform.Core.Entities
 {
@@ -14,7 +9,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         public string Name { get; set; }
         public string Description { get; set; }
         public int Order { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
 
         // Navigation properties

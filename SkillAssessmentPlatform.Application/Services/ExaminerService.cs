@@ -1,21 +1,12 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Common;
-using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Core.Interfaces.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
-    public class ExaminerService 
+    public class ExaminerService
     {
         private readonly IUnitOfWork _unitOfWork;
         //private readonly ITrackRepository _trackRepository;
@@ -71,7 +62,7 @@ namespace SkillAssessmentPlatform.Application.Services
             // هنا نحدث الخصائص الموجودة فقط في dto
             _mapper.Map(examinerDto, examiner); // يتم التحديث داخل الكائن نفسه عشان ما نعمل مابنغ يدوي
 
-            var result = await _unitOfWork.ExaminerRepository.UpdateAsync(examiner); 
+            var result = await _unitOfWork.ExaminerRepository.UpdateAsync(examiner);
             if (result == null)
                 throw new BadRequestException("Update failed");
 
@@ -83,7 +74,7 @@ namespace SkillAssessmentPlatform.Application.Services
             var tracks = await _unitOfWork.TrackRepository.GetByExaminerIdAsync(examinerId);
 
             return _mapper.Map<List<TrackDto>>(tracks);
-            
+
         }
         public async Task<bool> AddTrackToExaminerAsync(string examinerId, int trackId)
         {
@@ -95,13 +86,13 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return true;
         }
-        
+
         public async Task<IEnumerable<ExaminerLoadDTO>> GetExaminerWorkloadAsync(string examinerId)
         {
             var workload = await _unitOfWork.ExaminerLoadRepository.GetByExaminerIdAsync(examinerId);
             return _mapper.Map<IEnumerable<ExaminerLoadDTO>>(workload);
         }
-      
+
         public async Task<bool> RemoveTrackFromExaminerAsync(string examinerId, int trackId)
         {
             var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(examinerId);

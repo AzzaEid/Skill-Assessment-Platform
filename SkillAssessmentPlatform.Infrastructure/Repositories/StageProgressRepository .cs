@@ -2,18 +2,12 @@
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
-using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
-    public class StageProgressRepository : GenericRepository<StageProgress> , IStageProgressRepository
+    public class StageProgressRepository : GenericRepository<StageProgress>, IStageProgressRepository
     {
         private readonly ILogger<StageProgressRepository> _logger;
 
@@ -35,7 +29,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<StageProgress> GetCurrentStageProgressAsync(int levelProgressId)
         {
             return await _context.StageProgresses
-                .Where(sp => sp.LevelProgressId == levelProgressId && sp.Status ==ProgressStatus.InProgress)
+                .Where(sp => sp.LevelProgressId == levelProgressId && sp.Status == ProgressStatus.InProgress)
                 .Include(sp => sp.Stage)
                 .FirstOrDefaultAsync();
         }
@@ -81,7 +75,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return stageProgress;
         }
 
-        public async Task<StageProgress> CreateNextStageProgressAsync(int levelProgressId, int currentStageId,string freeExaminerId)
+        public async Task<StageProgress> CreateNextStageProgressAsync(int levelProgressId, int currentStageId, string freeExaminerId)
         {
             // Get the current stage
             var currentStage = await _context.Stages.FindAsync(currentStageId);
@@ -113,20 +107,20 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return stageProgress;
         }
 
-        public async Task<int> GetAttemptCountAsync( int stageId)
+        public async Task<int> GetAttemptCountAsync(int stageId)
         {
             return await _context.StageProgresses
                 .CountAsync(sp => sp.StageId == stageId);
         }
         public async Task<int> GetLevelProgressIdofStageAsync(int stageId)
         {
-            var sp =  await _context.StageProgresses
+            var sp = await _context.StageProgresses
                .Where(sp => sp.StageId == stageId).FirstAsync();
             return sp.LevelProgressId;
         }
         public async Task<StageProgress> CreateNewAttemptAsync(int levelProgressId, int stageId, string freeExaminerId)
         {
-     
+
 
             var attemptCount = await GetAttemptCountAsync(stageId);
 
@@ -163,7 +157,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<StageProgress> GetLatestSPinLPAsync(int levelProgressId)
         {
             return await _context.StageProgresses
-                .Where(sp => sp.LevelProgressId == levelProgressId )
+                .Where(sp => sp.LevelProgressId == levelProgressId)
                 .Include(sp => sp.Stage)
                 .OrderByDescending(e => e.StartDate)
                 .FirstOrDefaultAsync();
@@ -172,4 +166,3 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
     }
 }
-    

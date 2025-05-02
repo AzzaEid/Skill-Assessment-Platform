@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkillAssessmentPlatform.Application.DTOs
+﻿namespace SkillAssessmentPlatform.Application.DTOs
 {
-    public class LevelDto
+    public class LevelDetailDto
     {
         public int Id { get; set; }
         public int TrackId { get; set; }
@@ -14,8 +8,8 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public string Description { get; set; }
         public int Order { get; set; }
         public bool IsActive { get; set; }
-        public List<StageDTO> Stages { get; set; }
-      
+        public List<StageDetailDTO> Stages { get; set; }
+
 
 
     }

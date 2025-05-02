@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation
+﻿namespace SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation
 {
     public class EvaluationCriteria
     {
@@ -14,7 +8,7 @@ namespace SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation
         public string Name { get; set; }
         public string Description { get; set; }
         public float Weight { get; set; }
-
+        public Boolean isActive { get; set; } = true;
         // Navigation properties
         public Stage Stage { get; set; }
         public ICollection<DetailedFeedback> DetailedFeedbacks { get; set; } = new List<DetailedFeedback>();

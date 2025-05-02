@@ -20,12 +20,12 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
 
-        public async Task<List<LevelDto>> GetLevelsByLevelIdAsync(int trackId)
+        public async Task<List<LevelDetailDto>> GetLevelsByLevelIdAsync(int trackId)
         {
             var levels = await _unitOfWork.LevelRepository.GetLevelsByIdAsync(trackId);
-            if (levels == null || !levels.Any()) return new List<LevelDto>();
+            if (levels == null || !levels.Any()) return new List<LevelDetailDto>();
 
-            return levels.Select(level => new LevelDto
+            return levels.Select(level => new LevelDetailDto
             {
                 Id = level.Id,
                 TrackId = level.TrackId,
@@ -33,7 +33,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Description = level.Description,
                 Order = level.Order,
                 IsActive = level.IsActive,
-                Stages = level.Stages?.Select(stage => new StageDTO
+                Stages = level.Stages?.Select(stage => new StageDetailDTO
                 {
                     Name = stage.Name,
                     Description = stage.Description,
@@ -46,12 +46,12 @@ namespace SkillAssessmentPlatform.Application.Services
 
 
 
-        /*public async Task<List<LevelDto>> GetLevelsByTrackIdAsync(int id)
+        /*public async Task<List<LevelDetailDto>> GetLevelsByTrackIdAsync(int id)
         {
             var levels = await _unitOfWork.LevelRepository.GetLevelsByTrackIdAsync(id);
-            if (levels == null || !levels.Any()) return new List<LevelDto>();
+            if (levels == null || !levels.Any()) return new List<LevelDetailDto>();
 
-            return levels.Select(level => new LevelDto
+            return levels.Select(level => new LevelDetailDto
             {
                 Id = level.Id,
                 Name = level.Name,
@@ -78,13 +78,13 @@ namespace SkillAssessmentPlatform.Application.Services
             return true;
         }
 
-        public async Task<List<StageDTO>> GetStagesByLevelIdAsync(int levelId)
+        public async Task<List<StageDetailDTO>> GetStagesByLevelIdAsync(int levelId)
         {
             var level = await _unitOfWork.LevelRepository.GetLevelWithStagesAsync(levelId);
             if (level == null || level.Stages == null)
                 return null;
 
-            return level.Stages.Select(stage => new StageDTO
+            return level.Stages.Select(stage => new StageDetailDTO
             {
                 Id = stage.Id,
 

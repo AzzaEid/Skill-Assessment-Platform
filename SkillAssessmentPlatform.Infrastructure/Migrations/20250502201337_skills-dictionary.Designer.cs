@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkillAssessmentPlatform.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkillAssessmentPlatform.Infrastructure.Data;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250502201337_skills-dictionary")]
+    partial class skillsdictionary
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,25 +69,25 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "551beece-77a4-4c4c-9847-ff884f995278",
+                            Id = "c97e60a8-6529-4fb1-8f95-f6462485bc65",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "0b8c6b1b-96e6-4534-bcf5-080ef874d877",
+                            Id = "6a54ff2c-0865-41ba-a1d3-47e9d332a997",
                             Name = "Examiner",
                             NormalizedName = "EXAMINER"
                         },
                         new
                         {
-                            Id = "33c59dcc-b9fb-441f-b981-357e173580b9",
+                            Id = "12572d86-a048-4cd6-999e-ecde7e456220",
                             Name = "SeniorExaminer",
                             NormalizedName = "SENIOREXAMINER"
                         },
                         new
                         {
-                            Id = "670cc7a5-417f-469f-aa7c-18ab00a54f08",
+                            Id = "4299ff4e-4342-4bd1-81c2-556e4c3109f7",
                             Name = "Applicant",
                             NormalizedName = "APPLICANT"
                         });
@@ -864,6 +867,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SeniorExaminerID")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -1366,7 +1370,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 {
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Users.Examiner", "SeniorExaminer")
                         .WithMany("ManagedTracks")
-                        .HasForeignKey("SeniorExaminerID");
+                        .HasForeignKey("SeniorExaminerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("SeniorExaminer");
                 });

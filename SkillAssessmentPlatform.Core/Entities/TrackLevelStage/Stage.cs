@@ -1,12 +1,6 @@
 ﻿using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Core.Entities
 {
@@ -18,7 +12,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         public string Description { get; set; }
         public StageType Type { get; set; }  // "Exam", "Task", "Interview"
         public int Order { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
         public int PassingScore { get; set; }
         public int NoOfattempts { get; set; } = 3;
 

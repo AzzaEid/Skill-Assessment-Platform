@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
@@ -50,7 +45,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
         public virtual async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public virtual async Task<int> GetTotalCountAsync()
@@ -92,6 +87,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
-        
+
     }
 }

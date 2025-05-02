@@ -18,12 +18,12 @@ namespace SkillAssessmentPlatform.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<StageDTO> GetStageByIdAsync(int id)
+        public async Task<StageDetailDTO> GetStageByIdAsync(int id)
         {
             var stage = await _unitOfWork.StageRepository.GetByIdAsync(id);
             
 
-            return new StageDTO
+            return new StageDetailDTO
             {
                 Id = stage.Id,
                 Name = stage.Name,

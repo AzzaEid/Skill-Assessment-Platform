@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Core.Entities.Users;
-using System.Reflection.Emit;
-using System.Reflection;
-using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
-using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
+using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
+using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Entities.Users;
+using System.Reflection;
+using System.Text.Json;
 
 
 namespace SkillAssessmentPlatform.Infrastructure.Data
@@ -59,7 +56,26 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.Examiner.ToString(), NormalizedName = Actors.Examiner.ToString().ToUpper() },
             new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.SeniorExaminer.ToString(), NormalizedName = Actors.SeniorExaminer.ToString().ToUpper() },
             new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.Applicant.ToString(), NormalizedName = Actors.Applicant.ToString().ToUpper() }
+                );
+
+            var dictionaryConverter = new ValueConverter<Dictionary<string, string>, string>(
+            dict => JsonSerializer.Serialize(dict, (JsonSerializerOptions?)null),
+            json => JsonSerializer.Deserialize<Dictionary<string, string>>(json ?? "{}", (JsonSerializerOptions?)null)!
         );
+
+            var dictionaryComparer = new ValueComparer<Dictionary<string, string>>(
+                (d1, d2) => JsonSerializer.Serialize(d1, (JsonSerializerOptions?)null) == JsonSerializer.Serialize(d2, (JsonSerializerOptions?)null),
+                d => d == null ? 0 : JsonSerializer.Serialize(d, (JsonSerializerOptions?)null).GetHashCode(),
+                d => JsonSerializer.Deserialize<Dictionary<string, string>>(JsonSerializer.Serialize(d, (JsonSerializerOptions?)null), (JsonSerializerOptions?)null)!
+            );
+
+            builder.Entity<Track>()
+                .Property(t => t.AssociatedSkills)
+                .HasConversion(dictionaryConverter)
+                .HasColumnType("nvarchar(max)")
+                .Metadata.SetValueComparer(dictionaryComparer);
+
+
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             #region temporary
             builder.Entity<Track>()

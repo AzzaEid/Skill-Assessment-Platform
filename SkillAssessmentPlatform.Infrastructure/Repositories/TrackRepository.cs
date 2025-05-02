@@ -1,20 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Entities;
-using SkillAssessmentPlatform.Core.Entities.Users;
-using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Core.Interfaces.Repository;
-using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using SkillAssessmentPlatform.Core.Entities;
-using SkillAssessmentPlatform.Core.Entities.Users;
-using SkillAssessmentPlatform.Core.Enums;
-using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 
@@ -26,7 +11,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         public TrackRepository(AppDbContext context) : base(context)
         {
-            _context = context; 
+            //_context = context; 
         }
 
         public async Task<Track> GetTrackWithDetailsAsync(int trackId)
@@ -58,6 +43,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.Tracks.AddAsync(track);
             _context.SaveChanges();
         }
-      
+        public async Task<List<Track>> GetByExaminerIdAsync(string examinerId)
+        {
+            return await _context.Tracks
+                .Where(t => t.Examiners.Any(e => e.Id == examinerId))  // the relation is M-M
+                .ToListAsync();
+        }
     }
 }

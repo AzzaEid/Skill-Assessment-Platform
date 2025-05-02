@@ -30,7 +30,7 @@ namespace SkillAssessmentPlatform.Application.Mapping
             /////////////test updating 
             CreateMap<ExaminerDTO, User>() .ReverseMap();
 
-            CreateMap<TrackDto, Track>() .ReverseMap();
+            CreateMap<TrackDetialDto, Track>() .ReverseMap();
 
 
             ///tracking

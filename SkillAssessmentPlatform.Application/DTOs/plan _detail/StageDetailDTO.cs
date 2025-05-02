@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
-    public class StageDTO
+    public class StageDetailDTO
     {
         public int Id { get; set; }
 
