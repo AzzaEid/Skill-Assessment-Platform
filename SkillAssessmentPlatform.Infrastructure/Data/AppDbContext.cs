@@ -16,6 +16,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
 {
     public class AppDbContext : IdentityDbContext<User, IdentityRole, string>
     {
+        #region DbSets
         public DbSet<Examiner> Examiners { get; set; }
         public DbSet<Applicant> Applicants { get; set; }
         public DbSet<ExaminerLoad> ExaminerLoads { get; set; }
@@ -38,25 +39,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<Certificate> Certificates { get; set; }
-
+        #endregion
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 
         }
-        //==> this part have to be seprated in EntityMappers
+        //==> this part have to be seprate in EntityMappers
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-
-            builder.Entity<IdentityRole>().HasData(
-            new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.Admin.ToString(), NormalizedName = Actors.Admin.ToString().ToUpper() },
-            new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.Examiner.ToString(), NormalizedName = Actors.Examiner.ToString().ToUpper() },
-            new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.SeniorExaminer.ToString(), NormalizedName = Actors.SeniorExaminer.ToString().ToUpper() },
-            new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Actors.Applicant.ToString(), NormalizedName = Actors.Applicant.ToString().ToUpper() }
-                );
 
             var dictionaryConverter = new ValueConverter<Dictionary<string, string>, string>(
             dict => JsonSerializer.Serialize(dict, (JsonSerializerOptions?)null),
