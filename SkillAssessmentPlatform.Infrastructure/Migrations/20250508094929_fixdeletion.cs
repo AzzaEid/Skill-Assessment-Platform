@@ -3,44 +3,228 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class addRelations : Migration
+    public partial class fixdeletion : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "ExaminerLoad");
+            migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
 
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "2621f9b8-07e3-403c-bb6f-404539928e09");
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UserType = table.Column<int>(type: "int", nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
 
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "605e416a-a428-4eef-87d3-795c17e33095");
+            migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "7526f193-77b7-4cd3-af2f-66eedb96eb08");
+            migrationBuilder.CreateTable(
+                name: "Applicants",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ApplicantId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Applicants", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Applicants_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
+                        principalTable: "Applicants",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Applicants_Users_Id",
+                        column: x => x.Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "dab7c4d0-0b55-4af8-9bbf-f06c11debc1f");
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
-            migrationBuilder.AddColumn<string>(
-                name: "UserId",
-                table: "Examiners",
-                type: "nvarchar(450)",
-                nullable: true);
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Examiners",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Specialization = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Examiners", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Examiners_Users_Id",
+                        column: x => x.Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notification",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notification", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notification_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Appointments",
@@ -48,35 +232,36 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExaminerId = table.Column<int>(type: "int", nullable: false),
+                    ExaminerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsBooked = table.Column<bool>(type: "bit", nullable: false),
-                    ExaminerId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    IsBooked = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Appointments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Appointments_Examiners_ExaminerId1",
-                        column: x => x.ExaminerId1,
+                        name: "FK_Appointments_Examiners_ExaminerId",
+                        column: x => x.ExaminerId,
                         principalTable: "Examiners",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ExaminerLoads",
                 columns: table => new
                 {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ExaminerID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    ID = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", maxLength: 50, nullable: false),
                     MaxWorkLoad = table.Column<int>(type: "int", nullable: false),
                     CurrWorkLoad = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExaminerLoads", x => new { x.ExaminerID, x.Type });
+                    table.PrimaryKey("PK_ExaminerLoads", x => x.ID);
                     table.ForeignKey(
                         name: "FK_ExaminerLoads_Examiners_ExaminerID",
                         column: x => x.ExaminerID,
@@ -91,42 +276,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExaminerId = table.Column<int>(type: "int", nullable: false),
-                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TotalScore = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    FeedbackDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExaminerId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ExaminerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Comments = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    TotalScore = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    FeedbackDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Feedbacks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Feedbacks_Examiners_ExaminerId1",
-                        column: x => x.ExaminerId1,
+                        name: "FK_Feedbacks_Examiners_ExaminerId",
+                        column: x => x.ExaminerId,
                         principalTable: "Examiners",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Notification",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notification", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Notification_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -137,14 +298,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SeniorExaminerID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Objectives = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SeniorExaminerID = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Objectives = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     AssociatedSkills = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -163,20 +324,20 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicantId = table.Column<int>(type: "int", nullable: false),
+                    ApplicantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TrackId = table.Column<int>(type: "int", nullable: false),
                     EnrollmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApplicantId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Enrollments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Enrollments_Applicants_ApplicantId1",
-                        column: x => x.ApplicantId1,
+                        name: "FK_Enrollments_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
                         principalTable: "Applicants",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Enrollments_Tracks_TrackId",
                         column: x => x.TrackId,
@@ -186,7 +347,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExaminerTrack",
+                name: "ExaminerTracks",
                 columns: table => new
                 {
                     ExaminersId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -194,19 +355,19 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExaminerTrack", x => new { x.ExaminersId, x.WorkingTracksId });
+                    table.PrimaryKey("PK_ExaminerTracks", x => new { x.ExaminersId, x.WorkingTracksId });
                     table.ForeignKey(
-                        name: "FK_ExaminerTrack_Examiners_ExaminersId",
+                        name: "FK_ExaminerTracks_Examiners_ExaminersId",
                         column: x => x.ExaminersId,
                         principalTable: "Examiners",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ExaminerTrack_Tracks_WorkingTracksId",
+                        name: "FK_ExaminerTracks_Tracks_WorkingTracksId",
                         column: x => x.WorkingTracksId,
                         principalTable: "Tracks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -216,8 +377,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TrackId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Order = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -240,7 +401,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EnrollmentId = table.Column<int>(type: "int", nullable: false),
                     LevelId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -268,12 +429,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LevelId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     Order = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    PassingScore = table.Column<int>(type: "int", nullable: false)
+                    PassingScore = table.Column<int>(type: "int", nullable: false),
+                    NoOfattempts = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -287,29 +449,28 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Certificate",
+                name: "Certificates",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicantId = table.Column<int>(type: "int", nullable: false),
+                    ApplicantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     LeveProgressId = table.Column<int>(type: "int", nullable: false),
                     IssueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    VerificationCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApplicantId1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    LevelProgressId = table.Column<int>(type: "int", nullable: false)
+                    VerificationCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Certificate", x => x.Id);
+                    table.PrimaryKey("PK_Certificates", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Certificate_Applicants_ApplicantId1",
-                        column: x => x.ApplicantId1,
+                        name: "FK_Certificates_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
                         principalTable: "Applicants",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Certificate_LevelProgresses_LevelProgressId",
-                        column: x => x.LevelProgressId,
+                        name: "FK_Certificates_LevelProgresses_LeveProgressId",
+                        column: x => x.LeveProgressId,
                         principalTable: "LevelProgresses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -322,9 +483,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StageId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Weight = table.Column<float>(type: "real", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Weight = table.Column<float>(type: "real", nullable: false),
+                    isActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -345,8 +507,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StageId = table.Column<int>(type: "int", nullable: false),
                     DurationMinutes = table.Column<int>(type: "int", nullable: false),
-                    Difficulty = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    QuestionsType = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Difficulty = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    QuestionsType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -368,7 +530,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     StageId = table.Column<int>(type: "int", nullable: false),
                     MaxDaysToBook = table.Column<int>(type: "int", nullable: false),
                     DurationMinutes = table.Column<int>(type: "int", nullable: false),
-                    Instructions = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Instructions = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -387,25 +549,24 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EnrollmentId = table.Column<int>(type: "int", nullable: false),
+                    LevelProgressId = table.Column<int>(type: "int", nullable: false),
                     StageId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     Score = table.Column<int>(type: "int", nullable: false),
-                    ExaminerId = table.Column<int>(type: "int", nullable: false),
+                    ExaminerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Attempts = table.Column<int>(type: "int", nullable: false),
-                    ExaminerId1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    LevelProgressId = table.Column<int>(type: "int", nullable: false)
+                    Attempts = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_StageProgresses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StageProgresses_Examiners_ExaminerId1",
-                        column: x => x.ExaminerId1,
+                        name: "FK_StageProgresses_Examiners_ExaminerId",
+                        column: x => x.ExaminerId,
                         principalTable: "Examiners",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_StageProgresses_LevelProgresses_LevelProgressId",
                         column: x => x.LevelProgressId,
@@ -428,8 +589,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StageId = table.Column<int>(type: "int", nullable: false),
                     DaysToSubmit = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Requirements = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -450,16 +611,15 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FeedbackId = table.Column<int>(type: "int", nullable: false),
                     CriterionId = table.Column<int>(type: "int", nullable: false),
-                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Score = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    EvaluationCriteriaId = table.Column<int>(type: "int", nullable: false)
+                    Comments = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Score = table.Column<decimal>(type: "decimal(18,4)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DetailedFeedbacks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DetailedFeedbacks_EvaluationCriteria_EvaluationCriteriaId",
-                        column: x => x.EvaluationCriteriaId,
+                        name: "FK_DetailedFeedbacks_EvaluationCriteria_CriterionId",
+                        column: x => x.CriterionId,
                         principalTable: "EvaluationCriteria",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -475,13 +635,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "ExamRequests",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     ExamId = table.Column<int>(type: "int", nullable: false),
                     ApplicantId = table.Column<int>(type: "int", nullable: false),
                     ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Instructions = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FeedbackId = table.Column<int>(type: "int", nullable: false)
+                    Instructions = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    FeedbackId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -493,8 +653,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ExamRequests_Feedbacks_FeedbackId",
-                        column: x => x.FeedbackId,
+                        name: "FK_ExamRequests_Feedbacks_Id",
+                        column: x => x.Id,
                         principalTable: "Feedbacks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -504,14 +664,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "InterviewBooks",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     InterviewId = table.Column<int>(type: "int", nullable: false),
                     AppointmentId = table.Column<int>(type: "int", nullable: false),
                     ApplicantId = table.Column<int>(type: "int", nullable: false),
                     ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MeetingLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     FeedbackId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -524,8 +683,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_InterviewBooks_Feedbacks_FeedbackId",
-                        column: x => x.FeedbackId,
+                        name: "FK_InterviewBooks_Feedbacks_Id",
+                        column: x => x.Id,
                         principalTable: "Feedbacks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -544,18 +703,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TaskPoolId = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Difficulty = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TasksPoolId = table.Column<int>(type: "int", nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Requirements = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Difficulty = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tasks_TasksPools_TasksPoolId",
-                        column: x => x.TasksPoolId,
+                        name: "FK_Tasks_TasksPools_TaskPoolId",
+                        column: x => x.TaskPoolId,
                         principalTable: "TasksPools",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -568,20 +726,19 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TaskId = table.Column<int>(type: "int", nullable: false),
-                    ApplicantId = table.Column<int>(type: "int", nullable: false),
+                    ApplicantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     AssignedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StageProgressId = table.Column<int>(type: "int", nullable: false)
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TaskApplicants", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TaskApplicants_StageProgresses_StageProgressId",
-                        column: x => x.StageProgressId,
-                        principalTable: "StageProgresses",
+                        name: "FK_TaskApplicants_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
+                        principalTable: "Applicants",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TaskApplicants_Tasks_TaskId",
                         column: x => x.TaskId,
@@ -597,9 +754,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TaskApplicantId = table.Column<int>(type: "int", nullable: false),
-                    SubmissionUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SubmissionUrl = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     SubmissionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FeedbackId = table.Column<int>(type: "int", nullable: false)
+                    FeedbackId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -618,41 +776,57 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "3652be4c-93ff-4abd-b6f3-83622f5d81f6", null, "Admin", "ADMIN" },
-                    { "a0c1f138-d0ca-441a-8689-22f453e3e4b3", null, "Examiner", "EXAMINER" },
-                    { "a8e136f4-e602-40bd-8f0d-13fa7e978347", null, "Applicant", "APPLICANT" },
-                    { "ef3f52a3-88f2-420c-b9a7-0068e2eb369d", null, "SeniorExaminer", "SENIOREXAMINER" }
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_Applicants_ApplicantId",
+                table: "Applicants",
+                column: "ApplicantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Examiners_UserId",
-                table: "Examiners",
+                name: "IX_Appointments_ExaminerId",
+                table: "Appointments",
+                column: "ExaminerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointments_ExaminerId1",
-                table: "Appointments",
-                column: "ExaminerId1");
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Certificate_ApplicantId1",
-                table: "Certificate",
-                column: "ApplicantId1");
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Certificate_LevelProgressId",
-                table: "Certificate",
-                column: "LevelProgressId");
+                name: "IX_Certificates_ApplicantId",
+                table: "Certificates",
+                column: "ApplicantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetailedFeedbacks_EvaluationCriteriaId",
+                name: "IX_Certificates_LeveProgressId",
+                table: "Certificates",
+                column: "LeveProgressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DetailedFeedbacks_CriterionId",
                 table: "DetailedFeedbacks",
-                column: "EvaluationCriteriaId");
+                column: "CriterionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DetailedFeedbacks_FeedbackId",
@@ -660,9 +834,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 column: "FeedbackId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Enrollments_ApplicantId1",
+                name: "IX_Enrollments_ApplicantId",
                 table: "Enrollments",
-                column: "ApplicantId1");
+                column: "ApplicantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollments_TrackId",
@@ -675,21 +849,19 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 column: "StageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExaminerTrack_WorkingTracksId",
-                table: "ExaminerTrack",
+                name: "IX_ExaminerLoads_ExaminerID",
+                table: "ExaminerLoads",
+                column: "ExaminerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExaminerTracks_WorkingTracksId",
+                table: "ExaminerTracks",
                 column: "WorkingTracksId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamRequests_ExamId",
                 table: "ExamRequests",
-                column: "ExamId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ExamRequests_FeedbackId",
-                table: "ExamRequests",
-                column: "FeedbackId",
-                unique: true);
+                column: "ExamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exams_StageId",
@@ -698,20 +870,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Feedbacks_ExaminerId1",
+                name: "IX_Feedbacks_ExaminerId",
                 table: "Feedbacks",
-                column: "ExaminerId1");
+                column: "ExaminerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InterviewBooks_AppointmentId",
                 table: "InterviewBooks",
                 column: "AppointmentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_InterviewBooks_FeedbackId",
-                table: "InterviewBooks",
-                column: "FeedbackId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_InterviewBooks_InterviewId",
@@ -740,14 +906,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 column: "TrackId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notification_UserId1",
+                name: "IX_Notification_UserId",
                 table: "Notification",
-                column: "UserId1");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StageProgresses_ExaminerId1",
+                name: "IX_StageProgresses_ExaminerId",
                 table: "StageProgresses",
-                column: "ExaminerId1");
+                column: "ExaminerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StageProgresses_LevelProgressId",
@@ -765,9 +931,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 column: "LevelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TaskApplicants_StageProgressId",
+                name: "IX_TaskApplicants_ApplicantId",
                 table: "TaskApplicants",
-                column: "StageProgressId");
+                column: "ApplicantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TaskApplicants_TaskId",
@@ -775,14 +941,15 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 column: "TaskId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tasks_TasksPoolId",
+                name: "IX_Tasks_TaskPoolId",
                 table: "Tasks",
-                column: "TasksPoolId");
+                column: "TaskPoolId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TasksPools_StageId",
                 table: "TasksPools",
-                column: "StageId");
+                column: "StageId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TaskSubmissions_FeedbackId",
@@ -800,23 +967,39 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 table: "Tracks",
                 column: "SeniorExaminerID");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Examiners_Users_UserId",
-                table: "Examiners",
-                column: "UserId",
-                principalTable: "Users",
-                principalColumn: "Id");
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "Users",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "Users",
+                column: "NormalizedUserName",
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Examiners_Users_UserId",
-                table: "Examiners");
+            migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
-                name: "Certificate");
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Certificates");
 
             migrationBuilder.DropTable(
                 name: "DetailedFeedbacks");
@@ -825,7 +1008,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "ExaminerLoads");
 
             migrationBuilder.DropTable(
-                name: "ExaminerTrack");
+                name: "ExaminerTracks");
 
             migrationBuilder.DropTable(
                 name: "ExamRequests");
@@ -837,7 +1020,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "Notification");
 
             migrationBuilder.DropTable(
+                name: "StageProgresses");
+
+            migrationBuilder.DropTable(
                 name: "TaskSubmissions");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "EvaluationCriteria");
@@ -852,25 +1041,25 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "Interviews");
 
             migrationBuilder.DropTable(
+                name: "LevelProgresses");
+
+            migrationBuilder.DropTable(
                 name: "Feedbacks");
 
             migrationBuilder.DropTable(
                 name: "TaskApplicants");
 
             migrationBuilder.DropTable(
-                name: "StageProgresses");
+                name: "Enrollments");
 
             migrationBuilder.DropTable(
                 name: "Tasks");
 
             migrationBuilder.DropTable(
-                name: "LevelProgresses");
+                name: "Applicants");
 
             migrationBuilder.DropTable(
                 name: "TasksPools");
-
-            migrationBuilder.DropTable(
-                name: "Enrollments");
 
             migrationBuilder.DropTable(
                 name: "Stages");
@@ -881,65 +1070,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
             migrationBuilder.DropTable(
                 name: "Tracks");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Examiners_UserId",
-                table: "Examiners");
+            migrationBuilder.DropTable(
+                name: "Examiners");
 
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "3652be4c-93ff-4abd-b6f3-83622f5d81f6");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "a0c1f138-d0ca-441a-8689-22f453e3e4b3");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "a8e136f4-e602-40bd-8f0d-13fa7e978347");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: "ef3f52a3-88f2-420c-b9a7-0068e2eb369d");
-
-            migrationBuilder.DropColumn(
-                name: "UserId",
-                table: "Examiners");
-
-            migrationBuilder.CreateTable(
-                name: "ExaminerLoad",
-                columns: table => new
-                {
-                    ExaminerID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    CurrWorkLoad = table.Column<int>(type: "int", nullable: false),
-                    ID = table.Column<int>(type: "int", nullable: false),
-                    MaxWorkLoad = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExaminerLoad", x => new { x.ExaminerID, x.Type });
-                    table.ForeignKey(
-                        name: "FK_ExaminerLoad_Examiners_ExaminerID",
-                        column: x => x.ExaminerID,
-                        principalTable: "Examiners",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "2621f9b8-07e3-403c-bb6f-404539928e09", null, "Examiner", "EXAMINER" },
-                    { "605e416a-a428-4eef-87d3-795c17e33095", null, "SeniorExaminer", "SENIOREXAMINER" },
-                    { "7526f193-77b7-4cd3-af2f-66eedb96eb08", null, "Applicant", "APPLICANT" },
-                    { "dab7c4d0-0b55-4af8-9bbf-f06c11debc1f", null, "Admin", "ADMIN" }
-                });
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

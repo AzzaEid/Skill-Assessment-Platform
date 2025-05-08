@@ -17,6 +17,6 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<T> UpdateAsync(T entity);
         Task<bool> DeleteAsync(string id);
         Task<bool> DeleteAsync(int id);
-       // Task<int> GetTotalCountAsync();
+       // AppTask<int> GetTotalCountAsync();
     }
 }

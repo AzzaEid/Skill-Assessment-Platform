@@ -110,7 +110,7 @@ namespace SkillAssessmentPlatform.Application.Services
             return _mapper.Map<UserDTO>(user);
         }
         /*
-                public async Task<PagedResponse<UserDTO>> SearchUsersAsync(string searchTerm, string userType = null, int page = 1, int pageSize = 10)
+                public async AppTask<PagedResponse<UserDTO>> SearchUsersAsync(string searchTerm, string userType = null, int page = 1, int pageSize = 10)
                 {
                     IEnumerable<User> users;
                     int totalCount;

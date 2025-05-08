@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
 {
@@ -12,10 +8,10 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public int StageId { get; set; }
         public int DurationMinutes { get; set; }
         public string Difficulty { get; set; }
-        public string QuestionsType { get; set; }
+        public QuestionType QuestionsType { get; set; }
 
         // Navigation properties
         public Stage Stage { get; set; }
-        public ExamRequest ExamRequest { get; set; }
+        public ICollection<ExamRequest> ExamRequests { get; set; } = new HashSet<ExamRequest>();
     }
 }

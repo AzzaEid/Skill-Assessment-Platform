@@ -7,19 +7,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Seeder
     {
         public static async Task SeedAsync(RoleManager<IdentityRole> _roleManager)
         {
-
             var roles = new[] { Actors.Admin, Actors.Examiner, Actors.SeniorExaminer, Actors.Applicant };
             foreach (var role in roles)
             {
-                if (!await _roleManager.RoleExistsAsync(role.ToString()))
+                var roleName = role.ToString();
+                var existingRole = await _roleManager.FindByNameAsync(roleName);
+                if (existingRole == null)
                 {
-                    await _roleManager.CreateAsync(
-                        new IdentityRole { Name = role.ToString(), NormalizedName = role.ToString() }
-                        );
+                    await _roleManager.CreateAsync(new IdentityRole { Name = roleName });
                 }
             }
-
-
         }
     }
+
 }

@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
+﻿namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
 {
     public class Interview
     {
-
         public int Id { get; set; }
         public int StageId { get; set; }
         public int MaxDaysToBook { get; set; }

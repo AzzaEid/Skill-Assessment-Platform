@@ -48,7 +48,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
         /*
         [HttpGet("{applicantId}/enrollments")]
-        public async Task<IActionResult> GetEnrollments(
+        public async AppTask<IActionResult> GetEnrollments(
             string applicantId,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
@@ -58,7 +58,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
 
         [HttpGet("{applicantId}/certificates")]
-        public async Task<IActionResult> GetCertificates(
+        public async AppTask<IActionResult> GetCertificates(
             string applicantId,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
@@ -68,7 +68,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
 
         [HttpPost("{applicantId}/enrollments")]
-        public async Task<IActionResult> EnrollInTrack(
+        public async AppTask<IActionResult> EnrollInTrack(
             string applicantId,
             [FromBody] EnrollmentCreateDTO enrollmentDto)
         {
@@ -77,7 +77,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
 
         [HttpGet("{applicantId}/progress")]
-        public async Task<IActionResult> GetProgress(
+        public async AppTask<IActionResult> GetProgress(
             string applicantId,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)

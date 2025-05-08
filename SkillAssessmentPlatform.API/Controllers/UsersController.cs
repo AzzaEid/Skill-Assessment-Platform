@@ -60,7 +60,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
 
         //[HttpGet("search")]
-        //public async Task<IActionResult> SearchUsers(
+        //public async AppTask<IActionResult> SearchUsers(
         //[FromQuery] string term,
         //[FromQuery] string type,
         //[FromQuery] int page = 1,

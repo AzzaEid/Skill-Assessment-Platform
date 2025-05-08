@@ -31,14 +31,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public DbSet<DetailedFeedback> DetailedFeedbacks { get; set; }
         public DbSet<ExamRequest> ExamRequests { get; set; }
         public DbSet<TasksPool> TasksPools { get; set; }
-        public DbSet<Core.Entities.Tasks__Exams__and_Interviews.Task> Tasks { get; set; }
+        public DbSet<AppTask> Tasks { get; set; }
         public DbSet<TaskApplicant> TaskApplicants { get; set; }
         public DbSet<TaskSubmission> TaskSubmissions { get; set; }
         public DbSet<Interview> Interviews { get; set; }
         public DbSet<InterviewBook> InterviewBooks { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Exam> Exams { get; set; }
-        public DbSet<Certificate> Certificates { get; set; }
+        public DbSet<AppCertificate> Certificates { get; set; }
         #endregion
 
 
@@ -70,33 +70,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
 
 
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
             #region temporary
-            builder.Entity<Track>()
-                .HasOne(t => t.SeniorExaminer)
-                .WithMany(e => e.ManagedTracks)
-                .HasForeignKey(t => t.SeniorExaminerID);
 
-            builder.Entity<Stage>()
-                .HasOne(s => s.Interview)
-                .WithOne(i => i.Stage)
-                .HasForeignKey<Interview>(i => i.StageId);
 
-            builder.Entity<Stage>()
-                .HasOne(s => s.Exam)
-                .WithOne(e => e.Stage)
-                .HasForeignKey<Exam>(e => e.StageId);
-            builder.Entity<Exam>()
-               .HasOne(e => e.ExamRequest)
-               .WithOne(er => er.Exam)
-               .HasForeignKey<ExamRequest>(er => er.ExamId);
 
-            builder.Entity<DetailedFeedback>()
-        .Property(d => d.Score)
-        .HasColumnType("decimal(18, 4)");
 
-            builder.Entity<Feedback>()
-                .Property(f => f.TotalScore)
-                .HasColumnType("decimal(18, 4)");
+
             #endregion
         }
 

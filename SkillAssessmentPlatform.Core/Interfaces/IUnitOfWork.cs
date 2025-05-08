@@ -29,7 +29,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         #endregion
 
         #region methods
-        //  Task<IDbContextTransaction> BeginTransactionAsync();
+        //  AppTask<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveChangesAsync();
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task CommitTransactionAsync();

@@ -117,7 +117,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
                         /* >>> ---
                          * / Create certificate 
-                        var certificate = new Certificate
+                        var certificate = new AppCertificate
                         {
                             ApplicantId = enrollment.ApplicantId,
                             LevelProgressID = levelProgress.Id,
@@ -263,7 +263,7 @@ namespace SkillAssessmentPlatform.Application.Services
             return result;
         }
         /*
-        public async Task<StageProgressDTO> CreateNextStageProgressAsync(int enrollmentId, int currentStageId)
+        public async AppTask<StageProgressDTO> CreateNextStageProgressAsync(int enrollmentId, int currentStageId)
         {
             var nextStageProgress = await _unitOfWork.StageProgressRepository
                 .CreateNextStageProgressAsync(enrollmentId, currentStageId);

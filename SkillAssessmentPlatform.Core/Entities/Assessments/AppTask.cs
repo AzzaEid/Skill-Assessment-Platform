@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
 {
-    public class Task
+    public class AppTask
     {
         public int Id { get; set; }
         public int TaskPoolId { get; set; }
