@@ -8,7 +8,7 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public float Weight { get; set; }
-        public Boolean isActive { get; set; } = true;
+        public Boolean IsActive { get; set; } = true;
         // Navigation properties
         public Stage Stage { get; set; }
         public ICollection<DetailedFeedback> DetailedFeedbacks { get; set; } = new List<DetailedFeedback>();

@@ -64,7 +64,19 @@ namespace SkillAssessmentPlatform.API.Controllers
 
             return _responseHandler.Deleted(); 
         }
-       
+
+        [HttpPut("{id}/restore")]
+        public async Task<IActionResult> RestoreLevel(int id)
+        {
+            var result = await _levelService.RestoreLevelAsync(id);
+
+            return result switch
+            {
+                "Level not found" => NotFound(new { message = result }),
+                "Level is already active" => BadRequest(new { message = result }),
+                _ => _responseHandler.Success(message: result)
+            };
+        }
 
 
     }

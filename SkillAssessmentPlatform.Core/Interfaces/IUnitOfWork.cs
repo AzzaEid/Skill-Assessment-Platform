@@ -14,7 +14,9 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         ILevelRepository LevelRepository { get; }
         IStageRepository StageRepository { get; }
         IEvaluationCriteriaRepository EvaluationCriteriaRepository { get; }
-        
+        IExamRepository ExamRepository { get; }
+
+
         #region repos
         IGenericRepository<T> Repository<T>() where T : class;
         TRepository GetCustomRepository<TRepository>() where TRepository : class;

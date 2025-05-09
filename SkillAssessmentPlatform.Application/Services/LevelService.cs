@@ -107,9 +107,9 @@ namespace SkillAssessmentPlatform.Application.Services
                 LevelId = levelId,
                 Name = dto.Name,
                 Description = dto.Description,
-                Type = dto.Type,
-                Order = dto.Order,
-                PassingScore = dto.PassingScore,
+                Type = (Core.Enums.StageType)dto.Type,
+                Order = (int)dto.Order,
+                PassingScore = (int)dto.PassingScore,
                 IsActive = true
             };
 
@@ -122,12 +122,76 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<bool> DeleteLevelAsync(int id)
         {
-            var level = await _unitOfWork.LevelRepository.GetByIdAsync(id);
+            var level = await _unitOfWork.LevelRepository.GetLevelWithStagesAsync(id);
             if (level == null) return false;
 
-            await _unitOfWork.LevelRepository.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync();
-            return true;
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            {
+                try
+                {
+                    level.IsActive = false;
+
+                    if (level.Stages != null)
+                    {
+                        foreach (var stage in level.Stages)
+                        {
+                            stage.IsActive = false;
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    throw new Exception("Failed to soft-delete level", ex);
+                }
+            }
+        }
+
+        public async Task<string> RestoreLevelAsync(int levelId)
+        {
+            var level = await _unitOfWork.LevelRepository.GetLevelWithStagesAsync(levelId);
+            if (level == null)
+                return "Level not found";
+
+            if (level.IsActive)
+                return "Level is already active";
+
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            {
+                try
+                {
+                    level.IsActive = true;
+
+                    if (level.Stages != null)
+                    {
+                        foreach (var stage in level.Stages)
+                        {
+                            stage.IsActive = true;
+
+                            if (stage.EvaluationCriteria != null)
+                            {
+                                foreach (var criteria in stage.EvaluationCriteria)
+                                {
+                                    criteria.IsActive = true;
+                                }
+                            }
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return "Level restored successfully with its stages and criteria";
+                }
+                catch (Exception ex)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    throw new Exception("Failed to restore level", ex);
+                }
+            }
         }
 
 

@@ -61,6 +61,7 @@ public class Program
             builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
             builder.Services.AddScoped<ILevelProgressRepository, LevelProgressRepository>();
             builder.Services.AddScoped<IStageProgressRepository, StageProgressRepository>();
+            builder.Services.AddScoped<IExamRepository, ExamRepository>();
         // Repositories
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -85,8 +86,10 @@ public class Program
             builder.Services.AddScoped<EnrollmentService>();
             builder.Services.AddScoped<StageProgressService>();
             builder.Services.AddScoped<LevelProgressService>();
+            builder.Services.AddScoped<ExamService>();
 
-            builder.Services.AddDbContext<AppDbContext>();
+
+        builder.Services.AddDbContext<AppDbContext>();
            
 
 
@@ -108,8 +111,10 @@ public class Program
         builder.Services.AddScoped<EmailServices>();
         builder.Services.AddScoped<LevelService>();
         builder.Services.AddScoped<StageService>();
+       
 
-            builder.Services.AddControllers()
+
+        builder.Services.AddControllers()
                             .AddJsonOptions(options =>
                             {
                                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());

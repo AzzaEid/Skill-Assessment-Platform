@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkillAssessmentPlatform.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkillAssessmentPlatform.Infrastructure.Data;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250503135137_InitialCreatee")]
+    partial class InitialCreatee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,25 +69,25 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b4032537-a9f6-4cd0-a3dc-5daa7e0dbea1",
+                            Id = "07696748-fd20-4e3d-b693-db7b85e9dcbe",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "a322ebd2-1eeb-4aab-b9ef-a95772f38b1f",
+                            Id = "5c0df495-9de3-49c0-b5a6-3c8824400955",
                             Name = "Examiner",
                             NormalizedName = "EXAMINER"
                         },
                         new
                         {
-                            Id = "56574ea8-b54d-4a6c-a3f2-ffe4709411b3",
+                            Id = "31d93f16-1c37-4863-b93a-1f9a37a4a254",
                             Name = "SeniorExaminer",
                             NormalizedName = "SENIOREXAMINER"
                         },
                         new
                         {
-                            Id = "24373dbf-75b7-4398-b802-5941037b69e4",
+                            Id = "8575285d-95f1-4f37-a57c-8c33d51710c2",
                             Name = "Applicant",
                             NormalizedName = "APPLICANT"
                         });
@@ -338,9 +341,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -350,6 +350,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.Property<float>("Weight")
                         .HasColumnType("real");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -473,7 +476,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NoOfAttempts")
+                    b.Property<int>("NoOfattempts")
                         .HasColumnType("int");
 
                     b.Property<int>("Order")
@@ -578,9 +581,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<string>("QuestionsType")
                         .IsRequired()

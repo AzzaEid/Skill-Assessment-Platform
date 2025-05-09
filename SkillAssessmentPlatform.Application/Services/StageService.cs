@@ -104,15 +104,71 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<bool> SoftDeleteStageAsync(int stageId)
         {
-            var stage = await _unitOfWork.StageRepository.GetByIdAsync(stageId);
+            var stage = await _unitOfWork.StageRepository.GetByIdWithCriteriaAsync(stageId);
             if (stage == null)
                 return false;
 
-            stage.IsActive = false;
-            await _unitOfWork.SaveChangesAsync();
-            return true;
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            {
+                try
+                {
+                    stage.IsActive = false;
+
+                    if (stage.EvaluationCriteria != null)
+                    {
+                        foreach (var criteria in stage.EvaluationCriteria)
+                        {
+                            criteria.IsActive = false;
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    throw new Exception("Failed to soft-delete stage", ex);
+                }
+            }
         }
 
+
+        public async Task<string> RestoreStageAsync(int stageId)
+        {
+            var stage = await _unitOfWork.StageRepository.GetByIdWithCriteriaAsync(stageId);
+            if (stage == null)
+                return "Stage not found";
+
+            if (stage.IsActive)
+                return "Stage is already active";
+
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            {
+                try
+                {
+                    stage.IsActive = true;
+
+                    if (stage.EvaluationCriteria != null)
+                    {
+                        foreach (var criteria in stage.EvaluationCriteria)
+                        {
+                            criteria.IsActive = true;
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return "Stage restored successfully with its criteria";
+                }
+                catch (Exception ex)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    throw new Exception("Failed to restore stage", ex);
+                }
+            }
+        }
 
 
     }

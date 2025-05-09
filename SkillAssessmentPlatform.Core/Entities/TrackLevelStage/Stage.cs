@@ -14,7 +14,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         public int Order { get; set; }
         public bool IsActive { get; set; } = true;
         public int PassingScore { get; set; }
-        public int NoOfattempts { get; set; } = 3;
+        public int NoOfAttempts { get; set; } = 3;
 
         // Navigation properties
         public Level Level { get; set; }

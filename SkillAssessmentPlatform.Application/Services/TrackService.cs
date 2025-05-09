@@ -115,7 +115,7 @@ namespace SkillAssessmentPlatform.Application.Services
         }
         public async Task<bool> CreateTrackStructureAsync(TrackStructureDTO structureDTO)
         {
-            // التحقق من وجود المسار
+            
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(structureDTO.TrackId);
             if (track == null)
                 throw new KeyNotFoundException($"Track with ID {structureDTO.TrackId} not found");
@@ -124,22 +124,22 @@ namespace SkillAssessmentPlatform.Application.Services
             {
                 try
                 {
-                    // إضافة المستويات
+                  
                     foreach (var levelDTO in structureDTO.Levels)
                     {
                         var level = new Level
                         {
-                            TrackId = structureDTO.TrackId,
+                            TrackId = (int)structureDTO.TrackId,
                             Name = levelDTO.Name,
                             Description = levelDTO.Description,
-                            Order = levelDTO.Order,
+                            Order = (int)levelDTO.Order,
                             IsActive = true
                         };
 
                         await _unitOfWork.LevelRepository.AddAsync(level);
                         await _unitOfWork.SaveChangesAsync();
 
-                        // إضافة المراحل لكل مستوى
+                      
                         foreach (var stageDTO in levelDTO.Stages)
                         {
                             var stage = new Stage
@@ -147,16 +147,16 @@ namespace SkillAssessmentPlatform.Application.Services
                                 LevelId = level.Id,
                                 Name = stageDTO.Name,
                                 Description = stageDTO.Description,
-                                Type = stageDTO.Type,
-                                Order = stageDTO.Order,
+                                Type = (Core.Enums.StageType)stageDTO.Type,
+                                Order = (int)stageDTO.Order,
                                 IsActive = true,
-                                PassingScore = stageDTO.PassingScore
+                                PassingScore = (int)stageDTO.PassingScore
                             };
-                            ///>>
+                            
                             await _unitOfWork.StageRepository.AddAsync(stage);
                             await _unitOfWork.SaveChangesAsync();
 
-                            // إضافة معايير التقييم لكل مرحلة
+                            
                             foreach (var criteriaDTO in stageDTO.EvaluationCriteria)
                             {
                                 var criteria = new EvaluationCriteria
@@ -164,7 +164,7 @@ namespace SkillAssessmentPlatform.Application.Services
                                     StageId = stage.Id,
                                     Name = criteriaDTO.Name,
                                     Description = criteriaDTO.Description,
-                                    Weight = criteriaDTO.Weight
+                                    Weight = (float)criteriaDTO.Weight
                                 };
 
                                 await _unitOfWork.EvaluationCriteriaRepository.AddAsync(criteria);
@@ -176,12 +176,18 @@ namespace SkillAssessmentPlatform.Application.Services
                     await transaction.CommitAsync();
                     return true;
                 }
+                /* catch (Exception ex)
+                 {
+                     await transaction.RollbackAsync();
+                     //_logger.LogError(ex, "Error creating track structure for track ID {TrackId}", structureDTO.TrackId);
+                     throw new Exception("Failed to create track structure, ", ex);
+                 } */
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    //_logger.LogError(ex, "Error creating track structure for track ID {TrackId}", structureDTO.TrackId);
-                    throw new Exception("Failed to create track structure, ", ex);
+                    throw new Exception($"Failed to create track structure: {ex.Message} | Inner: {ex.InnerException?.Message}", ex);
                 }
+
             }
         }
         public async Task<TrackDto> UpdateTrackAsync(TrackDto trackDto)
@@ -203,39 +209,52 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<bool> DeActivateTrackAsync(int id)
         {
-            var track = await _unitOfWork.TrackRepository.GetByIdAsync(id);
+            var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(id);
             if (track == null) return false;
+
             using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
                     track.IsActive = false;
-                    await _unitOfWork.SaveChangesAsync();
 
-                    foreach (var level in track.Levels)
+                    if (track.Levels != null)
                     {
-                        level.IsActive = false;
-                        await _unitOfWork.SaveChangesAsync();
-                        foreach (var satge in level.Stages)
+                        foreach (var level in track.Levels)
                         {
-                            satge.IsActive = false;
-                            await _unitOfWork.SaveChangesAsync();
-                            foreach (var cirteria in satge.EvaluationCriteria)
+                            level.IsActive = false;
+
+                            if (level.Stages != null)
                             {
-                                cirteria.isActive = false;
-                                await _unitOfWork.SaveChangesAsync();
+                                foreach (var stage in level.Stages)
+                                {
+                                    stage.IsActive = false;
+
+                                    if (stage.EvaluationCriteria != null)
+                                    {
+                                        foreach (var criteria in stage.EvaluationCriteria)
+                                        {
+                                            criteria.IsActive = false;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
+
+                    await _unitOfWork.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
                 }
                 catch (Exception ex)
                 {
-                    _unitOfWork.RollbackTransactionAsync();
-                    throw new Exception("Failed to delete track structure, ", ex);
+                    await _unitOfWork.RollbackTransactionAsync();
+                    throw new Exception("Failed to deactivate track structure", ex);
                 }
             }
-            return true;
         }
+
+
         public async Task<bool> ActivateTrackAsync(int id)
         {
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(id);
@@ -257,7 +276,7 @@ namespace SkillAssessmentPlatform.Application.Services
                             await _unitOfWork.SaveChangesAsync();
                             foreach (var cirteria in satge.EvaluationCriteria)
                             {
-                                cirteria.isActive = true;
+                                cirteria.IsActive = true;
                                 await _unitOfWork.SaveChangesAsync();
                             }
                         }
@@ -271,6 +290,93 @@ namespace SkillAssessmentPlatform.Application.Services
             }
             return true;
         }
+
+        public async Task<IEnumerable<TrackDetialDto>> GetOnlyActiveTracksAsync()
+        {
+            var tracks = await _unitOfWork.TrackRepository.GetOnlyActiveTracksAsync();
+
+            return tracks.Select(t => new TrackDetialDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Description = t.Description,
+                Objectives = t.Objectives,
+                Image = t.Image,
+                IsActive = t.IsActive,
+                AssociatedSkills = t.AssociatedSkills,
+                SeniorExaminerID = t.SeniorExaminerID
+            });
+        }
+
+        public async Task<IEnumerable<TrackDetialDto>> GetOnlyDeactivatedTracksAsync()
+        {
+            var tracks = await _unitOfWork.TrackRepository.GetOnlyDeactivatedTracksAsync();
+
+            return tracks.Select(t => new TrackDetialDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Description = t.Description,
+                Objectives = t.Objectives,
+                Image = t.Image,
+                IsActive = t.IsActive,
+                AssociatedSkills = t.AssociatedSkills,
+                SeniorExaminerID = t.SeniorExaminerID
+            });
+        }
+
+        public async Task<string> RestoreTrackAsync(int id)
+        {
+            var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(id);
+            if (track == null)
+                return "Track not found";
+
+            if (track.IsActive)
+                return "Track is already active";
+
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            {
+                try
+                {
+                    track.IsActive = true;
+
+                    if (track.Levels != null)
+                    {
+                        foreach (var level in track.Levels)
+                        {
+                            level.IsActive = true;
+
+                            if (level.Stages != null)
+                            {
+                                foreach (var stage in level.Stages)
+                                {
+                                    stage.IsActive = true;
+
+                                    if (stage.EvaluationCriteria != null)
+                                    {
+                                        foreach (var criteria in stage.EvaluationCriteria)
+                                        {
+                                            criteria.IsActive = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return "Track restored successfully with all related data";
+                }
+                catch (Exception ex)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    throw new Exception("Failed to restore track", ex);
+                }
+            }
+        }
+
 
         //public async Task<CreateLevelDTO> CreateLevelAsync(int trackId, [FromBody] CreateLevelDTO dto)
         //{

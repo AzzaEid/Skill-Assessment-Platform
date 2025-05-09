@@ -27,6 +27,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IEnrollmentRepository _enrollmentRepository;
         private readonly ILevelProgressRepository _levelProgressRepository;
         private readonly IStageProgressRepository _stageProgressRepository;
+        private readonly IExamRepository _examRepository; // ✅ استخدمي casing الصحيح هنا
+
 
         public UnitOfWork(
             AppDbContext context,
@@ -41,7 +43,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IExaminerLoadRepository examinerLoadRepository,
             IEnrollmentRepository enrollmentRepository,
             ILevelProgressRepository levelProgressRepository,
-            IStageProgressRepository stageProgressRepository)
+            IStageProgressRepository stageProgressRepository,
+            IExamRepository examRepository // ✅ هنا فقط
+        )
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -56,8 +60,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _enrollmentRepository = enrollmentRepository;
             _levelProgressRepository = levelProgressRepository;
             _stageProgressRepository = stageProgressRepository;
-
-
+            _examRepository = examRepository; // ✅ خزّنيها هنا
         }
 
         // Custom Repositories exposed
@@ -70,12 +73,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public ILevelRepository LevelRepository => _levelRepository;
         public IStageRepository StageRepository => _stageRepository;
         public IEvaluationCriteriaRepository EvaluationCriteriaRepository => _evaluationCriteriaRepository;
-
         public IEnrollmentRepository EnrollmentRepository => _enrollmentRepository;
         public ILevelProgressRepository LevelProgressRepository => _levelProgressRepository;
         public IStageProgressRepository StageProgressRepository => _stageProgressRepository;
-
-
+        public IExamRepository ExamRepository => _examRepository; // ✅ الـ property الفعلية
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
