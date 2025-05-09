@@ -1,26 +1,10 @@
 ﻿using AutoMapper;
-using MailKit.Net.Smtp;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NETCore.MailKit.Core;
 using SkillAssessmentPlatform.Application.DTOs.Auth;
-using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
-using SkillAssessmentPlatform.Infrastructure.Repositories;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -66,7 +50,7 @@ namespace SkillAssessmentPlatform.Application.Services
             }
 
             var user = _mapper.Map<User>(dto);
-            return await _unitOfWork.AuthRepository.RegisterExaminerAsync(user, dto.Password);
+            return await _unitOfWork.AuthRepository.RegisterExaminerAsync(user, dto.Password, dto.WorkingTrackIds);
         }
         public async Task EmailConfirmationAsync(string email, string token)
         {
@@ -111,7 +95,7 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task ResetPasswordAsync(ResetPasswordDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Token))
-{
+            {
                 throw new ArgumentException("Token is required");
             }
             await _unitOfWork.AuthRepository.ResetPassword(dto.Email, dto.Password, dto.Token);

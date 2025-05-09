@@ -1,22 +1,15 @@
-﻿using MailKit.Net.Smtp;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using SkillAssessmentPlatform.Core.Common;
+using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
+using SkillAssessmentPlatform.Infrastructure.Data;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using UnauthorizedAccessException = SkillAssessmentPlatform.Core.Exceptions.UnauthorizedAccessException;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
@@ -28,17 +21,19 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         private readonly IConfiguration _configuration;
         private readonly EmailServices _emailServices;
         private readonly ILogger<AuthRepository> _logger;
-
+        private readonly AppDbContext _context;
 
         public AuthRepository(UserManager<User> userManager,
             IConfiguration configuration,
             EmailServices emailServices,
-            ILogger<AuthRepository> logger)
+            ILogger<AuthRepository> logger,
+            AppDbContext context)
         {
             _userManager = userManager;
             _configuration = configuration;
             _emailServices = emailServices;
             _logger = logger;
+            _context = context;
         }
 
 
@@ -76,7 +71,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return applicant.Id;
         }
 
-        public async Task<string> RegisterExaminerAsync(User user, string password)
+        public async Task<string> RegisterExaminerAsync(User user, string password, List<int> trackIds)
         {
             var examiner = new Examiner
             {
@@ -85,8 +80,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 UserType = Actors.Examiner,
                 FullName = user.FullName,
                 Specialization = "----",
-
+                WorkingTracks = new List<Track>()
             };
+            // add tracks
+            foreach (var trackId in trackIds)
+            {
+                var track = await _context.Tracks.FindAsync(trackId);
+                if (track != null)
+                {
+                    examiner.WorkingTracks.Add(track);
+                }
+            }
+            // add the examiner
             var result = await _userManager.CreateAsync(examiner, password);
 
             if (!result.Succeeded)
@@ -101,6 +106,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 throw new BadRequestException("Problem in role assign", roleResult.Errors);
             }
 
+            // send confirmation email
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(examiner);
             string message = "Thank you for registering! Please click the button below to activate your account.";
 
@@ -277,7 +283,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             _logger.LogWarning("\n\n ====>\n token after genrate =    " + token);
 
             string message = "\r\nThank you for reaching out to us. We have received your request to reset your password.\r\n\r\nTo proceed with resetting your password, please follow the instructions below:\r\n\r\nClick on the password reset link sent to your registered email address.\r\nFollow the prompts to create a new password.\r\n";
-            
+
             await SendEmailAsync(user.Email, token, "resetpassword", "Forgot Password", "Reset your password", message);
         }
         public async Task ResetPassword(string email, string password, string token)
@@ -288,8 +294,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             {
                 throw new UserNotFoundException("Invalid email.");
             }
-            _logger.LogInformation("\n\n ======> Recived token = "+token);
-             var decodedToken = WebUtility.UrlDecode(token);
+            _logger.LogInformation("\n\n ======> Recived token = " + token);
+            var decodedToken = WebUtility.UrlDecode(token);
             //var decodedToken = Uri.UnescapeDataString(token);
             //string decodedToken = Base64UrlEncoder.Decode(token);
             //var decodedToken = Encoding.UTF8.GetString(Convert.FromBase64String(token));
@@ -297,45 +303,45 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
             _logger.LogInformation("\n\n ======> Decoded token = " + decodedToken);
             var resetPassResult = await _userManager.ResetPasswordAsync(user, token, password);
-                if (!resetPassResult.Succeeded)
-                {
-                    foreach (var error in resetPassResult.Errors)
-                        _logger.LogError(error.Code, error.Description);
-                   
-                    throw new BadRequestException("Failed to reset password.", resetPassResult.Errors);
+            if (!resetPassResult.Succeeded)
+            {
+                foreach (var error in resetPassResult.Errors)
+                    _logger.LogError(error.Code, error.Description);
 
-                }
+                throw new BadRequestException("Failed to reset password.", resetPassResult.Errors);
+
             }
+        }
         //string decodedToken = Uri.UnescapeDataString(token);
         //string decodedToken = Uri.UnescapeDataString(token);
 
 
-    public async Task<bool> UpdateUserEmail(string userId, string newEmail)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-            throw new UserNotFoundException("Invalid email.");
-
-        var existUser = await _userManager.FindByEmailAsync(newEmail);
-        if (existUser != null)
-                    throw new BadRequestException($"Email {newEmail} already exists");
-
-        var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
-
-        var result = await _userManager.ChangeEmailAsync(user, newEmail, token);
-        if (!result.Succeeded)
+        public async Task<bool> UpdateUserEmail(string userId, string newEmail)
         {
-            throw new BadRequestException("Field to change email. ", result.Errors);
-        }
-        user.UserName = newEmail;
-        var updateUserNameResult = await _userManager.UpdateAsync(user);
-        if (!updateUserNameResult.Succeeded)
-        {
-            throw new BadRequestException("Field to user name. ", updateUserNameResult.Errors);
-        }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new UserNotFoundException("Invalid email.");
 
-        return updateUserNameResult.Succeeded;
+            var existUser = await _userManager.FindByEmailAsync(newEmail);
+            if (existUser != null)
+                throw new BadRequestException($"Email {newEmail} already exists");
+
+            var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+
+            var result = await _userManager.ChangeEmailAsync(user, newEmail, token);
+            if (!result.Succeeded)
+            {
+                throw new BadRequestException("Field to change email. ", result.Errors);
+            }
+            user.UserName = newEmail;
+            var updateUserNameResult = await _userManager.UpdateAsync(user);
+            if (!updateUserNameResult.Succeeded)
+            {
+                throw new BadRequestException("Field to user name. ", updateUserNameResult.Errors);
+            }
+
+            return updateUserNameResult.Succeeded;
+        }
     }
-    }
-    }
+}
 

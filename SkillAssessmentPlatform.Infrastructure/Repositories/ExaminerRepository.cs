@@ -7,11 +7,6 @@ using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
@@ -53,23 +48,24 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             var examiner = await _context.Users
                 .OfType<Examiner>()
                 .Include(e => e.ExaminerLoads)
+                .Include(e => e.WorkingTracks)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (examiner == null)
                 throw new UserNotFoundException($"No examiner with id: {id}");
 
             return examiner;
-        
+
         }
         public override async Task<Examiner> UpdateAsync(Examiner entity)
         {
-            var result =  await _userManager.UpdateAsync(entity);
-            if  (!result.Succeeded)   
+            var result = await _userManager.UpdateAsync(entity);
+            if (!result.Succeeded)
             {
                 throw new BadRequestException($"problem", result.Errors);
             }
-            return  await GetByIdAsync(entity.Id);
-            
+            return await GetByIdAsync(entity.Id);
+
         }
 
         public async Task<Examiner> UpdateSpecializationAsync(string id, string specialization)

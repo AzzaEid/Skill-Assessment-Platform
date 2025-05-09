@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
-using SkillAssessmentPlatform.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Data
 {
@@ -27,6 +23,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IEnrollmentRepository _enrollmentRepository;
         private readonly ILevelProgressRepository _levelProgressRepository;
         private readonly IStageProgressRepository _stageProgressRepository;
+        private readonly ISeniorRepository _seniorRepository;
 
         public UnitOfWork(
             AppDbContext context,
@@ -41,7 +38,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IExaminerLoadRepository examinerLoadRepository,
             IEnrollmentRepository enrollmentRepository,
             ILevelProgressRepository levelProgressRepository,
-            IStageProgressRepository stageProgressRepository)
+            IStageProgressRepository stageProgressRepository,
+            ISeniorRepository seniorRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -56,6 +54,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _enrollmentRepository = enrollmentRepository;
             _levelProgressRepository = levelProgressRepository;
             _stageProgressRepository = stageProgressRepository;
+            _seniorRepository = seniorRepository;
 
 
         }
@@ -65,6 +64,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IUserRepository UserRepository => _userRepository;
         public IApplicantRepository ApplicantRepository => _applicantRepository;
         public IExaminerRepository ExaminerRepository => _examinerRepository;
+        public ISeniorRepository SeniorRepository => _seniorRepository;
         public IExaminerLoadRepository ExaminerLoadRepository => _examinerLoadRepository;
         public ITrackRepository TrackRepository => _trackRepository;
         public ILevelRepository LevelRepository => _levelRepository;
