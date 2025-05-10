@@ -1,23 +1,14 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Common;
-using SkillAssessmentPlatform.Core.Entities;
-using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Core.Interfaces.Repository;
-using SkillAssessmentPlatform.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
     public class ApplicantService
     {
         private readonly IUnitOfWork _unitOfWork;
-       
+
         private readonly IMapper _mapper;
 
         public ApplicantService(

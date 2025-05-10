@@ -17,6 +17,7 @@ namespace SkillAssessmentPlatform.Application
             services.AddTransient<UserService>();
             services.AddTransient<ApplicantService>();
             services.AddTransient<ExaminerService>();
+            services.AddTransient<SeniorService>();
             services.AddTransient<ExaminerLoadsService>();
             //==
             services.AddTransient<EnrollmentService>();

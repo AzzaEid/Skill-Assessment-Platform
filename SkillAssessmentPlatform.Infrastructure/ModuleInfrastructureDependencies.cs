@@ -23,6 +23,7 @@ namespace SkillAssessmentPlatform.Infrastructure
             services.AddTransient<IApplicantRepository, ApplicantRepository>();
             services.AddTransient<IExaminerRepository, ExaminerRepository>();
             services.AddTransient<IExaminerLoadRepository, ExaminerLoadRepository>();
+            services.AddTransient<ISeniorRepository, SeniorRepository>();
             //===
             services.AddTransient<ITrackRepository, TrackRepository>();
             services.AddTransient<ILevelRepository, LevelRepository>();
