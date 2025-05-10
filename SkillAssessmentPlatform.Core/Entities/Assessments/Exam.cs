@@ -8,8 +8,10 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public int StageId { get; set; }
         public int DurationMinutes { get; set; }
         public string Difficulty { get; set; }
-        public string QuestionsType { get; set; }
+      //  public string QuestionsType { get; set; }
         public bool IsActive { get; set; } = true;
+        public QuestionType QuestionsType { get; set; }
+
 
 
         // Navigation properties
