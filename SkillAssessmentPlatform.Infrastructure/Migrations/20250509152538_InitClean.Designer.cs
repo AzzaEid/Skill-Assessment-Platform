@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkillAssessmentPlatform.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkillAssessmentPlatform.Infrastructure.Data;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250509152538_InitClean")]
+    partial class InitClean
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -308,6 +311,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -318,9 +324,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.Property<float>("Weight")
                         .HasColumnType("real");
-
-                    b.Property<bool>("isActive")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -450,7 +453,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("NoOfattempts")
+                    b.Property<int>("NoOfAttempts")
                         .HasColumnType("int");
 
                     b.Property<int>("Order")
@@ -595,6 +598,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("QuestionsCategory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("QuestionsType")
                         .HasColumnType("int");
 
@@ -657,10 +667,16 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<int>("MaxDaysToBook")
                         .HasColumnType("int");
 
                     b.Property<int>("StageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

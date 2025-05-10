@@ -17,9 +17,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<Track> GetTrackWithDetailsAsync(int trackId)
         {
             return await _context.Tracks
-                .Include(t => t.Levels)
-                    .ThenInclude(l => l.Stages)
-                .FirstOrDefaultAsync(t => t.Id == trackId);
+            .Include(t => t.Levels)
+            .ThenInclude(l => l.Stages)
+            .ThenInclude(s => s.EvaluationCriteria)
+             .FirstOrDefaultAsync(t => t.Id == trackId);
+
         }
 
         public async Task<IEnumerable<Level>> GetLevelsByTrackIdAsync(int trackId)
@@ -49,5 +51,22 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Where(t => t.Examiners.Any(e => e.Id == examinerId))  // the relation is M-M
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Track>> GetOnlyActiveTracksAsync()
+        {
+            return await _context.Tracks
+                .Where(t => t.IsActive)
+                .ToListAsync();
+        }
+
+
+        public async Task<IEnumerable<Track>> GetOnlyDeactivatedTracksAsync()
+        {
+            return await _context.Tracks
+                .Where(t => !t.IsActive)
+                .ToListAsync();
+        }
+
+
     }
 }

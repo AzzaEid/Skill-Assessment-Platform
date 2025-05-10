@@ -9,6 +9,13 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         ILevelRepository LevelRepository { get; }
         IStageRepository StageRepository { get; }
         IEvaluationCriteriaRepository EvaluationCriteriaRepository { get; }
+        IExamRepository ExamRepository { get; }
+        IInterviewRepository InterviewRepository { get; }
+        ITasksPoolRepository TasksPoolRepository { get; }
+        IAppTaskRepository AppTaskRepository { get; }
+
+
+
 
         #region repos
         IGenericRepository<T> Repository<T>() where T : class;
@@ -22,6 +29,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IEnrollmentRepository EnrollmentRepository { get; }
         ILevelProgressRepository LevelProgressRepository { get; }
         IStageProgressRepository StageProgressRepository { get; }
+       // ITasksPoolRepository TasksPoolRepository { get; }
 
         #endregion
 

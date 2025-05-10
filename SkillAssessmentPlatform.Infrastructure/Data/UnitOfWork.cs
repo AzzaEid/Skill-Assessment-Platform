@@ -24,6 +24,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly ILevelProgressRepository _levelProgressRepository;
         private readonly IStageProgressRepository _stageProgressRepository;
         private readonly ISeniorRepository _seniorRepository;
+        private readonly IExamRepository _examRepository;
+        private readonly IInterviewRepository _interviewRepository;
+        private readonly ITasksPoolRepository _tasksPoolRepository;
+        private readonly IAppTaskRepository _appTaskRepository;
+
 
         public UnitOfWork(
             AppDbContext context,
@@ -40,6 +45,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             ILevelProgressRepository levelProgressRepository,
             IStageProgressRepository stageProgressRepository,
             ISeniorRepository seniorRepository)
+            IExamRepository examRepository,
+            IInterviewRepository interviewRepository,
+            IAppTaskRepository appTaskRepository,
+            ITasksPoolRepository tasksPoolRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -56,7 +65,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _stageProgressRepository = stageProgressRepository;
             _seniorRepository = seniorRepository;
 
-
+            _examRepository = examRepository;
+            _interviewRepository = interviewRepository;
+            _tasksPoolRepository = tasksPoolRepository;
+            _appTaskRepository = appTaskRepository;
         }
 
         // Custom Repositories exposed
@@ -70,12 +82,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public ILevelRepository LevelRepository => _levelRepository;
         public IStageRepository StageRepository => _stageRepository;
         public IEvaluationCriteriaRepository EvaluationCriteriaRepository => _evaluationCriteriaRepository;
-
         public IEnrollmentRepository EnrollmentRepository => _enrollmentRepository;
         public ILevelProgressRepository LevelProgressRepository => _levelProgressRepository;
         public IStageProgressRepository StageProgressRepository => _stageProgressRepository;
+        public IExamRepository ExamRepository => _examRepository;
+        public IInterviewRepository InterviewRepository => _interviewRepository;
+        public ITasksPoolRepository TasksPoolRepository => _tasksPoolRepository;
 
-
+        public IAppTaskRepository AppTaskRepository => _appTaskRepository;
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

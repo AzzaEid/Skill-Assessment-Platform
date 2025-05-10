@@ -70,6 +70,19 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Success(message: "Stage deactivated (soft deleted) successfully.");
         }
 
+        [HttpPut("{id}/restore")]
+        public async Task<IActionResult> RestoreStage(int id)
+        {
+            var result = await _stageService.RestoreStageAsync(id);
+
+            return result switch
+            {
+                "Stage not found" => NotFound(new { message = result }),
+                "Stage is already active" => BadRequest(new { message = result }),
+                _ => _responseHandler.Success(message: result)
+            };
+        }
+
 
     }
 }

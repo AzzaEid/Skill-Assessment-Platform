@@ -88,5 +88,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return true;
         }
 
+        public virtual void DeleteEntity(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+        }
+
+
     }
 }

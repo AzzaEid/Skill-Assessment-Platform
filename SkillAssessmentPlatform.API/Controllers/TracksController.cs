@@ -37,7 +37,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTrackDTO dto) =>
+    public async Task<IActionResult> Create([FromForm] CreateTrackDTO dto) =>
      _responseHandler.Created(await _trackService.CreateTrackAsync(dto));
 
     [HttpPost("structure")]
@@ -54,7 +54,9 @@ public class TracksController : ControllerBase
         }
         catch (Exception ex)
         {
-            return _responseHandler.BadRequest($" errors in creating {ex.Message}");
+            // return _responseHandler.BadRequest($" errors in creating {ex.Message}");
+            return BadRequest($" errors in creating {ex.Message} | Inner: {ex.InnerException?.Message}");
+
         }
     }
 
@@ -74,6 +76,33 @@ public class TracksController : ControllerBase
     {
         await _trackService.ActivateTrackAsync(id);
         return _responseHandler.Deleted();
+    }
+    [HttpGet("active")]
+    public async Task<IActionResult> GetOnlyActiveTracks()
+    {
+        var result = await _trackService.GetOnlyActiveTracksAsync();
+        return _responseHandler.Success(result);
+    }
+
+    [HttpGet("not-active")]
+    public async Task<IActionResult> GetOnlyDeactivatedTracks()
+    {
+        var result = await _trackService.GetOnlyDeactivatedTracksAsync();
+        return _responseHandler.Success(result);
+    }
+
+
+    [HttpPut("{id}/restore")]
+    public async Task<IActionResult> RestoreTrack(int id)
+    {
+        var result = await _trackService.RestoreTrackAsync(id);
+
+        return result switch
+        {
+            "Track not found" => NotFound(new { message = result }),
+            "Track is already active" => BadRequest(new { message = result }),
+            _ => _responseHandler.Success(message: result)
+        };
     }
 
     //[HttpPost("{trackId}/levels")]

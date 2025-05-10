@@ -291,7 +291,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
             // check the no. of allowed attempts and existed attempts
             var attempts = await _unitOfWork.StageProgressRepository.GetAttemptCountAsync(stageId);
-            if (stage.NoOfattempts <= attempts)
+            if (stage.NoOfAttempts <= attempts)
                 throw new BadRequestException("This stage does not allow more attempts");
 
             // التحقق من عدم وجود محاولة قيد التقدم
