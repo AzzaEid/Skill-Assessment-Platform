@@ -1,10 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
-using SkillAssessmentPlatform.Core.Entities.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
 {
@@ -17,6 +12,7 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public DateTime ScheduledDate { get; set; }
         public string Instructions { get; set; }
         public int FeedbackId { get; set; }
+        public ExamRequestStatus Status { get; set; }
 
         // Navigation properties
         public Exam Exam { get; set; }

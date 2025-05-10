@@ -38,7 +38,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
 
         [HttpPost("register/applicant")]
-        public async Task<IActionResult> RegisterApplicant([FromBody] UserRegisterDTO userRegisterDTO)
+        public async AppTask<IActionResult> RegisterApplicant([FromBody] UserRegisterDTO userRegisterDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -55,7 +55,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         [HttpPost("register/examiner")]
 
         //[Authorize(Roles ="Admin")]
-        public async Task<IActionResult> RegisterExaminer([FromBody] UserRegisterDTO userRegisterDTO)
+        public async AppTask<IActionResult> RegisterExaminer([FromBody] UserRegisterDTO userRegisterDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -72,7 +72,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDTO loginDTO)
+        public async AppTask<IActionResult> Login(LoginDTO loginDTO)
         {
             if (loginDTO == null)
             {
@@ -87,7 +87,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
 
         [HttpGet("emailconfirmation")]
-        public async Task<IActionResult> EmailConfirmation([FromQuery] string email, [FromQuery] string token)
+        public async AppTask<IActionResult> EmailConfirmation([FromQuery] string email, [FromQuery] string token)
         {
             if (email == null || token == null)
             {
@@ -106,7 +106,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
         [HttpPost("forgotpassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        public async AppTask<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -122,7 +122,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
         }
         [HttpGet("resetpassword")]
-        public async Task<IActionResult> ResetPassword([FromQuery] string email, [FromQuery] string token)
+        public async AppTask<IActionResult> ResetPassword([FromQuery] string email, [FromQuery] string token)
         {
             if(email == null) { return BadRequest(); }
             string encodedToken = Base64UrlEncoder.Encode(token);
@@ -132,7 +132,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
         [HttpPost("resetpassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
+        public async AppTask<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
         {
             if(dto == null) 
             { 
@@ -148,7 +148,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
         [HttpPost("changepassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ChangePassword(ChangePasswordDTO dto)
+        public async AppTask<IActionResult> ChangePassword(ChangePasswordDTO dto)
         {
             if (dto == null)
             {
@@ -161,14 +161,14 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
+        public async AppTask<IActionResult> DeleteUser(string id)
         {
             await _authService.DeleteUserAsync(id);
             return NoContent(); 
         }
 
         [HttpPut("updateuseremail")]
-        public async Task<IActionResult> UpdateUserEmail(UpdateEmailDto dto)
+        public async AppTask<IActionResult> UpdateUserEmail(UpdateEmailDto dto)
         {
             if (dto == null)
             {

@@ -15,6 +15,12 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IStageRepository StageRepository { get; }
         IEvaluationCriteriaRepository EvaluationCriteriaRepository { get; }
         IExamRepository ExamRepository { get; }
+        IInterviewRepository InterviewRepository { get; }
+        ITasksPoolRepository TasksPoolRepository { get; }
+        IAppTaskRepository AppTaskRepository { get; }
+
+
+
 
 
         #region repos
@@ -28,10 +34,12 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IEnrollmentRepository EnrollmentRepository { get; }
         ILevelProgressRepository LevelProgressRepository { get; }
         IStageProgressRepository StageProgressRepository { get; }
+       // ITasksPoolRepository TasksPoolRepository { get; }
+
         #endregion
 
         #region methods
-        //  Task<IDbContextTransaction> BeginTransactionAsync();
+        //  AppTask<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveChangesAsync();
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task CommitTransactionAsync();

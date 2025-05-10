@@ -58,7 +58,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
                     /* >>> ---
                      * / Create certificate 
-                    var certificate = new Certificate
+                    var certificate = new AppCertificate
                     {
                         ApplicantId = enrollment.ApplicantId,
                         LevelProgressID = levelProgress.Id,

@@ -10,7 +10,7 @@ namespace SkillAssessmentPlatform.Core.Entities
         public int LevelId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public StageType Type { get; set; }  // "Exam", "Task", "Interview"
+        public StageType Type { get; set; }  // "Exam", "AppTask", "Interview"
         public int Order { get; set; }
         public bool IsActive { get; set; } = true;
         public int PassingScore { get; set; }
@@ -22,6 +22,6 @@ namespace SkillAssessmentPlatform.Core.Entities
         public ICollection<StageProgress> StageProgresses { get; set; }
         public Interview Interview { get; set; }
         public Exam Exam { get; set; }
-        public ICollection<TasksPool> TasksPools { get; set; }
+        public TasksPool TasksPool { get; set; }
     }
 }

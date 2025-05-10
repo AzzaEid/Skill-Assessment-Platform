@@ -1,70 +1,40 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using SkillAssessmentPlatform.API.Bases;
+using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.API.Middleware;
-using SkillAssessmentPlatform.Application.Mapping;
-using SkillAssessmentPlatform.Application.Services;
+using SkillAssessmentPlatform.Application;
 using SkillAssessmentPlatform.Core.Entities.Users;
-using SkillAssessmentPlatform.Core.Enums;
+using SkillAssessmentPlatform.Infrastructure;
+using SkillAssessmentPlatform.Infrastructure.Data;
+using SkillAssessmentPlatform.Infrastructure.Seeder;
+using System.Text.Json.Serialization;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Infrastructure.Data;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 using SkillAssessmentPlatform.Infrastructure.Repositories;
-using System.Text;
-using System.Text.Json.Serialization;
-using SkillAssessmentPlatform.API.Common;
+using SkillAssessmentPlatform.Application.Mapping;
+using SkillAssessmentPlatform.Application.Services;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container
-        builder.Services.AddControllers();
-
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-        builder.Services.AddIdentity<User, IdentityRole>(options =>
-        {
-            options.Password.RequireUppercase = false;
-            options.SignIn.RequireConfirmedEmail = false;
-        })
+        builder.Services.AddIdentity<User, IdentityRole>()
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
-        builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
-            options.TokenLifespan = TimeSpan.FromHours(7));
 
-        builder.Services.AddLogging();
-        builder.Services.AddScoped<IResponseHandler, ResponseHandler>();
+        // Database
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
-            builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
-            builder.Services.AddScoped<IExaminerRepository, ExaminerRepository>();
-            builder.Services.AddScoped<ITrackRepository, TrackRepository>();
-            builder.Services.AddScoped<ILevelRepository, LevelRepository>();
-            builder.Services.AddScoped<IStageRepository, StageRepository>();
-            builder.Services.AddScoped<IEvaluationCriteriaRepository, EvaluationCriteriaRepository>();
-            builder.Services.AddScoped<IExaminerLoadRepository, ExaminerLoadRepository>();
-            builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
-            builder.Services.AddScoped<ILevelProgressRepository, LevelProgressRepository>();
-            builder.Services.AddScoped<IStageProgressRepository, StageProgressRepository>();
-            builder.Services.AddScoped<IExamRepository, ExamRepository>();
-        // Repositories
+        // Infrastructure
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+        // Repositories
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
@@ -73,32 +43,17 @@ public class Program
         builder.Services.AddScoped<ILevelRepository, LevelRepository>();
         builder.Services.AddScoped<IStageRepository, StageRepository>();
         builder.Services.AddScoped<IEvaluationCriteriaRepository, EvaluationCriteriaRepository>();
-
-
-            builder.Services.AddScoped<AuthService>();
-            builder.Services.AddScoped<TokenService>();
-            builder.Services.AddScoped<UserService>();
-            builder.Services.AddScoped<ApplicantService>();
-            builder.Services.AddScoped<ExaminerService>();
-            builder.Services.AddScoped<ExaminerLoadsService>();
-            builder.Services.AddScoped<UserService>();
-            builder.Services.AddScoped<TrackService>();
-            builder.Services.AddScoped<EnrollmentService>();
-            builder.Services.AddScoped<StageProgressService>();
-            builder.Services.AddScoped<LevelProgressService>();
-            builder.Services.AddScoped<ExamService>();
-
-
-        builder.Services.AddDbContext<AppDbContext>();
-           
+        builder.Services.AddScoped<IExaminerLoadRepository, ExaminerLoadRepository>();
+        builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+        builder.Services.AddScoped<ILevelProgressRepository, LevelProgressRepository>();
+        builder.Services.AddScoped<IStageProgressRepository, StageProgressRepository>();
+        builder.Services.AddScoped<IExamRepository, ExamRepository>();
+        builder.Services.AddScoped<IInterviewRepository, InterviewRepository>();
+        builder.Services.AddScoped<ITasksPoolRepository, TasksPoolRepository>();
+        builder.Services.AddScoped<IAppTaskRepository, AppTaskRepository>();
 
 
 
-
-            builder.Services.AddSingleton<IFileService, FileService>();
-
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Services.AddScoped<EmailServices>();
 
         // Services
         builder.Services.AddScoped<AuthService>();
@@ -106,39 +61,38 @@ public class Program
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<ApplicantService>();
         builder.Services.AddScoped<ExaminerService>();
+        builder.Services.AddScoped<ExaminerLoadsService>();
         builder.Services.AddScoped<TrackService>();
-        builder.Services.AddSingleton<IFileService, FileService>();
-        builder.Services.AddScoped<EmailServices>();
+        builder.Services.AddScoped<EnrollmentService>();
+        builder.Services.AddScoped<StageProgressService>();
+        builder.Services.AddScoped<LevelProgressService>();
         builder.Services.AddScoped<LevelService>();
         builder.Services.AddScoped<StageService>();
-       
+        builder.Services.AddScoped<ExamService>();
+        builder.Services.AddScoped<InterviewService>();
+        builder.Services.AddScoped<TasksPoolService>();
+        builder.Services.AddScoped<AppTaskService>();
 
 
-        builder.Services.AddControllers()
-                            .AddJsonOptions(options =>
-                            {
-                                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                            });
 
 
+        // Shared
+        builder.Services.AddScoped<IResponseHandler, ResponseHandler>();
+        builder.Services.AddSingleton<IFileService, FileService>();
+        builder.Services.AddScoped<EmailServices>();
         builder.Services.AddAutoMapper(typeof(MappingProfile));
-       
 
+        // Controllers & Enums
+        builder.Services.AddControllers()
+                        .AddJsonOptions(options =>
+                        {
+                            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                        });
 
-        // CORS setup for HTTPS frontend
-        //builder.Services.AddCors(options =>
-        //{
-        //    options.AddPolicy("AllowFrontend", policy =>
-        //    {
-        //        policy.WithOrigins("https://localhost:7160")
-        //              .AllowAnyHeader()
-        //              .AllowAnyMethod();
-        //    });
-        //});
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
+        // CORS
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowAll", policy =>
@@ -149,31 +103,18 @@ public class Program
             });
         });
 
-        //  Move Authentication before Build
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.RequireHttpsMetadata = false;
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidAudience = builder.Configuration["JWT:Audience"],
-                ValidIssuer = builder.Configuration["JWT:Issuer"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:key"]))
-            };
-        });
-
-        //  Build the app only once
         var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            await RolesSeeder.SeedAsync(roleManager);
+
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            await UsersSeeder.SeedAsync(userManager);
+        }
+
         app.UseCors("AllowAll");
-        //  Use correct middleware order
-    //    app.UseCors("AllowFrontend");
         app.UseHttpsRedirection();
         app.UseMiddleware<ErrorHandlerMiddleware>();
         app.UseAuthentication();
@@ -185,48 +126,7 @@ public class Program
             app.UseSwaggerUI();
         }
 
-        using (var scope = app.Services.CreateScope())
-        {
-            var serviceProvider = scope.ServiceProvider;
-            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
-            await SeedAdmin(serviceProvider, logger);
-        }
-
         app.MapControllers();
         app.Run();
-    }
-
-    async static Task SeedAdmin(IServiceProvider serviceProvider, ILogger logger)
-    {
-        var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
-        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-        string adminEmail = "azzaaleid@gmail.com";
-        string adminPassword = "Admin@123456";
-
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        if (adminUser == null)
-        {
-            adminUser = new User
-            {
-                UserName = adminEmail,
-                Email = adminEmail,
-                EmailConfirmed = true,
-                UserType = Actors.Admin,
-                FullName = "Admin",
-                Gender = Gender.Female
-            };
-
-            var result = await userManager.CreateAsync(adminUser, adminPassword);
-            if (result.Succeeded)
-            {
-                await userManager.AddToRoleAsync(adminUser, Actors.Admin.ToString());
-                logger.LogInformation("Admin created!");
-            }
-            else
-            {
-                logger.LogError("Seed admin failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-            }
-        }
     }
 }

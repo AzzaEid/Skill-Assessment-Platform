@@ -82,7 +82,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Certificate>> GetCertificatesAsync(string applicantId)
+        public async Task<IEnumerable<AppCertificate>> GetCertificatesAsync(string applicantId)
         {
             return await _context.Certificates
                 .Where(c => c.ApplicantId == applicantId)

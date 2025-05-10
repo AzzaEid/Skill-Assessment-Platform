@@ -12,6 +12,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public int Id { get; set; } 
         public int DurationMinutes { get; set; }
         public string Difficulty { get; set; }
-        public string QuestionsType { get; set; }
+        public List<string> QuestionsType { get; set; }
+
     }
 }

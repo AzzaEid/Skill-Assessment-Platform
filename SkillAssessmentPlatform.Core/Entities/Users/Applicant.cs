@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
+﻿using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
+using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Core.Entities.Users
 {
@@ -14,7 +8,9 @@ namespace SkillAssessmentPlatform.Core.Entities.Users
     {
         public ApplicantStatus Status { get; set; }
 
-        public ICollection<Enrollment> Enrollments { get; set; }
-        public ICollection<Certificate> Certificates { get; set; }
+        public ICollection<Enrollment> Enrollments { get; set; } = new HashSet<Enrollment>();
+        public ICollection<AppCertificate> Certificates { get; set; } = new HashSet<AppCertificate>();
+        public ICollection<Applicant> Applicants { get; set; } = new HashSet<Applicant>();
+        public ICollection<TaskApplicant> TaskApplicants { get; set; } = new HashSet<TaskApplicant>();
     }
 }

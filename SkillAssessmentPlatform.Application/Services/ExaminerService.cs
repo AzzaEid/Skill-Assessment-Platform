@@ -41,7 +41,7 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
         /*cuz-error
-        public async Task<ExaminerDTO> UpdateExaminerAsync(string id, UpdateExaminerDTO examinerDto)
+        public async AppTask<ExaminerDTO> UpdateExaminerAsync(string id, UpdateExaminerDTO examinerDto)
         {
             var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(id);
 

@@ -21,6 +21,6 @@ namespace SkillAssessmentPlatform.Core.Entities
         public Level Level { get; set; }
         public Enrollment Enrollment { get; set; }
         public ICollection<StageProgress> StageProgresses { get; set; }
-        public ICollection<Certificate> Certificates { get; set; }
+        public ICollection<AppCertificate> Certificates { get; set; }
     }
 }

@@ -105,7 +105,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
         /*
         [HttpPost("enrollment/{enrollmentId}/stage/{currentStageId}/next")]
-        public async Task<IActionResult> CreateNextStageProgress(int enrollmentId, int currentStageId)
+        public async AppTask<IActionResult> CreateNextStageProgress(int enrollmentId, int currentStageId)
         {
             var nextStageProgress = await _stageProgressService.CreateNextStageProgressAsync(enrollmentId, currentStageId);
             return _responseHandler.Created(nextStageProgress, "Next stage progress created successfully");

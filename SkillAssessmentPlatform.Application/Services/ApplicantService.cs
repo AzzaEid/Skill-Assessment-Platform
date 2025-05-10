@@ -58,7 +58,7 @@ namespace SkillAssessmentPlatform.Application.Services
             return _mapper.Map<ApplicantDTO>(updatedApplicant);
         }
         /*
-        public async Task<PagedResponse<EnrollmentDTO>> GetApplicantEnrollmentsAsync(string applicantId, int page = 1, int pageSize = 10)
+        public async AppTask<PagedResponse<EnrollmentDTO>> GetApplicantEnrollmentsAsync(string applicantId, int page = 1, int pageSize = 10)
         {
             var enrollments = await _enrollmentRepository.GetByApplicantIdAsync(applicantId, page, pageSize);
             var totalCount = await _enrollmentRepository.CountByApplicantIdAsync(applicantId);
@@ -71,7 +71,7 @@ namespace SkillAssessmentPlatform.Application.Services
             );
         }
 
-        public async Task<PagedResponse<CertificateDTO>> GetApplicantCertificatesAsync(string applicantId, int page = 1, int pageSize = 10)
+        public async AppTask<PagedResponse<CertificateDTO>> GetApplicantCertificatesAsync(string applicantId, int page = 1, int pageSize = 10)
         {
             var certificates = await _certificateRepository.GetByApplicantIdAsync(applicantId, page, pageSize);
             var totalCount = await _certificateRepository.CountByApplicantIdAsync(applicantId);
@@ -84,7 +84,7 @@ namespace SkillAssessmentPlatform.Application.Services
             );
         }
         
-        public async Task<EnrollmentDTO> EnrollApplicantInTrackAsync(string applicantId, EnrollmentCreateDTO enrollmentDto)
+        public async AppTask<EnrollmentDTO> EnrollApplicantInTrackAsync(string applicantId, EnrollmentCreateDTO enrollmentDto)
         {
             var track = await _trackRepository.GetByIdAsync(enrollmentDto.TrackId);
             var applicant = await _applicantRepository.GetByIdAsync(applicantId);
@@ -101,7 +101,7 @@ namespace SkillAssessmentPlatform.Application.Services
             return _mapper.Map<EnrollmentDTO>(createdEnrollment);
         }
 
-        public async Task<PagedResponse<ProgressDTO>> GetApplicantProgressAsync(string applicantId, int page = 1, int pageSize = 10)
+        public async AppTask<PagedResponse<ProgressDTO>> GetApplicantProgressAsync(string applicantId, int page = 1, int pageSize = 10)
         {
             var progressRecords = await _enrollmentRepository.GetProgressByApplicantIdAsync(applicantId, page, pageSize);
             var totalCount = await _enrollmentRepository.CountProgressByApplicantIdAsync(applicantId);

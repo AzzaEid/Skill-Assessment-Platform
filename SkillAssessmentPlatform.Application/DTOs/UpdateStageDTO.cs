@@ -11,7 +11,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public StageType Type { get; set; }  // "Task", "Exam", "Interview"
+        public StageType Type { get; set; }  // "AppTask", "Exam", "Interview"
         public int Order { get; set; }
         public int PassingScore { get; set; }
         public int NoOfattempts { get; set; } = 0;

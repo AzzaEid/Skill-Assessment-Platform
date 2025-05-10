@@ -75,7 +75,7 @@ namespace SkillAssessmentPlatform.Application.Services
         }
         /*
          * old login
-        public async Task<Response<string>> LogInAsync(LoginDTO loginDTO)
+        public async AppTask<Response<string>> LogInAsync(LoginDTO loginDTO)
         {
             try
             {

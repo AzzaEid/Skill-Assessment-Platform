@@ -15,6 +15,6 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public string Requirements { get; set; }
         // Navigation properties
         public Stage Stage { get; set; }
-        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public ICollection<AppTask> Tasks { get; set; } = new List<AppTask>();
     }
 }

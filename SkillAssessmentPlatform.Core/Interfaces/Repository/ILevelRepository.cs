@@ -14,8 +14,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task AddAsync(Level level);
 
 
-        //    Task<IEnumerable<Level>> GetStagesByLevelIdAsync(int trackId);
-        //     Task<Level> GetLevelWithStagesAsync(int levelId);
+        //    AppTask<IEnumerable<Level>> GetStagesByLevelIdAsync(int trackId);
+        //     AppTask<Level> GetLevelWithStagesAsync(int levelId);
 
 
         Task<IEnumerable<Level>> GetLevelsByTrackIdAsync(int trackId);

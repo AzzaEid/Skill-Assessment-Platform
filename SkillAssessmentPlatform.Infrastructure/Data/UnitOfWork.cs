@@ -27,7 +27,15 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IEnrollmentRepository _enrollmentRepository;
         private readonly ILevelProgressRepository _levelProgressRepository;
         private readonly IStageProgressRepository _stageProgressRepository;
-        private readonly IExamRepository _examRepository; // ✅ استخدمي casing الصحيح هنا
+        private readonly IExamRepository _examRepository;
+        private readonly IInterviewRepository _interviewRepository;
+        private readonly ITasksPoolRepository _tasksPoolRepository;
+        private readonly IAppTaskRepository _appTaskRepository;
+
+
+
+
+
 
 
         public UnitOfWork(
@@ -44,8 +52,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IEnrollmentRepository enrollmentRepository,
             ILevelProgressRepository levelProgressRepository,
             IStageProgressRepository stageProgressRepository,
-            IExamRepository examRepository // ✅ هنا فقط
-        )
+            IExamRepository examRepository,
+            IInterviewRepository interviewRepository,
+            IAppTaskRepository appTaskRepository,
+            ITasksPoolRepository tasksPoolRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -60,7 +70,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _enrollmentRepository = enrollmentRepository;
             _levelProgressRepository = levelProgressRepository;
             _stageProgressRepository = stageProgressRepository;
-            _examRepository = examRepository; // ✅ خزّنيها هنا
+            _examRepository = examRepository;
+            _interviewRepository = interviewRepository;
+            _tasksPoolRepository = tasksPoolRepository;
+            _appTaskRepository = appTaskRepository;
         }
 
         // Custom Repositories exposed
@@ -76,7 +89,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IEnrollmentRepository EnrollmentRepository => _enrollmentRepository;
         public ILevelProgressRepository LevelProgressRepository => _levelProgressRepository;
         public IStageProgressRepository StageProgressRepository => _stageProgressRepository;
-        public IExamRepository ExamRepository => _examRepository; // ✅ الـ property الفعلية
+        public IExamRepository ExamRepository => _examRepository;
+        public IInterviewRepository InterviewRepository => _interviewRepository;
+        public ITasksPoolRepository TasksPoolRepository => _tasksPoolRepository;
+
+        public IAppTaskRepository AppTaskRepository => _appTaskRepository;
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
