@@ -8,16 +8,11 @@ using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
 
-    public class ApplicantRepository : GenericRepository<Applicant>,IApplicantRepository
+    public class ApplicantRepository : GenericRepository<Applicant>, IApplicantRepository
     {
         private readonly UserManager<User> _userManager;
         private readonly ILogger<ApplicantRepository> _logger;
@@ -39,15 +34,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public override async Task<IEnumerable<Applicant>> GetPagedAsync(int page, int pageSize)
+        public override IQueryable<Applicant> GetPagedQueryable(int page, int pageSize)
         {
-            return await _context.Users
+            return _context.Users
                 .OfType<Applicant>()
                 .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Take(pageSize);
         }
-     
+
         public override async Task<Applicant> GetByIdAsync(string id)
         {
             var applicant = await _context.Users
@@ -59,7 +53,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
             return applicant;
         }
-    
+
         public async Task<Applicant> UpdateStatusAsync(string id, ApplicantStatus status)
         {
             var applicant = await GetByIdAsync(id);
@@ -93,7 +87,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         public async Task<Enrollment> EnrollInTrackAsync(string applicantId, int trackId)
         {
-            
+
             // Check if enrollment already exists
             var existingEnrollment = await _context.Enrollments
                 .FirstOrDefaultAsync(e => e.ApplicantId == applicantId && e.TrackId == trackId);
@@ -158,8 +152,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
                 await _context.SaveChangesAsync();
             }
-            
-            
+
+
             //var enrollment = new Enrollment();
             return enrollment;
         }
@@ -174,5 +168,5 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .ToListAsync();
         }
     }
-    
+
 }

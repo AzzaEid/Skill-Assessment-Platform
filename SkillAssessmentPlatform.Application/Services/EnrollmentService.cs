@@ -2,15 +2,9 @@
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities;
-using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -29,7 +23,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<PagedResponse<EnrollmentDTO>> GetAllEnrollmentsAsync(int page = 1, int pageSize = 10)
         {
-            var enrollments = await _unitOfWork.EnrollmentRepository.GetPagedAsync(page, pageSize);
+            var enrollments = _unitOfWork.EnrollmentRepository.GetPagedQueryable(page, pageSize).ToList();
             var totalCount = await _unitOfWork.EnrollmentRepository.GetTotalCountAsync();
 
             return new PagedResponse<EnrollmentDTO>(
@@ -119,7 +113,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         {
                             LevelProgressId = levelProgress.Id,
                             StageId = firstStage.Id,
-                            Status = ProgressStatus.InProgress ,
+                            Status = ProgressStatus.InProgress,
                             StartDate = DateTime.Now,
                             Attempts = 1,
                             ExaminerId = freeExaminerId.ToString()

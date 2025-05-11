@@ -23,7 +23,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<PagedResponse<ExaminerDTO>> GetAllExaminersAsync(int page = 1, int pageSize = 10)
         {
-            var examiners = await _unitOfWork.ExaminerRepository.GetPagedAsync(page, pageSize);
+            var examiners = _unitOfWork.ExaminerRepository.GetPagedQueryable(page, pageSize);
             var totalCount = await _unitOfWork.ExaminerRepository.GetTotalCountAsync();
 
             return new PagedResponse<ExaminerDTO>(

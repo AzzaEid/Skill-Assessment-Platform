@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SkillAssessmentPlatform.Application.Mapping;
 using SkillAssessmentPlatform.Application.Services;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
 namespace SkillAssessmentPlatform.Application
 {
@@ -28,8 +27,14 @@ namespace SkillAssessmentPlatform.Application
             services.AddTransient<LevelService>();
             services.AddTransient<StageService>();
             //==
-            services.AddTransient<EmailServices>();
 
+            //==
+            services.AddTransient<ExamService>();
+            services.AddTransient<InterviewService>();
+            services.AddTransient<TasksPoolService>();
+            services.AddTransient<AppTaskService>();
+            ///==
+            services.AddTransient<AppointmentService>();
 
             return services;
 

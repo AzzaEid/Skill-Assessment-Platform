@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Appointment;
 using SkillAssessmentPlatform.Application.DTOs.Auth;
 using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Entities.Users;
 
 namespace SkillAssessmentPlatform.Application.Mapping
@@ -39,6 +41,11 @@ namespace SkillAssessmentPlatform.Application.Mapping
 
             //plan
             CreateMap<Track, TrackDto>().ReverseMap();
+
+            // Appointment
+            CreateMap<Appointment, AppointmentDTO>()
+                .ForMember(dest => dest.ExaminerName, opt => opt.MapFrom(src => src.Examiner.FullName));
+            CreateMap<AppointmentCreateDTO, Appointment>();
         }
     }
 }

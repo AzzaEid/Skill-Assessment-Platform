@@ -12,8 +12,8 @@ using SkillAssessmentPlatform.Infrastructure.Data;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250509152538_InitClean")]
-    partial class InitClean
+    [Migration("20250510101443_afterpull")]
+    partial class afterpull
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -600,10 +600,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
-
-                    b.Property<string>("QuestionsCategory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("QuestionsType")
                         .HasColumnType("int");

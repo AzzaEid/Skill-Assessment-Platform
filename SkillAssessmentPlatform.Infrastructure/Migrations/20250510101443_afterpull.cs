@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitClean : Migration
+    public partial class afterpull : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -508,7 +508,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     StageId = table.Column<int>(type: "int", nullable: false),
                     DurationMinutes = table.Column<int>(type: "int", nullable: false),
                     Difficulty = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    QuestionsCategory = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     QuestionsType = table.Column<int>(type: "int", nullable: false)
                 },

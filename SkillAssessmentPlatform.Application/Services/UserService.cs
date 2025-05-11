@@ -1,16 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using SkillAssessmentPlatform.Application.DTOs.Auth;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Exceptions;
-using System;
-using SkillAssessmentPlatform.Core.Common;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
-using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Core.Interfaces;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -90,7 +86,7 @@ namespace SkillAssessmentPlatform.Application.Services
             }
             else
             {
-                users = await _unitOfWork.UserRepository.GetPagedAsync(page, pageSize);
+                users = _unitOfWork.UserRepository.GetPagedQueryable(page, pageSize).ToList();
                 totalCount = await _unitOfWork.UserRepository.GetTotalCountAsync();
             }
             var userDtos = _mapper.Map<IEnumerable<UserDTO>>(users);
@@ -102,7 +98,7 @@ namespace SkillAssessmentPlatform.Application.Services
             );
 
         }
-    
+
 
         public async Task<UserDTO> GetUserByIdAsync(string id)
         {
