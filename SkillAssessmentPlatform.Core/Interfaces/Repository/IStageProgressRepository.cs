@@ -1,11 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SkillAssessmentPlatform.Core.Entities;
+﻿using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
@@ -14,7 +8,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<IEnumerable<StageProgress>> GetByLevelProgressIdAsync(int levelProgressId);
         Task<StageProgress> GetCurrentStageProgressAsync(int levelProgressId);
         Task<StageProgress> GetCurrentStageProgressByEnrollmentAsync(int enrollmentId);
-        Task<StageProgress>  UpdateStatusAsync(int stageProgressId, ProgressStatus status, int score = 0);
+        Task<StageProgress> UpdateStatusAsync(int stageProgressId, ProgressStatus status, int score = 0);
         Task<StageProgress> AssignExaminerAsync(int stageProgressId, string examinerId);
         Task<StageProgress> CreateNextStageProgressAsync(int levelProgressId, int currentStageId, string freeExaminerId);
         Task<int> GetAttemptCountAsync(int stageId);
@@ -24,6 +18,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 
         Task<StageProgress> GetLatestSPinLPAsync(int levelProgressId);
         Task<IEnumerable<StageProgress>> GetFailedStagesByEnrollmentIdAsync(int enrollmentId);
+        Task<StageProgress> GetByApplicantAndStageAsync(string applicantId, int stageId);
 
 
 

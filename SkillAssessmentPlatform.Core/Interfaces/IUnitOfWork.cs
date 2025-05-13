@@ -32,7 +32,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         // ITasksPoolRepository TasksPoolRepository { get; }
 
         IAppointmentRepository AppointmentRepository { get; }
-
+        IInterviewBookRepository InterviewBookRepository { get; }
         #endregion
 
         #region methods

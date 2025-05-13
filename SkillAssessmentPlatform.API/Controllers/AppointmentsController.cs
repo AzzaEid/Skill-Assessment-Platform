@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs.Appointment;
 using SkillAssessmentPlatform.Application.Services;
+using SkillAssessmentPlatform.Core.Results;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
@@ -22,15 +23,6 @@ namespace SkillAssessmentPlatform.API.Controllers
             _responseHandler = responseHandler;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
-        {
-            var result = await _appointmentService.GetAllAppointmentsAsync(page, pageSize);
-            return _responseHandler.Success(result);
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -38,11 +30,28 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Success(appointment);
         }
 
-        [HttpGet("examiner/{examinerId}/available")]
-        public async Task<IActionResult> GetAvailableByExaminer(string examinerId)
+        /*  [HttpGet("examiner/{examinerId}/available")]
+          public async Task<IActionResult> GetAvailableByExaminer(string examinerId)
+          {
+              var appointments = await _appointmentService.GetAvailableAppointmentsByExaminerAsync(examinerId);
+              return _responseHandler.Success(appointments);
+          }
+        */
+        [HttpGet("slots/applicant/{applicantId}/stage/{stageId}")]
+        [Authorize(Roles = "Applicant")]
+        public async Task<IActionResult> GetApplicantAvailableSlots(string applicantId, int stageId)
         {
-            var appointments = await _appointmentService.GetAvailableAppointmentsByExaminerAsync(examinerId);
-            return _responseHandler.Success(appointments);
+            var slots = await _appointmentService.GetApplicantAvailableSlotsAsync(applicantId, stageId);
+            return _responseHandler.Success(slots);
+        }
+        [HttpGet("slots/examiner/{examinerId}")]
+        public async Task<IActionResult> GetExaminerAvailableSlots(
+        string examinerId,
+        [FromQuery] DateTime startDate,
+        [FromQuery] DateTime endDate)
+        {
+            var slots = await _appointmentService.GetAvailableSlotsAsync(examinerId, startDate, endDate);
+            return _responseHandler.Success(slots);
         }
 
         [HttpGet("examiner/{examinerId}/timerange")]
@@ -51,14 +60,14 @@ namespace SkillAssessmentPlatform.API.Controllers
             [FromQuery] DateTime startDate,
             [FromQuery] DateTime endDate)
         {
-            var appointments = await _appointmentService.GetAvailableAppointmentsForDateRangeAsync(
+            var appointments = await _appointmentService.GetAvailableAppointmentsAsync(
                 examinerId, startDate, endDate);
             return _responseHandler.Success(appointments);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin,SeniorExaminer")]
-        public async Task<IActionResult> Create([FromBody] AppointmentCreateDTO appointmentDto)
+        public async Task<IActionResult> Create([FromBody] AppointmentSingleCreateDTO appointmentDto)
         {
             var appointment = await _appointmentService.CreateAppointmentAsync(appointmentDto);
             if (appointment == null)
@@ -70,7 +79,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
         [HttpPost("bulk")]
         [Authorize(Roles = "Admin,SeniorExaminer")]
-        public async Task<IActionResult> CreateBulk([FromBody] AppointmentBulkCreateDTO bulkDto)
+        public async Task<IActionResult> CreateBulk([FromBody] AppointmentCreateDTO bulkDto)
         {
             var appointments = await _appointmentService.CreateBulkAppointmentsAsync(bulkDto);
             return _responseHandler.Created(appointments, "Appointments created successfully");

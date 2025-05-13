@@ -12,5 +12,9 @@ namespace SkillAssessmentPlatform.Core.Entities.Users
         public ICollection<AppCertificate> Certificates { get; set; } = new HashSet<AppCertificate>();
         public ICollection<Applicant> Applicants { get; set; } = new HashSet<Applicant>();
         public ICollection<TaskApplicant> TaskApplicants { get; set; } = new HashSet<TaskApplicant>();
+        public ICollection<ExamRequest> ExamRequests { get; set; } = new HashSet<ExamRequest>();
+        public ICollection<InterviewBook> InterviewBooks { get; set; } = new HashSet<InterviewBook>();
+
+
     }
 }

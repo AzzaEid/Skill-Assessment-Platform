@@ -4,36 +4,31 @@ using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
     public class ExaminerLoadRepository : GenericRepository<ExaminerLoad>, IExaminerLoadRepository
     {
         private readonly ILogger<ExaminerLoadRepository> _logger;
-        public ExaminerLoadRepository(AppDbContext context, 
-            ILogger<ExaminerLoadRepository> logger ) : base(context)
+        public ExaminerLoadRepository(AppDbContext context,
+            ILogger<ExaminerLoadRepository> logger) : base(context)
         {
             _logger = logger;
         }
         public async Task<IEnumerable<ExaminerLoad>> GetByExaminerIdAsync(string examinerId)
         {
-            return await  _context.ExaminerLoads
-                .Where( l => l.ExaminerID == examinerId)
+            return await _context.ExaminerLoads
+                .Where(l => l.ExaminerID == examinerId)
                 .ToListAsync();
         }
-        public async Task<ExaminerLoad> UpdateWorkLoadAsync(int id, int workLoad)
+        public async Task<ExaminerLoad> UpdateWorkLoadAsync(int id, int newWorkLoad)
         {
             var examinerLoad = await _context.ExaminerLoads.FindAsync(id);
 
             if (examinerLoad == null)
                 throw new KeyNotFoundException($"ExaminerLoad with id {id} not found");
 
-            examinerLoad.CurrWorkLoad = workLoad;
+            examinerLoad.MaxWorkLoad = newWorkLoad;
 
             _context.ExaminerLoads.Update(examinerLoad);
             await _context.SaveChangesAsync();

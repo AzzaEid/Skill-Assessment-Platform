@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
-using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Exceptions;
 
 namespace SkillAssessmentPlatform.API.Controllers
@@ -13,7 +11,7 @@ namespace SkillAssessmentPlatform.API.Controllers
     [ApiController]
     public class WorkloadsController : ControllerBase
     {
-    
+
         private readonly ExaminerLoadsService _workloadService;
         private readonly IResponseHandler _responseHandler;
 
@@ -51,7 +49,7 @@ namespace SkillAssessmentPlatform.API.Controllers
             var createdWorkload = await _workloadService.CreateExaminerLoadAsync(createDto);
             return _responseHandler.Success(createdWorkload, "Workload created successfully");
         }
-        
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,SeniorExaminer")]
         public async Task<IActionResult> UpdateWorkload(int id, [FromBody] UpdateWorkLoadDTO updateDto)
@@ -63,6 +61,18 @@ namespace SkillAssessmentPlatform.API.Controllers
 
             var updatedWorkload = await _workloadService.UpdateWorkLoadAsync(id, updateDto);
             return _responseHandler.Success(updatedWorkload, "Workload updated successfully");
+        }
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,SeniorExaminer")]
+        public async Task<IActionResult> DeleteWorkload(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new BadRequestException("Invalid data", GetModelStateErrors());
+            }
+
+            await _workloadService.DeleteLoad(id);
+            return _responseHandler.Deleted();
         }
 
         private List<string> GetModelStateErrors()

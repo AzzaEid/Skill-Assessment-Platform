@@ -7,7 +7,10 @@
         InterviewScheduled = 2,
         TaskAssigned = 3,
         FeedbackReceived = 4,
-        CertificateIssued = 5
+        CertificateIssued = 5,
+        NewInterviewBooking = 6,
+        InterviewConfirmed = 7,
+        InterviewBookingRejected = 8,
     }
 
 }

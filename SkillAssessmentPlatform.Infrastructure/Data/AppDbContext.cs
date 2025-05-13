@@ -39,6 +39,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<AppCertificate> Certificates { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         #endregion
 
 
@@ -50,6 +51,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             var dictionaryConverter = new ValueConverter<Dictionary<string, string>, string>(
             dict => JsonSerializer.Serialize(dict, (JsonSerializerOptions?)null),
@@ -69,7 +71,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
                 .Metadata.SetValueComparer(dictionaryComparer);
 
 
-            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
 
             #region temporary
 

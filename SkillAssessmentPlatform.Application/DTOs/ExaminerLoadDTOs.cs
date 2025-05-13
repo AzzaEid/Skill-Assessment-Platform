@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkillAssessmentPlatform.Application.DTOs
+﻿namespace SkillAssessmentPlatform.Application.DTOs
 {
     public class ExaminerLoadDTO
     {
@@ -15,7 +9,9 @@ namespace SkillAssessmentPlatform.Application.DTOs
     }
     public class UpdateWorkLoadDTO
     {
-        public int WorkLoad { get; set; }
+        //public StageType Type { get; set; }
+
+        public int MaxWorkLoad { get; set; }
     }
 
     public class CreateExaminerLoadDTO

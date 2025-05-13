@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs.Appointment;
-using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
+using SkillAssessmentPlatform.Core.Results;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -25,25 +25,60 @@ namespace SkillAssessmentPlatform.Application.Services
             _logger = logger;
         }
 
-        public async Task<PagedResponse<AppointmentDTO>> GetAllAppointmentsAsync(int page = 1, int pageSize = 10)
+        public async Task<IEnumerable<AppointmentDTO>> GetAvailableAppointmentsAsync(string examinerId, DateTime startDate, DateTime endDate)
         {
-            var appointmentsQuery = _unitOfWork.AppointmentRepository
-                .GetPagedQueryable(page, pageSize)
-                .Include(a => a.Examiner);
-            var totalCount = await _unitOfWork.AppointmentRepository.GetTotalCountAsync();
-            var appointments = await appointmentsQuery.ToListAsync();
+            try
+            {
 
-            var appointmentDTOs = _mapper.Map<List<AppointmentDTO>>(appointments);
+                var appointments = await _unitOfWork.AppointmentRepository.GetAvailableAppointmentsAsync(examinerId, startDate, endDate);
+                if (appointments == null)
+                {
+                    throw new KeyNotFoundException($"There's no appointments for examiner {examinerId}");
+                }
+                return _mapper.Map<IEnumerable<AppointmentDTO>>(appointments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting available appointments");
+                throw;
+            }
+        }
+        public async Task<IEnumerable<DateSlotDTO>> GetAvailableSlotsAsync(string examinerId, DateTime startDate, DateTime endDate)
+        {
 
-            return new PagedResponse<AppointmentDTO>(
-                appointmentDTOs,
-                page,
-                pageSize,
-                totalCount
-                );
+            var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(examinerId);
+            if (examiner == null)
+                throw new KeyNotFoundException($"There's no appointments for examiner {examinerId}");
+
+            return await _unitOfWork.AppointmentRepository.GetAvailableSlotsAsync(examinerId, startDate, endDate);
 
         }
+        public async Task<IEnumerable<AppointmentDTO>> CreateBulkAppointmentsAsync(AppointmentCreateDTO bulkDTO)
+        {
+            try
+            {
+                var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(bulkDTO.ExaminerId);
+                if (examiner == null)
+                    throw new KeyNotFoundException($"Appointment with id {bulkDTO.ExaminerId} not found");
+                // Validations
+                if (bulkDTO.EndDate < bulkDTO.StartDate)
+                    throw new BadRequestException("End date must be after start date");
 
+                if (bulkDTO.StartDate < DateTime.Now.Date)
+                    throw new BadRequestException("Start date cannot be in the past");
+
+                if (bulkDTO.SlotDurationMinutes <= 0)
+                    throw new BadRequestException("Slot duration must be greater than 0");
+
+                var appointments = await _unitOfWork.AppointmentRepository.CreateBulkAppointmentsAsync(bulkDTO);
+                return _mapper.Map<IEnumerable<AppointmentDTO>>(appointments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating bulk appointments");
+                throw;
+            }
+        }
         public async Task<AppointmentDTO> GetAppointmentByIdAsync(int id)
         {
             var appointment = await _unitOfWork.AppointmentRepository.GetByIdAsync(id);
@@ -55,36 +90,8 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
 
-        public async Task<IEnumerable<AppointmentDTO>> GetAvailableAppointmentsByExaminerAsync(string examinerId)
-        {
-            var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(examinerId);
-            if (examiner == null)
-                throw new KeyNotFoundException($"Appointment with id {examinerId} not found");
 
-            var appointments = await _unitOfWork.AppointmentRepository.GetAvailableAppointmentsByExaminerIdAsync(examinerId);
-            var appointmentDTOs = _mapper.Map<List<AppointmentDTO>>(appointments);
-
-            return appointmentDTOs;
-
-        }
-
-        public async Task<IEnumerable<AppointmentDTO>> GetAvailableAppointmentsForDateRangeAsync(
-            string examinerId, DateTime startDate, DateTime endDate)
-        {
-            var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(examinerId);
-            if (examiner == null)
-                throw new KeyNotFoundException($"Appointment with id {examinerId} not found");
-
-            var appointments = await _unitOfWork.AppointmentRepository.GetAvailableAppointmentsForDateRangeAsync(
-                examinerId, startDate, endDate);
-
-            var appointmentDTOs = _mapper.Map<List<AppointmentDTO>>(appointments);
-
-            return appointmentDTOs;
-        }
-
-
-        public async Task<AppointmentDTO>? CreateAppointmentAsync(AppointmentCreateDTO appointmentDTO)
+        public async Task<AppointmentDTO>? CreateAppointmentAsync(AppointmentSingleCreateDTO appointmentDTO)
         {
             var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(appointmentDTO.ExaminerId);
             if (examiner == null)
@@ -105,56 +112,46 @@ namespace SkillAssessmentPlatform.Application.Services
 
         }
 
-        public async Task<IEnumerable<AppointmentDTO>> CreateBulkAppointmentsAsync(AppointmentBulkCreateDTO bulkDTO)
+
+        public async Task<IEnumerable<DateSlotDTO>> GetApplicantAvailableSlotsAsync(string applicantId, int stageId)
         {
-            var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(bulkDTO.ExaminerId);
-            if (examiner == null)
-                throw new KeyNotFoundException($"Appointment with id {bulkDTO.ExaminerId} not found");
-            // Validations
-            if (bulkDTO.EndDate < bulkDTO.StartDate)
-                throw new BadRequestException("End date must be after start date");
-
-            if (bulkDTO.StartDate < DateTime.Now.Date)
-                throw new BadRequestException("Start date cannot be in the past");
-
-            if (bulkDTO.EndHour <= bulkDTO.StartHour)
-                throw new BadRequestException("End hour must be after start hour");
-
-            if (bulkDTO.SlotDurationMinutes <= 0)
-                throw new BadRequestException("Slot duration must be greater than 0");
-
-            var appointments = new List<Appointment>();
-
-            for (DateTime date = bulkDTO.StartDate; date <= bulkDTO.EndDate; date = date.AddDays(1))
+            try
             {
-                if (date.DayOfWeek == DayOfWeek.Friday)
-                    continue;
+                // الحصول على Stage Progress للمتقدم
+                var stageProgress = await _unitOfWork.StageProgressRepository.GetByApplicantAndStageAsync(applicantId, stageId);
 
-                for (int hour = bulkDTO.StartHour; hour < bulkDTO.EndHour; hour++)
-                {
-                    for (int minute = 0; minute < 60; minute += bulkDTO.SlotDurationMinutes)
-                    {
-                        var startTime = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
-                        var endTime = startTime.AddMinutes(bulkDTO.SlotDurationMinutes);
+                if (stageProgress == null)
+                    throw new KeyNotFoundException($"No stage progress found for applicant {applicantId} and stage {stageId}");
 
-                        if (endTime.Hour >= bulkDTO.EndHour)
-                            break;
+                // الحصول على معلومات المقابلة المرتبطة بالمرحلة
+                var stage = await _unitOfWork.StageRepository.GetByIdAsync(stageId);
 
-                        appointments.Add(new Appointment
-                        {
-                            ExaminerId = bulkDTO.ExaminerId,
-                            StartTime = startTime,
-                            EndTime = endTime,
-                            IsBooked = false
-                        });
-                    }
-                }
+                if (stage == null || stage.Type != StageType.Interview)
+                    throw new BadRequestException("Stage is not an interview type");
+
+                var interview = await _unitOfWork.InterviewRepository.GetByStageIdAsync(stageId);
+
+                if (interview == null)
+                    throw new KeyNotFoundException($"No interview configuration found for stage {stageId}");
+
+                // حساب تاريخ انتهاء الفترة المسموح بها للحجز
+                var startDate = stageProgress.StartDate;
+                var endDate = startDate.AddDays(interview.MaxDaysToBook);
+
+                // الحصول على المختبر المسؤول عن هذه المرحلة
+                var examiner = stageProgress.ExaminerId;
+
+                if (string.IsNullOrEmpty(examiner))
+                    throw new BadRequestException("No examiner assigned for this stage");
+
+                // الحصول على المواعيد المتاحة
+                return await _unitOfWork.AppointmentRepository.GetAvailableSlotsAsync(examiner, startDate, endDate);
             }
-
-            await _unitOfWork.AppointmentRepository.AddRangeAsync(appointments);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<List<AppointmentDTO>>(appointments);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting available slots for applicant {applicantId} and stage {stageId}");
+                throw;
+            }
         }
 
         public async Task<bool> DeleteAppointmentAsync(int id)

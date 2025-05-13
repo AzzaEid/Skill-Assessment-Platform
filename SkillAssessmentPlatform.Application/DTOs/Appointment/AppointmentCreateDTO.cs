@@ -2,7 +2,8 @@
 
 namespace SkillAssessmentPlatform.Application.DTOs.Appointment
 {
-    public class AppointmentCreateDTO
+
+    public class AppointmentSingleCreateDTO
     {
         [Required]
         public string ExaminerId { get; set; }

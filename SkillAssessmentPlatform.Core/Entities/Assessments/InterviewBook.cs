@@ -1,4 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
+using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
@@ -8,7 +9,7 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public int Id { get; set; }
         public int InterviewId { get; set; }
         public int AppointmentId { get; set; }
-        public int ApplicantId { get; set; }
+        public string ApplicantId { get; set; }
         public DateTime ScheduledDate { get; set; }
         public string MeetingLink { get; set; }
         public InterviewStatus Status { get; set; }
@@ -18,6 +19,8 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public Interview Interview { get; set; }
         public Appointment Appointment { get; set; }
         public Feedback Feedback { get; set; }
+        public Applicant Applicant { get; set; }
+
 
     }
 }

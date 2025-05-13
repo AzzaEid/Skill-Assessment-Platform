@@ -1,4 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
@@ -7,8 +8,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<IEnumerable<InterviewBook>> GetByApplicantIdAsync(string applicantId);
         Task<IEnumerable<InterviewBook>> GetByExaminerIdAsync(string examinerId);
         Task<IEnumerable<InterviewBook>> GetByStageIdAsync(int stageId);
-        Task<InterviewBook> BookInterviewAsync(string applicantId, int interviewId, int appointmentId);
-        Task<InterviewBook> UpdateInterviewStatusAsync(int interviewBookId, string status);
+        Task<InterviewBook> CreateInterviewBookAsync(InterviewBook interviewBook);
+        Task<InterviewBook> UpdateInterviewStatusAsync(int interviewBookId, InterviewStatus status);
         Task<InterviewBook> GenerateMeetingLinkAsync(int interviewBookId);
     }
 }

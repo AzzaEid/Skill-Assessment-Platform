@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Application.Mapping;
 using SkillAssessmentPlatform.Application.Services;
 
@@ -9,6 +10,9 @@ namespace SkillAssessmentPlatform.Application
         public static IServiceCollection AddApplicationDependencies(this IServiceCollection services)
         {
             services.AddAutoMapper(typeof(MappingProfile));
+            services.AddTransient<EmailService>();
+            services.AddTransient<IMeetingService, ZoomMeetService>();
+            services.AddTransient<NotificationService>();
 
 
             services.AddTransient<AuthService>();
@@ -35,6 +39,7 @@ namespace SkillAssessmentPlatform.Application
             services.AddTransient<AppTaskService>();
             ///==
             services.AddTransient<AppointmentService>();
+            services.AddTransient<InterviewBookService>();
 
             return services;
 

@@ -1,8 +1,6 @@
-﻿using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -24,7 +22,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 DurationMinutes = dto.DurationMinutes,
                 Instructions = dto.Instructions,
                 IsActive = true,
-                Status = dto.Status // ✅ default or passed from DTO
             };
 
             await _unitOfWork.InterviewRepository.AddAsync(interview);
@@ -37,7 +34,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 MaxDaysToBook = interview.MaxDaysToBook,
                 DurationMinutes = interview.DurationMinutes,
                 Instructions = interview.Instructions,
-                Status = interview.Status // ✅ include status in return
             };
         }
 
@@ -53,7 +49,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 MaxDaysToBook = interview.MaxDaysToBook,
                 DurationMinutes = interview.DurationMinutes,
                 Instructions = interview.Instructions,
-                Status = interview.Status // ✅ include status
             };
         }
 
@@ -75,7 +70,6 @@ namespace SkillAssessmentPlatform.Application.Services
             interview.MaxDaysToBook = dto.MaxDaysToBook;
             interview.DurationMinutes = dto.DurationMinutes;
             interview.Instructions = dto.Instructions;
-            interview.Status = dto.Status; // ✅ allow update status
 
             await _unitOfWork.SaveChangesAsync();
 
@@ -86,7 +80,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 MaxDaysToBook = interview.MaxDaysToBook,
                 DurationMinutes = interview.DurationMinutes,
                 Instructions = interview.Instructions,
-                Status = interview.Status
             };
         }
     }

@@ -163,6 +163,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
-
+        public async Task<StageProgress> GetByApplicantAndStageAsync(string applicantId, int stageId)
+        {
+            return await _context.StageProgresses
+                .Where(sp => sp.StageId == stageId
+                        && sp.LevelProgress.Enrollment.ApplicantId == applicantId)
+                .Include(sp => sp.Stage)
+                .OrderByDescending(e => e.StartDate)
+                .FirstOrDefaultAsync();
+        }
     }
 }
