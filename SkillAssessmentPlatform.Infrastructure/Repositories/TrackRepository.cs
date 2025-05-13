@@ -67,6 +67,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Track>> GetAllWithDetailsAsync()
+        {
+            return await _context.Tracks
+                .Include(t => t.Levels)
+                    .ThenInclude(l => l.Stages)
+                .Where(t => t.IsActive)
+                .ToListAsync();
+        }
 
     }
 }

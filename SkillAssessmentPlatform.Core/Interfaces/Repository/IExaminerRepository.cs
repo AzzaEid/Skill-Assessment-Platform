@@ -17,6 +17,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<IEnumerable<ExaminerLoad>> GetWorkloadAsync(string examinerId);
         Task<bool> RemoveTrackFromExaminerAsync(string examinerId, int trackId);
         Task<string?> GetAvailableExaminerAsync(StageType stageType);
+        Task<IEnumerable<Examiner>> GetWorkingExaminersByTrackIdAsync(int trackId);
+
 
     }
 }
