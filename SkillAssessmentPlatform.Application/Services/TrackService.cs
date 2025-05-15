@@ -1,8 +1,9 @@
-﻿using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
+using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
@@ -44,11 +45,13 @@ namespace SkillAssessmentPlatform.Application.Services
                     IsActive = level.IsActive,
                     Stages = level.Stages?.Select(stage => new StageDetailDTO
                     {
+                        Id = stage.Id,
                         Name = stage.Name,
                         Description = stage.Description,
                         Type = stage.Type,
                         Order = stage.Order,
-                        PassingScore = stage.PassingScore
+                        PassingScore = stage.PassingScore,
+                        IsActive = stage.IsActive
                     }).ToList()
                 }).ToList()
             };
@@ -56,7 +59,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<IEnumerable<TrackDetialDto>> GetAllTracksAsync()
         {
-            var tracks = await _unitOfWork.TrackRepository.GetAllAsync();
+            var tracks = await _unitOfWork.TrackRepository.GetAllWithDetailsAsync();
 
             return tracks
                 .Where(t => t.IsActive == true)
@@ -69,9 +72,29 @@ namespace SkillAssessmentPlatform.Application.Services
                     Objectives = t.Objectives,
                     AssociatedSkills = t.AssociatedSkills,
                     IsActive = t.IsActive,
-                    Image = t.Image
+                    Image = t.Image,
+                    Levels = t.Levels.Select(level => new LevelDetailDto
+                    {
+                        Id = level.Id,
+                        TrackId = level.TrackId,
+                        Name = level.Name,
+                        Description = level.Description,
+                      //  Order = level.Order,
+                        IsActive = level.IsActive,
+                        Stages = level.Stages?.Select(stage => new StageDetailDTO
+                        {
+                            Id = stage.Id,
+                            Name = stage.Name,
+                            Description = stage.Description,
+                            Type = stage.Type,
+                          //  Order = stage.Order,
+                            PassingScore = stage.PassingScore,
+                            IsActive = stage.IsActive
+                        }).ToList()
+                    }).ToList()
                 });
         }
+
         public async Task<IEnumerable<TrackDetialDto>> GetNotActiveTracksAsync()
         {
             var tracks = await _unitOfWork.TrackRepository.GetAllAsync();
@@ -98,9 +121,18 @@ namespace SkillAssessmentPlatform.Application.Services
             if (trackDto.ImageFile != null && trackDto.ImageFile.Length > 0)
                 imagePath = await _fileService.UploadFileAsync(trackDto.ImageFile, "track-images");
 
+            Examiner? seniorExaminer = null;
+            if (!string.IsNullOrEmpty(trackDto.SeniorExaminerID))
+            {
+                seniorExaminer = await _unitOfWork.ExaminerRepository.GetByIdAsync(trackDto.SeniorExaminerID);
+                if (seniorExaminer == null)
+                    throw new Exception($"Senior Examiner with ID {trackDto.SeniorExaminerID} not found.");
+            }
+
             var track = new Track
             {
                 SeniorExaminerID = trackDto.SeniorExaminerID,
+                SeniorExaminer = seniorExaminer, 
                 Name = trackDto.Name,
                 Description = trackDto.Description,
                 Objectives = trackDto.Objectives,
@@ -112,9 +144,9 @@ namespace SkillAssessmentPlatform.Application.Services
             await _unitOfWork.TrackRepository.AddAsync(track);
             await _unitOfWork.SaveChangesAsync();
 
-            //trackDto.Id = track.Id
             return trackDto;
         }
+
         public async Task<bool> CreateTrackStructureAsync(TrackStructureDTO structureDTO)
         {
 
@@ -447,24 +479,40 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
 
-        //public async Task<CreateLevelDTO> CreateLevelAsync(int trackId, [FromBody] CreateLevelDTO dto)
-        //{
-        //    var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackId);
-        //    var level = new Level
-        //    {
-        //        TrackId = trackId,
-        //        Name = dto.Name,
-        //        Description = dto.Description,
-        //        Order = dto.Order,
-        //        IsActive = dto.IsActive
-        //    };
+        public async Task<IEnumerable<ExaminerDTO>> GetWorkingExaminersByTrackIdAsync(int trackId)
+        {
+            var examiners = await _unitOfWork.ExaminerRepository.GetWorkingExaminersByTrackIdAsync(trackId);
 
-        //    await _unitOfWork.LevelRepository.AddAsync(level);
-        //    await _unitOfWork.SaveChangesAsync();
+            return examiners.Select(e => new ExaminerDTO
+            {
+                Id = e.Id,
+                FullName = e.FullName,
+                Email = e.Email,
+                Image = e.Image,
+                Specialization = e.Specialization,
+                ExaminerLoads = e.ExaminerLoads?.Select(load => new ExaminerLoadDTO
+                {
+                    ID = load.ID.ToString(),
+                    Type = load.Type.ToString(),
+                    CurrWorkLoad = load.CurrWorkLoad,
+                    MaxWorkLoad = load.MaxWorkLoad
+                })
+            });
+        }
 
-        //    dto.Id = level.Id;
-        //    return dto;
-        //}
+        public async Task<IEnumerable<TrackShortDto>> GetActiveTrackListAsync()
+        {
+            var tracks = await _unitOfWork.TrackRepository.GetOnlyActiveTracksAsync();
+
+            return tracks.Select(t => new TrackShortDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Image = t.Image
+            });
+        }
+
+
     }
 }
 

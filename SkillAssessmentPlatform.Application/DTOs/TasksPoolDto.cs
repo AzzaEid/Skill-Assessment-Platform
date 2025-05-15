@@ -13,6 +13,8 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public int DaysToSubmit { get; set; }
         public string Description { get; set; }
         public string Requirements { get; set; }
+        public bool IsActive { get; set; }
+
     }
 
 }

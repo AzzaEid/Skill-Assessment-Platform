@@ -105,6 +105,21 @@ public class TracksController : ControllerBase
         };
     }
 
+    [HttpGet("{trackId}/examiners")]
+    public async Task<IActionResult> GetWorkingExaminers(int trackId)
+    {
+        var result = await _trackService.GetWorkingExaminersByTrackIdAsync(trackId);
+        return _responseHandler.Success(result, "Working examiners fetched successfully");
+    }
+
+    [HttpGet("active-list")]
+    public async Task<IActionResult> GetActiveTrackList()
+    {
+        var result = await _trackService.GetActiveTrackListAsync();
+        return _responseHandler.Success(result, "Active tracks fetched successfully");
+    }
+
+
     //[HttpPost("{trackId}/levels")]
     //public async AppTask<IActionResult> CreateLevel(int trackId, [FromBody] CreateLevelDTO dto)
     //{

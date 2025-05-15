@@ -19,6 +19,10 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public double PassingScore { get; set; }
         public int NoOfattempts { get; set; } 
         public List<EvaluationCriteriaDTO> EvaluationCriteria { get; set; }
+        public ExamDto Exam { get; set; }
+        public InterviewDto Interview { get; set; }
+        public TasksPoolDto TasksPool { get; set; }
+
     }
 
 }
