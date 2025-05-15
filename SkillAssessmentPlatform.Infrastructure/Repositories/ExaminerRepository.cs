@@ -170,6 +170,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<IEnumerable<Examiner>> GetWorkingExaminersByTrackIdAsync(int trackId)
+        {
+            return await _context.Examiners
+                .Where(e => e.WorkingTracks.Any(t => t.Id == trackId))
+                .Include(e => e.ExaminerLoads)
+                .ToListAsync();
+        }
+
+
+
+
 
     }
 

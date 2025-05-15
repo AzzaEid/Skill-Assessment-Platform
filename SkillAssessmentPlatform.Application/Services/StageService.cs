@@ -1,11 +1,7 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -21,9 +17,8 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<StageDetailDTO> GetStageByIdAsync(int id)
         {
             var stage = await _unitOfWork.StageRepository.GetByIdAsync(id);
-            
 
-            return new StageDetailDTO
+            var stageDto = new StageDetailDTO
             {
                 Id = stage.Id,
                 Name = stage.Name,
@@ -31,14 +26,62 @@ namespace SkillAssessmentPlatform.Application.Services
                 Type = stage.Type,
                 Order = stage.Order,
                 IsActive = stage.IsActive,
-                PassingScore = stage.PassingScore,
-               /* EvaluationCriteria = stage.EvaluationCriteria?.Select(e => new EvaluationCriteriaDTO
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    Weight = e.Weight
-                }).ToList()*/
+                PassingScore = stage.PassingScore
             };
+
+            switch (stage.Type)
+            {
+                case StageType.Exam:
+                    var exam = await _unitOfWork.ExamRepository.GetByStageIdAsync(stage.Id);
+                    if (exam != null)
+                    {
+                        stageDto.Exam = new ExamDto
+                        {
+                            Id = exam.Id,
+                            StageId = exam.StageId,
+                            DurationMinutes = exam.DurationMinutes,
+                            Difficulty = exam.Difficulty,
+                            QuestionsType = exam.QuestionsType
+                                .ToString()
+                                .Split(", ", StringSplitOptions.RemoveEmptyEntries)
+                                .ToList()
+                        };
+                    }
+                    break;
+
+                case StageType.Interview:
+                    var interview = await _unitOfWork.InterviewRepository.GetByStageIdAsync(stage.Id);
+                    if (interview != null)
+                    {
+                        stageDto.Interview = new InterviewDto
+                        {
+                            Id = interview.Id,
+                            StageId = interview.StageId,
+                            MaxDaysToBook = interview.MaxDaysToBook,
+                            DurationMinutes = interview.DurationMinutes,
+                            Instructions = interview.Instructions,
+                            Status = interview.Status
+                        };
+                    }
+                    break;
+
+                case StageType.Task:
+                    var task = await _unitOfWork.TasksPoolRepository.GetByStageIdAsync(stage.Id);
+                    if (task != null)
+                    {
+                        stageDto.TasksPool = new TasksPoolDto
+                        {
+                            Id = task.Id,
+                            StageId = task.StageId,
+                            DaysToSubmit = task.DaysToSubmit,
+                            Description = task.Description,
+                            Requirements = task.Requirements
+                        };
+                    }
+                    break;
+            }
+
+            return stageDto;
         }
 
         public async Task<List<EvaluationCriteriaDTO>> GetCriteriaByStageIdAsync(int stageId)
@@ -57,7 +100,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 Weight = c.Weight
             }).ToList();
         }
-
 
         public async Task<EvaluationCriteriaDTO> AddCriterionAsync(int stageId, CreateEvaluationCriteriaDTO dto)
         {
@@ -134,7 +176,6 @@ namespace SkillAssessmentPlatform.Application.Services
             }
         }
 
-
         public async Task<string> RestoreStageAsync(int stageId)
         {
             var stage = await _unitOfWork.StageRepository.GetByIdWithCriteriaAsync(stageId);
@@ -169,8 +210,5 @@ namespace SkillAssessmentPlatform.Application.Services
                 }
             }
         }
-
-
     }
-
 }

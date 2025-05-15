@@ -37,7 +37,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] CreateTrackDTO dto) =>
+    public async Task<IActionResult> Create([FromBody] CreateTrackDTO dto) =>
      _responseHandler.Created(await _trackService.CreateTrackAsync(dto));
 
     [HttpPost("structure")]
@@ -104,6 +104,21 @@ public class TracksController : ControllerBase
             _ => _responseHandler.Success(message: result)
         };
     }
+
+    [HttpGet("{trackId}/examiners")]
+    public async Task<IActionResult> GetWorkingExaminers(int trackId)
+    {
+        var result = await _trackService.GetWorkingExaminersByTrackIdAsync(trackId);
+        return _responseHandler.Success(result, "Working examiners fetched successfully");
+    }
+
+    [HttpGet("active-list")]
+    public async Task<IActionResult> GetActiveTrackList()
+    {
+        var result = await _trackService.GetActiveTrackListAsync();
+        return _responseHandler.Success(result, "Active tracks fetched successfully");
+    }
+
 
     //[HttpPost("{trackId}/levels")]
     //public async AppTask<IActionResult> CreateLevel(int trackId, [FromBody] CreateLevelDTO dto)

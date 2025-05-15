@@ -15,6 +15,8 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public int DurationMinutes { get; set; }
         public string Instructions { get; set; }
         public InterviewStatus Status { get; set; }
+        public bool IsActive { get; set; }
+
     }
 
 }
