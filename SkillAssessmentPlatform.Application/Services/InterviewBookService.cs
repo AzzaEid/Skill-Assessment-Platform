@@ -146,33 +146,28 @@ namespace SkillAssessmentPlatform.Application.Services
         {
             try
             {
-                // الحصول على معلومات الحجز
+
                 var booking = await _unitOfWork.InterviewBookRepository.GetByIdAsync(bookingId);
                 if (booking == null)
                     throw new KeyNotFoundException($"Booking with id {bookingId} not found");
 
-                // الحصول على الموعد المرتبط
+
                 var appointment = await _unitOfWork.AppointmentRepository.GetByIdAsync(booking.AppointmentId);
 
-                // الحصول على المقابلة المرتبطة
+
                 var interview = await _unitOfWork.InterviewRepository.GetByIdAsync(booking.InterviewId);
 
-                // إنشاء رابط اجتماع
-                var meetingLink = await _meetingService.CreateMeetingAsync(
-                    appointment.StartTime,
-                    appointment.EndTime,
-                    appointment.ExaminerId,
-                    booking.ApplicantId,
-                    $"Interview for Stage {interview.StageId}"
-                );
 
-                // تحديث حالة الحجز
+
+                var meetingTopic = $"Interview for Stage {interview.StageId}";
+                var zoomMeeting = await _meetingService.CreateMeetingAsync(appointment.StartTime, appointment.EndTime, meetingTopic);
+
+
                 booking.Status = InterviewStatus.Scheduled;
-                booking.MeetingLink = meetingLink;
+                booking.MeetingLink = zoomMeeting.StartUrl;
 
                 await _unitOfWork.InterviewBookRepository.UpdateAsync(booking);
 
-                // إرسال إشعارات وبريد إلكتروني للمختبر والمتقدم
                 await SendInterviewScheduledNotificationsAsync(booking, appointment, interview);
 
                 return _mapper.Map<InterviewBookDTO>(booking);
@@ -185,14 +180,14 @@ namespace SkillAssessmentPlatform.Application.Services
         }
         private async Task NotifyExaminerAboutBookingAsync(string examinerId, int bookingId)
         {
-            // إرسال إشعار للمختبر
+            // Notify examiner
             await _notificationService.SendNotificationAsync(
                 examinerId,
                 NotificationType.NewInterviewBooking,
                 $"You have a new interview booking request. Please review and approve/reject it."
             );
 
-            // إرسال بريد إلكتروني للمختبر
+            // Email examiner about bokking
             var examiner = await _unitOfWork.UserRepository.GetByIdAsync(examinerId);
             await _emailService.SendEmailAsync(
                 examiner.Email,
@@ -239,32 +234,28 @@ namespace SkillAssessmentPlatform.Application.Services
         }
         private async Task SendInterviewScheduledNotificationsAsync(InterviewBook booking, Appointment appointment, Interview interview)
         {
-            // الحصول على معلومات المتقدم والمختبر
             var applicant = await _unitOfWork.ApplicantRepository.GetByIdAsync(booking.ApplicantId);
             var examiner = await _unitOfWork.UserRepository.GetByIdAsync(appointment.ExaminerId);
 
-            // إرسال إشعار للمتقدم
+            // notificaton
             await _notificationService.SendNotificationAsync(
                 booking.ApplicantId,
                NotificationType.InterviewScheduled,
                 $"Your interview has been scheduled for {appointment.StartTime:dd/MM/yyyy HH:mm}. A meeting link has been sent to your email."
             );
 
-            // إرسال إشعار للمختبر
             await _notificationService.SendNotificationAsync(
                 appointment.ExaminerId,
                 NotificationType.InterviewConfirmed,
                 $"An interview with {applicant.FullName} has been confirmed for {appointment.StartTime:dd/MM/yyyy HH:mm}."
             );
-
-            // إرسال بريد إلكتروني للمتقدم
+            //emal
             await _emailService.SendEmailAsync(
                 applicant.Email,
                 "Interview Scheduled",
                 $"Dear {applicant.FullName},<br><br>Your interview has been scheduled for {appointment.StartTime:dd/MM/yyyy HH:mm}.<br><br>You can join the meeting using this link: <a href='{booking.MeetingLink}'>{booking.MeetingLink}</a><br><br>Best regards,<br>The Team"
             );
 
-            // إرسال بريد إلكتروني للمختبر
             await _emailService.SendEmailAsync(
                 examiner.Email,
                 "Interview Confirmed",

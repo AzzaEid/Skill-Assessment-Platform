@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class afterpull : Migration
+    public partial class fix1to1Relation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -204,7 +204,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Notification",
+                name: "Notifications",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -217,9 +217,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Notification", x => x.Id);
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Notification_Users_UserId",
+                        name: "FK_Notifications_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -532,8 +532,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     MaxDaysToBook = table.Column<int>(type: "int", nullable: false),
                     DurationMinutes = table.Column<int>(type: "int", nullable: false),
                     Instructions = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -638,17 +637,24 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "ExamRequests",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ExamId = table.Column<int>(type: "int", nullable: false),
-                    ApplicantId = table.Column<int>(type: "int", nullable: false),
+                    ApplicantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Instructions = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    FeedbackId = table.Column<int>(type: "int", nullable: false),
+                    FeedbackId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExamRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExamRequests_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
+                        principalTable: "Applicants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamRequests_Exams_ExamId",
                         column: x => x.ExamId,
@@ -656,8 +662,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ExamRequests_Feedbacks_Id",
-                        column: x => x.Id,
+                        name: "FK_ExamRequests_Feedbacks_FeedbackId",
+                        column: x => x.FeedbackId,
                         principalTable: "Feedbacks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -667,18 +673,25 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "InterviewBooks",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     InterviewId = table.Column<int>(type: "int", nullable: false),
                     AppointmentId = table.Column<int>(type: "int", nullable: false),
-                    ApplicantId = table.Column<int>(type: "int", nullable: false),
-                    ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    MeetingLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApplicantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MeetingLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    FeedbackId = table.Column<int>(type: "int", nullable: false)
+                    FeedbackId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_InterviewBooks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InterviewBooks_Applicants_ApplicantId",
+                        column: x => x.ApplicantId,
+                        principalTable: "Applicants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_InterviewBooks_Appointments_AppointmentId",
                         column: x => x.AppointmentId,
@@ -686,11 +699,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_InterviewBooks_Feedbacks_Id",
-                        column: x => x.Id,
+                        name: "FK_InterviewBooks_Feedbacks_FeedbackId",
+                        column: x => x.FeedbackId,
                         principalTable: "Feedbacks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_InterviewBooks_Interviews_InterviewId",
                         column: x => x.InterviewId,
@@ -759,7 +771,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     TaskApplicantId = table.Column<int>(type: "int", nullable: false),
                     SubmissionUrl = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     SubmissionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FeedbackId = table.Column<int>(type: "int", nullable: false),
+                    FeedbackId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -862,9 +874,21 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 column: "WorkingTracksId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExamRequests_ApplicantId",
+                table: "ExamRequests",
+                column: "ApplicantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExamRequests_ExamId",
                 table: "ExamRequests",
                 column: "ExamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExamRequests_FeedbackId",
+                table: "ExamRequests",
+                column: "FeedbackId",
+                unique: true,
+                filter: "[FeedbackId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exams_StageId",
@@ -878,9 +902,21 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 column: "ExaminerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InterviewBooks_ApplicantId",
+                table: "InterviewBooks",
+                column: "ApplicantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InterviewBooks_AppointmentId",
                 table: "InterviewBooks",
                 column: "AppointmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterviewBooks_FeedbackId",
+                table: "InterviewBooks",
+                column: "FeedbackId",
+                unique: true,
+                filter: "[FeedbackId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InterviewBooks_InterviewId",
@@ -909,8 +945,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 column: "TrackId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notification_UserId",
-                table: "Notification",
+                name: "IX_Notifications_UserId",
+                table: "Notifications",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -958,7 +994,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "IX_TaskSubmissions_FeedbackId",
                 table: "TaskSubmissions",
                 column: "FeedbackId",
-                unique: true);
+                unique: true,
+                filter: "[FeedbackId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TaskSubmissions_TaskApplicantId",
@@ -1020,7 +1057,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                 name: "InterviewBooks");
 
             migrationBuilder.DropTable(
-                name: "Notification");
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "StageProgresses");

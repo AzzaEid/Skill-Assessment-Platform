@@ -26,6 +26,8 @@ namespace SkillAssessmentPlatform.Application.Mapping
             .ForMember(dest => dest.WorkingTracks, opt => opt.MapFrom(src => src.WorkingTracks));
 
             CreateMap<ExaminerLoadDTO, ExaminerLoad>().ReverseMap();
+            CreateMap<CreateExaminerLoadDTO, ExaminerLoad>().ReverseMap();
+
             CreateMap<Applicant, ApplicantDTO>().ReverseMap();
             CreateMap<UpdateExaminerDTO, Examiner>().ReverseMap();
             /////////////test updating 

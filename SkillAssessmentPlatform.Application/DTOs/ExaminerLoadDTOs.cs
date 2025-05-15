@@ -19,6 +19,5 @@
         public string ExaminerID { get; set; }
         public string Type { get; set; }
         public int MaxWorkLoad { get; set; }
-        public int CurrWorkLoad { get; set; } = 0;
     }
 }

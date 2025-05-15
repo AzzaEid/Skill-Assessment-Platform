@@ -14,9 +14,11 @@ namespace SkillAssessmentPlatform.Infrastructure.EntityMappers
                 .HasMaxLength(500);
 
             builder.HasOne(er => er.Feedback)
-                .WithMany()
-                .HasForeignKey(er => er.FeedbackId)
-                .OnDelete(DeleteBehavior.Restrict);
+                 .WithOne(f => f.ExamRequest)
+                 .HasForeignKey<ExamRequest>(er => er.FeedbackId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+
             builder.HasOne(er => er.Applicant)
                 .WithMany(a => a.ExamRequests)
                 .HasForeignKey(er => er.ApplicantId)

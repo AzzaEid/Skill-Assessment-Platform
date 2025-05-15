@@ -30,6 +30,8 @@ namespace SkillAssessmentPlatform.Infrastructure
             // Email
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             // services.AddTransient<IEmailService, EmailService>();
+            // Zoom
+            services.Configure<ZoomSettings>(configuration.GetSection("ZoomSettings"));
 
             // JWT Authentication
             services.AddAuthentication(options =>

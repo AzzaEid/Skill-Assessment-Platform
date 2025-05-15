@@ -24,8 +24,8 @@ namespace SkillAssessmentPlatform.Infrastructure.EntityMappers
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(ib => ib.Feedback)
-                .WithMany()
-                .HasForeignKey(ib => ib.FeedbackId)
+                .WithOne(f => f.InterviewBook)
+                .HasForeignKey<InterviewBook>(ib => ib.FeedbackId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(ib => ib.Applicant)

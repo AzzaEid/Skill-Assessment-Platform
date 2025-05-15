@@ -22,6 +22,7 @@ namespace SkillAssessmentPlatform.Infrastructure.EntityMappers
                 .WithOne(f => f.TaskSubmission)
                 .HasForeignKey<TaskSubmission>(ts => ts.FeedbackId)
                 .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
