@@ -28,7 +28,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IInterviewRepository _interviewRepository;
         private readonly ITasksPoolRepository _tasksPoolRepository;
         private readonly IAppTaskRepository _appTaskRepository;
-
+        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IInterviewBookRepository _interviewBookRepository;
 
         public UnitOfWork(
             AppDbContext context,
@@ -44,11 +45,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IEnrollmentRepository enrollmentRepository,
             ILevelProgressRepository levelProgressRepository,
             IStageProgressRepository stageProgressRepository,
-            ISeniorRepository seniorRepository)
+            ISeniorRepository seniorRepository,
             IExamRepository examRepository,
             IInterviewRepository interviewRepository,
             IAppTaskRepository appTaskRepository,
-            ITasksPoolRepository tasksPoolRepository)
+            ITasksPoolRepository tasksPoolRepository,
+            IAppointmentRepository appointmentRepository,
+            IInterviewBookRepository interviewBookRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -69,6 +72,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _interviewRepository = interviewRepository;
             _tasksPoolRepository = tasksPoolRepository;
             _appTaskRepository = appTaskRepository;
+            _appointmentRepository = appointmentRepository;
+            _interviewBookRepository = interviewBookRepository;
         }
 
         // Custom Repositories exposed
@@ -90,6 +95,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public ITasksPoolRepository TasksPoolRepository => _tasksPoolRepository;
 
         public IAppTaskRepository AppTaskRepository => _appTaskRepository;
+
+        public IAppointmentRepository AppointmentRepository => _appointmentRepository;
+        public IInterviewBookRepository InterviewBookRepository => _interviewBookRepository;
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

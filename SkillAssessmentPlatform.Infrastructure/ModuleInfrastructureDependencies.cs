@@ -12,6 +12,7 @@ namespace SkillAssessmentPlatform.Infrastructure
         public static IServiceCollection AddInfrastructureDependencies(this IServiceCollection services)
         {
             services.AddSingleton<IFileService, FileService>();
+            services.AddTransient<EmailSettings>();
             //==//
 
 
@@ -34,6 +35,13 @@ namespace SkillAssessmentPlatform.Infrastructure
             services.AddTransient<ILevelProgressRepository, LevelProgressRepository>();
             services.AddTransient<IStageProgressRepository, StageProgressRepository>();
             //===
+            services.AddTransient<IExamRepository, ExamRepository>();
+            services.AddTransient<IInterviewRepository, InterviewRepository>();
+            services.AddTransient<ITasksPoolRepository, TasksPoolRepository>();
+            services.AddTransient<IAppTaskRepository, AppTaskRepository>();
+            //==
+            services.AddTransient<IAppointmentRepository, AppointmentRepository>();
+            services.AddTransient<IInterviewBookRepository, InterviewBookRepository>();
 
             return services;
 

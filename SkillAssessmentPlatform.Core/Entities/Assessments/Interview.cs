@@ -1,6 +1,4 @@
-﻿using SkillAssessmentPlatform.Core.Enums;
-
-namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
+﻿namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
 {
     public class Interview
     {
@@ -10,7 +8,6 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public int DurationMinutes { get; set; }
         public string Instructions { get; set; }
         public bool IsActive { get; set; } = true;
-        public InterviewStatus Status { get; set; } = InterviewStatus.Scheduled;
 
 
         // Navigation properties

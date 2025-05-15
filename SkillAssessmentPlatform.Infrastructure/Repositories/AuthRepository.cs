@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Core.Entities;
@@ -7,9 +8,7 @@ using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 using System.Net;
-using System.Web;
 using UnauthorizedAccessException = SkillAssessmentPlatform.Core.Exceptions.UnauthorizedAccessException;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
@@ -19,25 +18,22 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly EmailServices _emailServices;
         private readonly ILogger<AuthRepository> _logger;
         private readonly AppDbContext _context;
 
         public AuthRepository(UserManager<User> userManager,
             IConfiguration configuration,
-            EmailServices emailServices,
             ILogger<AuthRepository> logger,
             AppDbContext context)
         {
             _userManager = userManager;
             _configuration = configuration;
-            _emailServices = emailServices;
             _logger = logger;
             _context = context;
         }
 
 
-        public async Task<string> RegisterApplicantAsync(User user, string password)
+        public async Task<(string ApplicantId, string Token)> RegisterApplicantAsync(User user, string password)
         {
             var applicant = new Applicant
             {
@@ -53,7 +49,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             {
                 throw new BadRequestException("User creation failed.", result.Errors);
             }
-            //add role in UserRole
+            /// Add role
             var roleResult = await _userManager.AddToRoleAsync(applicant, Actors.Applicant.ToString());
             if (!roleResult.Succeeded)
             {
@@ -63,15 +59,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             }
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(applicant);
-            string message = "Thank you for registering! Please click the button below to activate your account.";
-            await SendEmailAsync(applicant.Email, token, "emailconfirmation", "Account Activation", "Activate Your Account", message);
 
-            _logger.LogInformation("Applicant registered  & confirmation email sent: {Email}", user.Email);
-
-            return applicant.Id;
+            return (applicant.Id, token);
         }
 
-        public async Task<string> RegisterExaminerAsync(User user, string password, List<int> trackIds)
+
+        public async Task<(string ExaminerId, string Token)> RegisterExaminerAsync(User user, string password, List<int> trackIds)
         {
             var examiner = new Examiner
             {
@@ -82,38 +75,31 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 Specialization = "----",
                 WorkingTracks = new List<Track>()
             };
-            // add tracks
-            foreach (var trackId in trackIds)
-            {
-                var track = await _context.Tracks.FindAsync(trackId);
-                if (track != null)
-                {
-                    examiner.WorkingTracks.Add(track);
-                }
-            }
-            // add the examiner
-            var result = await _userManager.CreateAsync(examiner, password);
 
+            var tracks = await _context.Tracks
+                .Where(t => trackIds.Contains(t.Id))
+                .ToListAsync();
+
+            foreach (var track in tracks)
+            {
+                examiner.WorkingTracks.Add(track);
+            }
+
+
+            var result = await _userManager.CreateAsync(examiner, password);
             if (!result.Succeeded)
             {
                 throw new BadRequestException("User creation failed.", result.Errors);
             }
 
-            //add role in UserRole
             var roleResult = await _userManager.AddToRoleAsync(examiner, Actors.Examiner.ToString());
             if (!roleResult.Succeeded)
             {
                 throw new BadRequestException("Problem in role assign", roleResult.Errors);
             }
 
-            // send confirmation email
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(examiner);
-            string message = "Thank you for registering! Please click the button below to activate your account.";
-
-            await SendEmailAsync(examiner.Email, token, "emailconfirmation", "Account Activation", "Activate Your Account", message);
-
-            return examiner.Id;
-
+            return (examiner.Id, token);
         }
 
         public async Task EmailConfirmation(string email, string token)
@@ -135,98 +121,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             }
 
         }
-
-        public async Task<bool> SendEmailAsync(string email, string token, string endpoint, string subject, string action, string message)
-        {
-            try
-            {
-                _logger.LogWarning("\n\n SendEmailAsync method =====>  " + token);
-
-                // var decodedToken = Uri.UnescapeDataString(token);
-                string encodedToken = HttpUtility.UrlEncode(token);
-                //string encodedToken = Base64UrlEncoder.Encode(token);
-
-                _logger.LogWarning("\n\n ==== AFTER encoding  =====>  " + encodedToken);
-
-                string link = $"http://localhost:5112/api/auth/{endpoint}?email={email}&token={encodedToken}";
-
-                _logger.LogInformation($"\n\n[Email Sending] Email: {email}, Endpoint: {endpoint}, token : {token}--- Encoded Token: {encodedToken}");
-
-                string emailBody = $@"
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <style>
-                            body {{
-                                font-family: Arial, sans-serif;
-                                background-color: #f4f4f4;
-                                margin: 0;
-                                padding: 0;
-                            }}
-                            .container {{
-                                width: 80%;
-                                max-width: 600px;
-                                margin: 20px auto;
-                                background: #ffffff;
-                                padding: 20px;
-                                border-radius: 8px;
-                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                                text-align: center;
-                            }}
-                            h3 {{
-                                color: #333;
-                            }}
-                            p {{
-                                color: #555;
-                                font-size: 16px;
-                            }}
-                            .btn {{
-                                display: inline-block;
-                                padding: 12px 20px;
-                                margin-top: 10px;
-                                font-size: 16px;
-                                color: #fff;
-                                background-color: #28a745;
-                                text-decoration: none;
-                                border-radius: 5px;
-                            }}
-                            .btn:hover {{
-                                background-color: #218838;
-                            }}
-                            .footer {{
-                                margin-top: 20px;
-                                font-size: 12px;
-                                color: #999;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <div class='container'>
-                            <h3>{action}</h3>
-                            <p>{message}</p>
-                            <a href='{link}' class='btn'>{action}</a>
-                            <p>If the button doesn't work, you can also click on the following link:</p>
-                            <p><a href='{link}'>{link}</a></p>
-                            <p class='footer'>If you didn’t request this email, please ignore it.</p>
-                        </div>
-                    </body>
-                    </html>";
-
-                await _emailServices.SendEmailAsync(email, subject, emailBody);
-                _logger.LogInformation($"[Email Sent] Successfully sent email to {email}.");
-
-                return true;
-            }
-
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send email to {Email}. Error: {ErrorMessage}",
-                        email, ex.Message);
-
-                throw new SendEmailException($"Failed to send email to {email}", ex);
-            }
-        }
-
 
         public async Task ChangePasswordAsync(string email, string oldPassword, string newPassword)
         {
@@ -271,21 +165,21 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return user;
         }
 
-        public async Task ForgotPasswordAsync(string email)
+        public async Task<(string Email, string Token)> ForgotPasswordAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            if (user is null)
             {
-                throw new UserNotFoundException("Invalid email.");
+                throw new UserNotFoundException("No user found with the specified email.");
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            _logger.LogWarning("\n\n ====>\n token after genrate =    " + token);
 
-            string message = "\r\nThank you for reaching out to us. We have received your request to reset your password.\r\n\r\nTo proceed with resetting your password, please follow the instructions below:\r\n\r\nClick on the password reset link sent to your registered email address.\r\nFollow the prompts to create a new password.\r\n";
+            _logger.LogInformation("Password reset token generated for user: {Email}", email);
 
-            await SendEmailAsync(user.Email, token, "resetpassword", "Forgot Password", "Reset your password", message);
+            return (user.Email, token);
         }
+
         public async Task ResetPassword(string email, string password, string token)
         {
             //var newtoken = HttpUtility.UrlDecode(token);

@@ -1,14 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Application.DTOs;
-using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -73,8 +66,8 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<LevelProgressDTO>(levelProgress);
         }
-        
-    public async Task<IEnumerable<LevelProgressDTO>> GetByApplicantIdAsync(string applicantId)
+
+        public async Task<IEnumerable<LevelProgressDTO>> GetByApplicantIdAsync(string applicantId)
         {
             // Get all enrollments for this applicant
             var enrollments = await _unitOfWork.EnrollmentRepository.GetByApplicantIdAsync(applicantId);

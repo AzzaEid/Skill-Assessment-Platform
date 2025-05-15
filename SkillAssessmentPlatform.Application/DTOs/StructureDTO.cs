@@ -21,10 +21,13 @@ public class StageStructureDTO
 {
     public string? Name { get; set; }
     public string? Description { get; set; }
-    public StageType? Type { get; set; }
+    public StageType Type { get; set; }
     public int? Order { get; set; }
     public int? PassingScore { get; set; }
     public int? NoOfAttempts { get; set; }
+    public CreateInterviewDto? Interview { get; set; }
+    public ExamDto? Exam { get; set; }
+    public TasksPoolDto? TasksPool { get; set; }
     public List<EvaluationStructureCriteriaDTO?> EvaluationCriteria { get; set; }
 }
 

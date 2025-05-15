@@ -3,11 +3,6 @@ using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -43,7 +38,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<ExaminerLoadDTO> UpdateWorkLoadAsync(int id, UpdateWorkLoadDTO updateDto)
         {
-            var load = await _unitOfWork.ExaminerLoadRepository.UpdateWorkLoadAsync(id, updateDto.WorkLoad);
+            var load = await _unitOfWork.ExaminerLoadRepository.UpdateWorkLoadAsync(id, updateDto.MaxWorkLoad);
             return _mapper.Map<ExaminerLoadDTO>(load);
         }
 
@@ -62,6 +57,13 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<ExaminerLoadDTO>(load);
         }
-    
+        public async Task DeleteLoad(int id)
+        {
+            var load = await _unitOfWork.ExaminerLoadRepository.GetByIdAsync(id);
+            if (load == null)
+                throw new KeyNotFoundException($"no examiner load with id : {id}");
+            await _unitOfWork.ExaminerLoadRepository.DeleteAsync(id);
+        }
+
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Infrastructure.Data;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 using System.Text;
 
 namespace SkillAssessmentPlatform.Infrastructure
@@ -25,6 +26,12 @@ namespace SkillAssessmentPlatform.Infrastructure
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>
                 options.TokenLifespan = TimeSpan.FromHours(7));
+
+            // Email
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+            // services.AddTransient<IEmailService, EmailService>();
+            // Zoom
+            services.Configure<ZoomSettings>(configuration.GetSection("ZoomSettings"));
 
             // JWT Authentication
             services.AddAuthentication(options =>

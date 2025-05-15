@@ -21,10 +21,10 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<PagedResponse<ApplicantDTO>> GetAllApplicantsAsync(int page = 1, int pageSize = 10)
         {
-            //var applicants = await _applicantRepository.GetPagedAsync(page, pageSize);
+            //var applicants = await _applicantRepository.GetPagedQueryable(page, pageSize);
             //var totalCount = await _applicantRepository.CountAsync();
 
-            var applicants = await _unitOfWork.ApplicantRepository.GetPagedAsync(page, pageSize);
+            var applicants = _unitOfWork.ApplicantRepository.GetPagedQueryable(page, pageSize);
             var totalCount = await _unitOfWork.ApplicantRepository.GetTotalCountAsync();
             return new PagedResponse<ApplicantDTO>(
                 _mapper.Map<List<ApplicantDTO>>(applicants),

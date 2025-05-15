@@ -12,8 +12,8 @@ using SkillAssessmentPlatform.Infrastructure.Data;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250509152538_InitClean")]
-    partial class InitClean
+    [Migration("20250514200059_fix1to1Relation")]
+    partial class fix1to1Relation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -234,7 +234,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Enrollment", b =>
@@ -601,10 +601,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("QuestionsCategory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("QuestionsType")
                         .HasColumnType("int");
 
@@ -622,15 +618,19 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.ExamRequest", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ApplicantId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FeedbackId")
+                    b.Property<int?>("FeedbackId")
                         .HasColumnType("int");
 
                     b.Property<string>("Instructions")
@@ -646,7 +646,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApplicantId");
+
                     b.HasIndex("ExamId");
+
+                    b.HasIndex("FeedbackId")
+                        .IsUnique()
+                        .HasFilter("[FeedbackId] IS NOT NULL");
 
                     b.ToTable("ExamRequests");
                 });
@@ -676,9 +682,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Property<int>("StageId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("StageId")
@@ -690,25 +693,28 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.InterviewBook", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ApplicantId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AppointmentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FeedbackId")
+                    b.Property<int?>("FeedbackId")
                         .HasColumnType("int");
 
                     b.Property<int>("InterviewId")
                         .HasColumnType("int");
 
                     b.Property<string>("MeetingLink")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ScheduledDate")
+                    b.Property<DateTime?>("ScheduledDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
@@ -716,7 +722,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApplicantId");
+
                     b.HasIndex("AppointmentId");
+
+                    b.HasIndex("FeedbackId")
+                        .IsUnique()
+                        .HasFilter("[FeedbackId] IS NOT NULL");
 
                     b.HasIndex("InterviewId");
 
@@ -761,7 +773,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("FeedbackId")
+                    b.Property<int?>("FeedbackId")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
@@ -781,7 +793,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FeedbackId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[FeedbackId] IS NOT NULL");
 
                     b.HasIndex("TaskApplicantId");
 
@@ -1264,6 +1277,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.ExamRequest", b =>
                 {
+                    b.HasOne("SkillAssessmentPlatform.Core.Entities.Users.Applicant", "Applicant")
+                        .WithMany("ExamRequests")
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.Exam", "Exam")
                         .WithMany("ExamRequests")
                         .HasForeignKey("ExamId")
@@ -1272,9 +1291,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation.Feedback", "Feedback")
                         .WithOne("ExamRequest")
-                        .HasForeignKey("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.ExamRequest", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.ExamRequest", "FeedbackId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Applicant");
 
                     b.Navigation("Exam");
 
@@ -1294,6 +1314,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.InterviewBook", b =>
                 {
+                    b.HasOne("SkillAssessmentPlatform.Core.Entities.Users.Applicant", "Applicant")
+                        .WithMany("InterviewBooks")
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.Appointment", "Appointment")
                         .WithMany("InterviewBooks")
                         .HasForeignKey("AppointmentId")
@@ -1302,15 +1328,15 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation.Feedback", "Feedback")
                         .WithOne("InterviewBook")
-                        .HasForeignKey("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.InterviewBook", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.InterviewBook", "FeedbackId");
 
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.Interview", "Interview")
                         .WithMany("InterviewBooks")
                         .HasForeignKey("InterviewId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Applicant");
 
                     b.Navigation("Appointment");
 
@@ -1343,8 +1369,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation.Feedback", "Feedback")
                         .WithOne("TaskSubmission")
                         .HasForeignKey("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.TaskSubmission", "FeedbackId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews.TaskApplicant", "TaskApplicant")
                         .WithMany("TaskSubmissions")
@@ -1514,6 +1539,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Navigation("Certificates");
 
                     b.Navigation("Enrollments");
+
+                    b.Navigation("ExamRequests");
+
+                    b.Navigation("InterviewBooks");
 
                     b.Navigation("TaskApplicants");
                 });

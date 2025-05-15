@@ -33,14 +33,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public override async Task<IEnumerable<Examiner>> GetPagedAsync(int page, int pageSize)
+        public override IQueryable<Examiner> GetPagedQueryable(int page, int pageSize)
         {
-            return await _context.Users
+            return _context.Users
                 .OfType<Examiner>()
                 .Include(e => e.ExaminerLoads)
                 .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Take(pageSize);
         }
 
         public override async Task<Examiner> GetByIdAsync(string id)

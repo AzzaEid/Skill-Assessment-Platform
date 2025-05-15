@@ -1,21 +1,11 @@
-﻿using MailKit.Net.Smtp;
-using MailKit.Security;
-using Microsoft.Extensions.Configuration;
-using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using System.Threading.Tasks;
-
-namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
+﻿namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
 {  /// need to enhance !!
-    public class EmailServices
+    public class EmailSettings
     {
+        /*
         private readonly IConfiguration _configuration;
 
-        public EmailServices(IConfiguration configuration)
+        public EmailSettings(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -44,5 +34,11 @@ namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
         }
+    }
+        /*/
+        public string SenderEmail { get; set; }
+        public string SenderPassword { get; set; }
+        public string SmtpServer { get; set; }
+        public int SmtpPort { get; set; }
     }
 }

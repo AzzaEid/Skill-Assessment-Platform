@@ -52,12 +52,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _dbSet.CountAsync();
         }
-        public virtual async Task<IEnumerable<T>> GetPagedAsync(int page, int pageSize)
+        public virtual IQueryable<T> GetPagedQueryable(int page, int pageSize)
         {
-            return await _dbSet
+            return _dbSet
                 .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Take(pageSize);
         }
 
         public virtual async Task<T> UpdateAsync(T entity)
@@ -92,7 +91,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             _context.Set<T>().Remove(entity);
         }
-
+        public virtual async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+        }
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Exceptions;
@@ -23,7 +24,9 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<PagedResponse<ExaminerDTO>> GetAllExaminersAsync(int page = 1, int pageSize = 10)
         {
-            var examiners = await _unitOfWork.ExaminerRepository.GetPagedAsync(page, pageSize);
+            var examiners = _unitOfWork.ExaminerRepository.GetPagedQueryable(page, pageSize)
+                .Include(e => e.WorkingTracks)
+                .Include(e => e.ExaminerLoads);
             var totalCount = await _unitOfWork.ExaminerRepository.GetTotalCountAsync();
 
             return new PagedResponse<ExaminerDTO>(
