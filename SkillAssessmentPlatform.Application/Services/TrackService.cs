@@ -1,6 +1,8 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
+using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
@@ -115,7 +117,7 @@ namespace SkillAssessmentPlatform.Application.Services
         }
         public async Task<bool> CreateTrackStructureAsync(TrackStructureDTO structureDTO)
         {
-            
+
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(structureDTO.TrackId);
             if (track == null)
                 throw new KeyNotFoundException($"Track with ID {structureDTO.TrackId} not found");
@@ -124,7 +126,7 @@ namespace SkillAssessmentPlatform.Application.Services
             {
                 try
                 {
-                  
+
                     foreach (var levelDTO in structureDTO.Levels)
                     {
                         var level = new Level
@@ -139,7 +141,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         await _unitOfWork.LevelRepository.AddAsync(level);
                         await _unitOfWork.SaveChangesAsync();
 
-                      
+
                         foreach (var stageDTO in levelDTO.Stages)
                         {
                             var stage = new Stage
@@ -147,16 +149,19 @@ namespace SkillAssessmentPlatform.Application.Services
                                 LevelId = level.Id,
                                 Name = stageDTO.Name,
                                 Description = stageDTO.Description,
-                                Type = (Core.Enums.StageType)stageDTO.Type,
+                                Type = stageDTO.Type,
                                 Order = (int)stageDTO.Order,
                                 IsActive = true,
                                 PassingScore = (int)stageDTO.PassingScore
                             };
-                            
+
                             await _unitOfWork.StageRepository.AddAsync(stage);
                             await _unitOfWork.SaveChangesAsync();
 
-                            
+
+                            // based on stageType
+                            await AddStageDetailsAsync(stageDTO, stage.Id);
+
                             foreach (var criteriaDTO in stageDTO.EvaluationCriteria)
                             {
                                 var criteria = new EvaluationCriteria
@@ -190,6 +195,70 @@ namespace SkillAssessmentPlatform.Application.Services
 
             }
         }
+        private async Task AddStageDetailsAsync(StageStructureDTO stageDTO, int stageId)
+        {
+            switch (stageDTO.Type)
+            {
+                case StageType.Exam:
+                    // Convert List<string> to enum flags
+                    QuestionType combinedTypes = QuestionType.None;
+                    foreach (var type in stageDTO.Exam.QuestionsType)
+                    {
+                        if (Enum.TryParse(type, true, out QuestionType parsed))
+                        {
+                            combinedTypes |= parsed;
+                        }
+                    }
+                    if (stageDTO.Exam != null)
+                    {
+                        var exam = new Exam
+                        {
+                            StageId = stageId,
+                            DurationMinutes = stageDTO.Exam.DurationMinutes,
+                            Difficulty = stageDTO.Exam.Difficulty,
+                            QuestionsType = combinedTypes
+                        };
+
+                        await _unitOfWork.ExamRepository.AddAsync(exam);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                    break;
+
+                case StageType.Interview:
+                    if (stageDTO.Interview != null)
+                    {
+                        var interview = new Interview
+                        {
+                            StageId = stageId,
+                            MaxDaysToBook = stageDTO.Interview.MaxDaysToBook,
+                            DurationMinutes = stageDTO.Interview.DurationMinutes,
+                            Instructions = stageDTO.Interview.Instructions,
+                        };
+
+                        await _unitOfWork.InterviewRepository.AddAsync(interview);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                    break;
+
+                case StageType.Task:
+                    if (stageDTO.TasksPool != null)
+                    {
+                        var task = new TasksPool
+                        {
+                            StageId = stageId,
+                            DaysToSubmit = stageDTO.TasksPool.DaysToSubmit,
+                            Description = stageDTO.TasksPool.Description,
+                            Requirements = stageDTO.TasksPool.Requirements,
+
+                        };
+
+                        await _unitOfWork.TasksPoolRepository.AddAsync(task);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                    break;
+            }
+        }
+
         public async Task<TrackDto> UpdateTrackAsync(TrackDto trackDto)
         {
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackDto.Id);
