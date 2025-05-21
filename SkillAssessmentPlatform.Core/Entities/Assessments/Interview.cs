@@ -1,4 +1,6 @@
-﻿namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
+﻿using SkillAssessmentPlatform.Core.Enums;
+
+namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
 {
     public class Interview
     {
@@ -13,5 +15,6 @@
         // Navigation properties
         public Stage Stage { get; set; }
         public ICollection<InterviewBook> InterviewBooks { get; set; } = new List<InterviewBook>();
+        public InterviewStatus Status { get; set; }
     }
 }

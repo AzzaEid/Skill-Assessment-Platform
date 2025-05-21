@@ -46,12 +46,22 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Success(stages);
         }
 
-        [HttpPost("{levelId}/stages")]
+      /*  [HttpPost("{levelId}/stages")]
         public async Task<IActionResult> CreateStage(int levelId, [FromBody] CreateStageDTO dto)
         {
             var created = await _levelService.CreateStage(levelId, dto);
             return _responseHandler.Created(created);
 
+        }
+      */
+        [HttpPost("{levelId}/stages")]
+        public async Task<IActionResult> AddStageWithDetails(int levelId, [FromBody] CreateStageWithDetailsDTO dto)
+        {
+            var success = await _levelService.AddStageToLevelAsync(levelId, dto);
+            if (!success)
+                return NotFound($"Level with ID {levelId} not found");
+
+            return Ok("Stage with details added successfully");
         }
 
         [HttpDelete("{id}")]

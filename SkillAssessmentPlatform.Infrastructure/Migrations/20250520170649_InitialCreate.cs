@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class fix1to1Relation : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -302,7 +302,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Objectives = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    AssociatedSkills = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AssociatedSkillsJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -532,7 +532,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     MaxDaysToBook = table.Column<int>(type: "int", nullable: false),
                     DurationMinutes = table.Column<int>(type: "int", nullable: false),
                     Instructions = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
