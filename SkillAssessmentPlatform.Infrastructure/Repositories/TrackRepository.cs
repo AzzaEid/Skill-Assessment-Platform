@@ -72,7 +72,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.Tracks
                 .Include(t => t.Levels)
                     .ThenInclude(l => l.Stages)
-                .Where(t => t.IsActive)
+                //.Where(t => t.IsActive)
                 .ToListAsync();
         }
 

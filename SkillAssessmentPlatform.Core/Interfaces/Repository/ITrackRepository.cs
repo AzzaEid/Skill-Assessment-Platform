@@ -1,18 +1,12 @@
 ﻿using SkillAssessmentPlatform.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
-    public interface ITrackRepository 
+    public interface ITrackRepository
     {
         Task<IEnumerable<Track>> GetAllAsync();
         Task<Track> GetByIdAsync(int id);
         Task<Track> GetTrackWithDetailsAsync(int id);
-     
 
         Task AddAsync(Track track);
 

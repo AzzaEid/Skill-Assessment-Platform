@@ -1,4 +1,6 @@
-﻿namespace SkillAssessmentPlatform.Application.DTOs
+﻿using SkillAssessmentPlatform.Core.Enums;
+
+namespace SkillAssessmentPlatform.Application.DTOs
 {
     public class ExaminerLoadDTO
     {
@@ -13,11 +15,14 @@
 
         public int MaxWorkLoad { get; set; }
     }
-
-    public class CreateExaminerLoadDTO
+    public class CreateExaminerLoadListDTO
     {
         public string ExaminerID { get; set; }
-        public string Type { get; set; }
+        public List<CreateExaminerLoadDTO> examinerLoads { get; set; }
+    }
+    public class CreateExaminerLoadDTO
+    {
+        public StageType Type { get; set; }
         public int MaxWorkLoad { get; set; }
     }
 }

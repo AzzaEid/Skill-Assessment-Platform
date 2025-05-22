@@ -45,7 +45,7 @@ namespace SkillAssessmentPlatform.Application.Mapping
             //plan
             CreateMap<Track, TrackDto>().ReverseMap();
             CreateMap<Track, TrackBaseDTO>().ReverseMap();
-
+            CreateMap<Level, LevelDetailDto>().ReverseMap();
             // Appointment
             CreateMap<Appointment, AppointmentDTO>()
                 .ForMember(dest => dest.ExaminerName, opt => opt.MapFrom(src => src.Examiner.FullName));

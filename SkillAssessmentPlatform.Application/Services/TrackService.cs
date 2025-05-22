@@ -2,8 +2,8 @@ using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
-using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Entities.Users;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
@@ -62,7 +62,6 @@ namespace SkillAssessmentPlatform.Application.Services
             var tracks = await _unitOfWork.TrackRepository.GetAllWithDetailsAsync();
 
             return tracks
-                .Where(t => t.IsActive == true)
                 .Select(t => new TrackDetialDto
                 {
                     Id = t.Id,
@@ -79,7 +78,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         TrackId = level.TrackId,
                         Name = level.Name,
                         Description = level.Description,
-                      //  Order = level.Order,
+                        //  Order = level.Order,
                         IsActive = level.IsActive,
                         Stages = level.Stages?.Select(stage => new StageDetailDTO
                         {
@@ -87,7 +86,7 @@ namespace SkillAssessmentPlatform.Application.Services
                             Name = stage.Name,
                             Description = stage.Description,
                             Type = stage.Type,
-                          //  Order = stage.Order,
+                            //  Order = stage.Order,
                             PassingScore = stage.PassingScore,
                             IsActive = stage.IsActive
                         }).ToList()
@@ -132,7 +131,7 @@ namespace SkillAssessmentPlatform.Application.Services
             var track = new Track
             {
                 SeniorExaminerID = trackDto.SeniorExaminerID,
-                SeniorExaminer = seniorExaminer, 
+                SeniorExaminer = seniorExaminer,
                 Name = trackDto.Name,
                 Description = trackDto.Description,
                 Objectives = trackDto.Objectives,
@@ -490,6 +489,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Email = e.Email,
                 Image = e.Image,
                 Specialization = e.Specialization,
+                UserType = e.UserType,
                 ExaminerLoads = e.ExaminerLoads?.Select(load => new ExaminerLoadDTO
                 {
                     ID = load.ID.ToString(),

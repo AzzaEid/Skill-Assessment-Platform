@@ -55,20 +55,18 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<EnrollmentDTO> EnrollApplicantInTrackAsync(string applicantId, EnrollmentCreateDTO enrollmentDto)
         {
-            // Check if applicant exists
             var applicant = await _unitOfWork.ApplicantRepository.GetByIdAsync(applicantId);
+            if (applicant == null)
+                throw new KeyNotFoundException($"Applicant with id {applicantId} not found");
 
-            // Check if track exists
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(enrollmentDto.TrackId);
             if (track == null)
                 throw new KeyNotFoundException($"Track with id {enrollmentDto.TrackId} not found");
 
-            // Check if enrollment already exists
             var existingEnrollment = await _unitOfWork.EnrollmentRepository.GetByApplicantAndTrackAsync(applicantId, enrollmentDto.TrackId);
             if (existingEnrollment != null)
                 throw new BadRequestException("Applicant is already enrolled in this track");
 
-            // Create enrollment
             var enrollment = new Enrollment
             {
                 ApplicantId = applicantId,
@@ -76,17 +74,16 @@ namespace SkillAssessmentPlatform.Application.Services
                 EnrollmentDate = DateTime.Now,
                 Status = EnrollmentStatus.Active,
             };
-            //>>> add transaction
-            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+            try
             {
                 await _unitOfWork.EnrollmentRepository.AddAsync(enrollment);
                 await _unitOfWork.SaveChangesAsync();
 
-                // Get the first level of the track
                 var firstLevel = await _unitOfWork.LevelRepository.GetFirstLevelByTrackIdAsync(enrollmentDto.TrackId);
                 if (firstLevel != null)
                 {
-                    // Create level progress
                     var levelProgress = new LevelProgress
                     {
                         EnrollmentId = enrollment.Id,
@@ -96,19 +93,15 @@ namespace SkillAssessmentPlatform.Application.Services
                     };
 
                     await _unitOfWork.LevelProgressRepository.AddAsync(levelProgress);
+                    await _unitOfWork.SaveChangesAsync();
 
-
-                    // Get the first stage of the level
                     var firstStage = await _unitOfWork.StageRepository.GetFirstStageByLevelIdAsync(firstLevel.Id);
-
-                    // Search for supervisor 
-                    var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(firstStage.Type);
-                    if (freeExaminerId == null)
-                        throw new InvalidOperationException("No available examiner found for this stage");
-
                     if (firstStage != null)
                     {
-                        // Create stage progress
+                        var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(firstStage.Type);
+                        if (freeExaminerId == null)
+                            throw new InvalidOperationException("No available examiner found for this stage");
+
                         var stageProgress = new StageProgress
                         {
                             LevelProgressId = levelProgress.Id,
@@ -120,15 +113,21 @@ namespace SkillAssessmentPlatform.Application.Services
                         };
 
                         await _unitOfWork.StageProgressRepository.AddAsync(stageProgress);
+                        await _unitOfWork.SaveChangesAsync();
                     }
-
-                    await _unitOfWork.SaveChangesAsync();
-                    await transaction.CommitAsync();
                 }
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
 
             return _mapper.Map<EnrollmentDTO>(enrollment);
         }
+
 
         public async Task<EnrollmentDTO> UpdateEnrollmentStatusAsync(int enrollmentId, UpdateEnrollmentStatusDTO updateDto)
         {
