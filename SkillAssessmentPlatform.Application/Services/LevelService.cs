@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
+using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -195,6 +198,84 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
 
+        public async Task<bool> AddStageToLevelAsync(int levelId, CreateStageWithDetailsDTO dto)
+        {
+            var level = await _unitOfWork.LevelRepository.GetByIdAsync(levelId);
+            if (level == null) return false;
+
+            var stage = new Stage
+            {
+                LevelId = levelId,
+                Name = dto.Name,
+                Description = dto.Description,
+                Type = dto.Type,
+                Order = dto.Order,
+                PassingScore = dto.PassingScore,
+                IsActive = true
+            };
+
+            await _unitOfWork.StageRepository.AddAsync(stage);
+            await _unitOfWork.SaveChangesAsync();
+
+            // ➕ أضف التفاصيل حسب نوع الستيج
+            await AddStageDetailsAsync(dto, stage.Id);
+
+            // ➕ تقييمات المرحلة
+            foreach (var criteriaDto in dto.EvaluationCriteria)
+            {
+                var criteria = new EvaluationCriteria
+                {
+                    StageId = stage.Id,
+                    Name = criteriaDto.Name,
+                    Description = criteriaDto.Description,
+                    Weight = (float)criteriaDto.Weight
+                };
+                await _unitOfWork.EvaluationCriteriaRepository.AddAsync(criteria);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task AddStageDetailsAsync(CreateStageWithDetailsDTO dto, int stageId)
+        {
+            switch (dto.Type)
+            {
+                case StageType.Exam:
+                    var exam = new Exam
+                    {
+                        StageId = stageId,
+                        DurationMinutes = dto.Exam.DurationMinutes,
+                        Difficulty = dto.Exam.Difficulty,
+                        QuestionsType = dto.Exam.QuestionsType.Aggregate(QuestionType.None, (acc, q) =>
+                            acc | Enum.Parse<QuestionType>(q, true))
+                    };
+                    await _unitOfWork.ExamRepository.AddAsync(exam);
+                    break;
+
+                case StageType.Interview:
+                    var interview = new Interview
+                    {
+                        StageId = stageId,
+                        MaxDaysToBook = dto.Interview.MaxDaysToBook,
+                        DurationMinutes = dto.Interview.DurationMinutes,
+                        Instructions = dto.Interview.Instructions
+                    };
+                    await _unitOfWork.InterviewRepository.AddAsync(interview);
+                    break;
+
+                case StageType.Task:
+                    var taskPool = new TasksPool
+                    {
+                        StageId = stageId,
+                        DaysToSubmit = dto.TasksPool.DaysToSubmit,
+                        Description = dto.TasksPool.Description,
+                        Requirements = dto.TasksPool.Requirements
+                    };
+                    await _unitOfWork.TasksPoolRepository.AddAsync(taskPool);
+                    break;
+            }
+        }
 
 
     }

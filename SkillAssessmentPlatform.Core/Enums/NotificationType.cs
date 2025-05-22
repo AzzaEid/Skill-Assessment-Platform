@@ -11,6 +11,7 @@
         NewInterviewBooking = 6,
         InterviewConfirmed = 7,
         InterviewBookingRejected = 8,
+        TaskSubmitted = 9,
     }
 
 }

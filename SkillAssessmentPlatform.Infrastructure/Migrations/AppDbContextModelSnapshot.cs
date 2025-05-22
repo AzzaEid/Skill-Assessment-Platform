@@ -679,6 +679,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Property<int>("StageId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("StageId")
@@ -838,7 +841,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AssociatedSkills")
+                    b.Property<string>("AssociatedSkillsJson")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
