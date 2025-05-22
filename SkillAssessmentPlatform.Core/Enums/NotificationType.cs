@@ -15,6 +15,7 @@
         ExamRequestApprove = 10,
         ExamRequestReject = 11,
         ReviewExam = 12
+        TaskSubmitted = 9,
     }
 
 }

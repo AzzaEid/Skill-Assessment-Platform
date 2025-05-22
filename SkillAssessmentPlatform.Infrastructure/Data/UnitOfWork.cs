@@ -31,6 +31,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IInterviewBookRepository _interviewBookRepository;
         private readonly IExamRequestRepository _examRequestRepository;
+        private readonly ITaskApplicantRepository _taskApplicantRepository;
+        private readonly ITaskSubmissionRepository _taskSubmissionRepository;
+
+
         public UnitOfWork(
             AppDbContext context,
             IAuthRepository authRepository,
@@ -53,6 +57,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IAppointmentRepository appointmentRepository,
             IInterviewBookRepository interviewBookRepository,
             IExamRequestRepository examRequestRepository)
+            IInterviewBookRepository interviewBookRepository,
+            ITaskApplicantRepository taskApplicantRepository,
+            ITaskSubmissionRepository taskSubmissionRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -68,13 +75,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _levelProgressRepository = levelProgressRepository;
             _stageProgressRepository = stageProgressRepository;
             _seniorRepository = seniorRepository;
-
             _examRepository = examRepository;
             _interviewRepository = interviewRepository;
             _tasksPoolRepository = tasksPoolRepository;
             _appTaskRepository = appTaskRepository;
             _appointmentRepository = appointmentRepository;
             _interviewBookRepository = interviewBookRepository;
+            _taskApplicantRepository = taskApplicantRepository;
+            _taskSubmissionRepository = taskSubmissionRepository;
             _examRequestRepository = examRequestRepository;
         }
 
@@ -95,12 +103,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IExamRepository ExamRepository => _examRepository;
         public IInterviewRepository InterviewRepository => _interviewRepository;
         public ITasksPoolRepository TasksPoolRepository => _tasksPoolRepository;
-
         public IAppTaskRepository AppTaskRepository => _appTaskRepository;
-
         public IAppointmentRepository AppointmentRepository => _appointmentRepository;
         public IInterviewBookRepository InterviewBookRepository => _interviewBookRepository;
         public IExamRequestRepository ExamRequestRepository => _examRequestRepository;
+        public ITaskApplicantRepository TaskApplicantRepository => _taskApplicantRepository;
+        public ITaskSubmissionRepository TaskSubmissionRepository => _taskSubmissionRepository;
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

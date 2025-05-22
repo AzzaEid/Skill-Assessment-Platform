@@ -13,6 +13,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IInterviewRepository InterviewRepository { get; }
         ITasksPoolRepository TasksPoolRepository { get; }
         IAppTaskRepository AppTaskRepository { get; }
+        ITaskApplicantRepository TaskApplicantRepository { get; }
 
 
 
@@ -34,6 +35,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IAppointmentRepository AppointmentRepository { get; }
         IInterviewBookRepository InterviewBookRepository { get; }
         IExamRequestRepository ExamRequestRepository { get; }
+        ITaskSubmissionRepository TaskSubmissionRepository { get; }
+
         #endregion
 
         #region methods

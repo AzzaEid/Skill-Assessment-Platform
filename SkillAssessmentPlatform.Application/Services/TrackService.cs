@@ -6,6 +6,8 @@ using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
+using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
+
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -32,7 +34,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Name = track.Name,
                 Description = track.Description,
                 Objectives = track.Objectives,
-                AssociatedSkills = track.AssociatedSkills,
+                AssociatedSkills = track.AssociatedSkills.ToList(),
                 IsActive = track.IsActive,
                 Image = track.Image,
                 Levels = track.Levels.Select(level => new LevelDetailDto
@@ -69,7 +71,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     Name = t.Name,
                     Description = t.Description,
                     Objectives = t.Objectives,
-                    AssociatedSkills = t.AssociatedSkills,
+                    AssociatedSkills = t.AssociatedSkills.ToList(),
                     IsActive = t.IsActive,
                     Image = t.Image,
                     Levels = t.Levels.Select(level => new LevelDetailDto
@@ -107,7 +109,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     Name = t.Name,
                     Description = t.Description,
                     Objectives = t.Objectives,
-                    AssociatedSkills = t.AssociatedSkills,
+                    AssociatedSkills = t.AssociatedSkills.ToList(),
                     IsActive = t.IsActive,
                     Image = t.Image
                 });
@@ -403,7 +405,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Objectives = t.Objectives,
                 Image = t.Image,
                 IsActive = t.IsActive,
-                AssociatedSkills = t.AssociatedSkills,
+                AssociatedSkills = t.AssociatedSkills.ToList(),
                 SeniorExaminerID = t.SeniorExaminerID
             });
         }
@@ -420,7 +422,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Objectives = t.Objectives,
                 Image = t.Image,
                 IsActive = t.IsActive,
-                AssociatedSkills = t.AssociatedSkills,
+                AssociatedSkills = t.AssociatedSkills.ToList(),
                 SeniorExaminerID = t.SeniorExaminerID
             });
         }
@@ -512,6 +514,18 @@ namespace SkillAssessmentPlatform.Application.Services
             });
         }
 
+        public async Task<bool> AddLevelToTrackAsync(int trackId, CreateLevelDTO dto)
+        {
+            var level = new Level
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                Order = (int)dto.Order,
+                IsActive = true
+            };
+
+            return await _unitOfWork.TrackRepository.AddLevelToTrackAsync(trackId, level);
+        }
 
     }
 }

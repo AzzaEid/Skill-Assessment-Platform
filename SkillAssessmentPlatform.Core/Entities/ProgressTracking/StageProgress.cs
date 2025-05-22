@@ -15,11 +15,13 @@ namespace SkillAssessmentPlatform.Core.Entities
         public DateTime CompletionDate { get; set; }
         public int Attempts { get; set; }
 
+        // ✅ FIX: Add ApplicantId
+        public string ApplicantId { get; set; }
 
         // Navigation properties
-        // add by the relation bett stageProg && EXaminer && Stage
         public Examiner Examiner { get; set; }
         public Stage Stage { get; set; }
         public LevelProgress LevelProgress { get; set; }
+        public Applicant Applicant { get; set; } // Optional nav property (useful if needed later)
     }
 }

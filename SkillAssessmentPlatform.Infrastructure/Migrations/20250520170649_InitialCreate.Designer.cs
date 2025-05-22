@@ -12,8 +12,8 @@ using SkillAssessmentPlatform.Infrastructure.Data;
 namespace SkillAssessmentPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250514200059_fix1to1Relation")]
-    partial class fix1to1Relation
+    [Migration("20250520170649_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -682,6 +682,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Property<int>("StageId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("StageId")
@@ -841,7 +844,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AssociatedSkills")
+                    b.Property<string>("AssociatedSkillsJson")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
