@@ -35,6 +35,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IAppointmentRepository AppointmentRepository { get; }
         IInterviewBookRepository InterviewBookRepository { get; }
         ITaskSubmissionRepository TaskSubmissionRepository { get; }
+        IAppCertificateRepository AppCertificateRepository { get; }
 
         #endregion
 

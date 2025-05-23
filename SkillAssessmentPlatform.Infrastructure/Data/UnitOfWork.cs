@@ -32,6 +32,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IInterviewBookRepository _interviewBookRepository;
         private readonly ITaskApplicantRepository _taskApplicantRepository;
         private readonly ITaskSubmissionRepository _taskSubmissionRepository;
+        private readonly IAppCertificateRepository _appCertificateRepository;
 
 
         public UnitOfWork(
@@ -56,7 +57,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IAppointmentRepository appointmentRepository,
             IInterviewBookRepository interviewBookRepository,
             ITaskApplicantRepository taskApplicantRepository,
-            ITaskSubmissionRepository taskSubmissionRepository)
+            ITaskSubmissionRepository taskSubmissionRepository,
+            IAppCertificateRepository appCertificateRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -80,6 +82,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _interviewBookRepository = interviewBookRepository;
             _taskApplicantRepository = taskApplicantRepository;
             _taskSubmissionRepository = taskSubmissionRepository;
+            _appCertificateRepository = appCertificateRepository;
         }
 
         // Custom Repositories exposed
@@ -104,6 +107,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IInterviewBookRepository InterviewBookRepository => _interviewBookRepository;
         public ITaskApplicantRepository TaskApplicantRepository => _taskApplicantRepository;
         public ITaskSubmissionRepository TaskSubmissionRepository => _taskSubmissionRepository;
+        public IAppCertificateRepository AppCertificateRepository => _appCertificateRepository;
+
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

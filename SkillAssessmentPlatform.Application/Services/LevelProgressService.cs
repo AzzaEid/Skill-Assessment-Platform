@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 
@@ -36,6 +37,7 @@ namespace SkillAssessmentPlatform.Application.Services
             return _mapper.Map<LevelProgressDTO>(levelProgress);
         }
 
+
         public async Task<LevelProgressDTO> UpdateStatusAsync(int levelProgressId, UpdateLevelStatusDTO updateDto)
         {
             var levelProgress = await _unitOfWork.LevelProgressRepository.UpdateStatusAsync(levelProgressId, updateDto.Status);
@@ -43,29 +45,37 @@ namespace SkillAssessmentPlatform.Application.Services
             // If level completed successfully, create progress for next level
             if (updateDto.Status == ProgressStatus.Successful)
             {
+                var enrollment = await _unitOfWork.EnrollmentRepository.GetByIdAsync(levelProgress.EnrollmentId);
+
+              
+                var certificate = new AppCertificate
+                {
+                    ApplicantId = enrollment.ApplicantId,
+                    LeveProgressId = levelProgress.Id,
+                    IssueDate = DateTime.UtcNow,
+                    VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
+                };
+                await _unitOfWork.AppCertificateRepository.AddAsync(certificate);
+
+                
                 var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
                     levelProgress.EnrollmentId,
                     levelProgress.LevelId);
-                if (result == null)  //// No next level, track completed
+
+                //// No next level, track completed
+                if (result == null)
                 {
                     await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
-                    /* >>> ---
-                     * / Create certificate 
-                    var certificate = new AppCertificate
-                    {
-                        ApplicantId = enrollment.ApplicantId,
-                        LevelProgressID = levelProgress.Id,
-                        IssueDate = DateTime.UtcNow,
-                        VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
-                    };
-
-                    await _context.Certificates.AddAsync(certificate);
-                    /*/
                 }
+
+              
+                await _unitOfWork.SaveChangesAsync();
             }
 
             return _mapper.Map<LevelProgressDTO>(levelProgress);
         }
+
+       
 
         public async Task<IEnumerable<LevelProgressDTO>> GetByApplicantIdAsync(string applicantId)
         {
