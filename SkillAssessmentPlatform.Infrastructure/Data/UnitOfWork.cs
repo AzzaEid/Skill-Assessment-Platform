@@ -33,7 +33,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly ITaskApplicantRepository _taskApplicantRepository;
         private readonly ITaskSubmissionRepository _taskSubmissionRepository;
         private readonly IAppCertificateRepository _appCertificateRepository;
-
+        private readonly IFeedbackRepository _feedbackRepository;
+        private readonly IDetailedFeedbackRepository _detailFeedbackRepository;
 
         public UnitOfWork(
             AppDbContext context,
@@ -58,7 +59,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IInterviewBookRepository interviewBookRepository,
             ITaskApplicantRepository taskApplicantRepository,
             ITaskSubmissionRepository taskSubmissionRepository,
-            IAppCertificateRepository appCertificateRepository)
+            IAppCertificateRepository appCertificateRepository,
+            IFeedbackRepository feedbackRepository,
+            IDetailedFeedbackRepository detailFeedbackRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -83,6 +86,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _taskApplicantRepository = taskApplicantRepository;
             _taskSubmissionRepository = taskSubmissionRepository;
             _appCertificateRepository = appCertificateRepository;
+            _feedbackRepository = feedbackRepository;
+            _detailFeedbackRepository = detailFeedbackRepository;
         }
 
         // Custom Repositories exposed
@@ -108,6 +113,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public ITaskApplicantRepository TaskApplicantRepository => _taskApplicantRepository;
         public ITaskSubmissionRepository TaskSubmissionRepository => _taskSubmissionRepository;
         public IAppCertificateRepository AppCertificateRepository => _appCertificateRepository;
+        public IFeedbackRepository FeedbackRepository => _feedbackRepository;
+        public IDetailedFeedbackRepository DetailedFeedbackRepository => _detailFeedbackRepository;
 
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
