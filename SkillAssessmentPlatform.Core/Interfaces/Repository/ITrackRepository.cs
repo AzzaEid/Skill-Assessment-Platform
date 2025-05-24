@@ -25,6 +25,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<List<Track>> GetByExaminerIdAsync(string examinerId);
         Task<IEnumerable<Track>> GetAllWithDetailsAsync();
 
+        
 
 
 

@@ -513,6 +513,28 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
 
+        public async Task<IEnumerable<StageDetailDTO>> GetTaskStagesByTrackIdAsync(int trackId)
+        {
+            var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(trackId);
+            if (track == null) throw new KeyNotFoundException("Track not found");
+
+            var taskStages = track.Levels
+                .SelectMany(l => l.Stages)
+                .Where(s => s.Type == StageType.Task && s.IsActive)
+                .Select(stage => new StageDetailDTO
+                {
+                    Id = stage.Id,
+                    Name = stage.Name,
+                    Description = stage.Description,
+                    Type = stage.Type,
+                    Order = stage.Order,
+                    PassingScore = stage.PassingScore,
+                    IsActive = stage.IsActive
+                });
+
+            return taskStages;
+        }
+
     }
 }
 

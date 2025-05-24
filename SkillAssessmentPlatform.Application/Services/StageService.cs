@@ -60,7 +60,7 @@ namespace SkillAssessmentPlatform.Application.Services
                             MaxDaysToBook = interview.MaxDaysToBook,
                             DurationMinutes = interview.DurationMinutes,
                             Instructions = interview.Instructions,
-                            Status = interview.Status
+                          //  Status = interview.Status
                         };
                     }
                     break;
