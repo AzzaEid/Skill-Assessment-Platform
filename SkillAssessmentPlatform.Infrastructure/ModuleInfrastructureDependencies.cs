@@ -44,6 +44,9 @@ namespace SkillAssessmentPlatform.Infrastructure
 
             services.AddTransient<IAppointmentRepository, AppointmentRepository>();
             services.AddTransient<IInterviewBookRepository, InterviewBookRepository>();
+            services.AddTransient<IAppCertificateRepository, AppCertificateRepository>();
+            services.AddTransient<IFeedbackRepository, FeedbackRepository>();
+            services.AddTransient<IDetailedFeedbackRepository, DetailedFeedbackRepository>();
 
             return services;
         }

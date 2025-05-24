@@ -12,6 +12,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task AddAsync(TaskSubmission submission);
         Task<TaskSubmission?> GetByIdAsync(int id);
         Task<IEnumerable<TaskSubmission>> GetByApplicantIdAsync(string applicantId);
+        Task<TaskSubmission?> GetByStageProgressIdAsync(int stageProgressId);
+
     }
 
 }

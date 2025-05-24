@@ -20,10 +20,12 @@ public class TaskApplicantRepository : ITaskApplicantRepository
     public async Task<TaskApplicant?> GetByIdAsync(int id)
     {
         return await _context.TaskApplicants
+            .Include(t => t.Applicant) // نحتاج هذا للوصول إلى ApplicantId
             .Include(t => t.Task)
-            .Include(t => t.Applicant) // موجود عندك Navigation Property ل Applicant
+                .ThenInclude(t => t.TasksPool) // نحتاج الوصول إلى StageId
             .FirstOrDefaultAsync(t => t.Id == id);
     }
+
 
     public async Task<IEnumerable<TaskApplicant>> GetByApplicantIdAsync(string applicantId)
     {
