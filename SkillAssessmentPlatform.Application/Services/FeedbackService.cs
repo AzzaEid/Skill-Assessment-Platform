@@ -7,9 +7,13 @@ using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Interfaces;
+using SkillAssessmentPlatform.Core.Interfaces.Repository;
+
 
 namespace SkillAssessmentPlatform.Application.Services
 {
+    using SkillAssessmentPlatform.Core.Interfaces.Repository;
+
     public class FeedbackService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -94,6 +98,65 @@ namespace SkillAssessmentPlatform.Application.Services
                 FeedbackDate = f.FeedbackDate
             });
         }
+
+        public async Task<FeedbackDTO?> UpdateAsync(int id, UpdateFeedbackDTO dto)
+        {
+            var feedback = await _unitOfWork.FeedbackRepository.GetByIdAsync(id);
+            if (feedback == null) return null;
+
+            feedback.Comments = dto.Comments;
+            feedback.TotalScore = dto.TotalScore;
+            feedback.FeedbackDate = DateTime.UtcNow;
+
+            await _unitOfWork.FeedbackRepository.UpdateAsync(feedback);
+            await _unitOfWork.SaveChangesAsync();
+
+            return new FeedbackDTO
+            {
+                Id = feedback.Id,
+                ExaminerId = feedback.ExaminerId,
+                Comments = feedback.Comments,
+                TotalScore = feedback.TotalScore,
+                FeedbackDate = feedback.FeedbackDate
+            };
+        }
+
+
+        public async Task<FeedbackDTO?> GetByProgressIdAsync(int progressId)
+        {
+            var stageProgress = await _unitOfWork.StageProgressRepository.GetByIdAsync(progressId);
+            if (stageProgress == null) return null;
+
+            var taskSubmission = await _unitOfWork.TaskSubmissionRepository.GetByStageProgressIdAsync(progressId);
+            if (taskSubmission?.FeedbackId == null) return null;
+
+            var feedback = await _unitOfWork.FeedbackRepository.GetByIdAsync(taskSubmission.FeedbackId.Value);
+            if (feedback == null) return null;
+
+            return new FeedbackDTO
+            {
+                Id = feedback.Id,
+                ExaminerId = feedback.ExaminerId,
+                Comments = feedback.Comments,
+                TotalScore = feedback.TotalScore,
+                FeedbackDate = feedback.FeedbackDate
+            };
+        }
+
+
+
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var feedback = await _unitOfWork.FeedbackRepository.GetByIdAsync(id);
+            if (feedback == null) return false;
+
+            _unitOfWork.FeedbackRepository.DeleteEntity(feedback);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+
 
     }
 

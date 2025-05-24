@@ -40,6 +40,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Where(s => s.TaskApplicant.StageProgress.ApplicantId == applicantId)
                 .ToListAsync();
         }
+
+
+        public async Task<TaskSubmission?> GetByStageProgressIdAsync(int stageProgressId)
+        {
+            return await _context.TaskSubmissions
+                .Include(ts => ts.TaskApplicant)
+                    .ThenInclude(ta => ta.Task)
+                        .ThenInclude(t => t.TasksPool)
+                .FirstOrDefaultAsync(ts => ts.TaskApplicant.StageProgressId == stageProgressId);
+        }
+
+
     }
 
 }
