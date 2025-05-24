@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
@@ -9,7 +9,6 @@ using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
-using System.Text.Json;
 
 
 namespace SkillAssessmentPlatform.Application.Services
@@ -157,7 +156,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 Name = trackDto.Name,
                 Description = trackDto.Description,
                 Objectives = trackDto.Objectives,
-                // AssociatedSkills = skills,
                 Image = imagePath,
                 CreatedAt = DateTime.UtcNow
             };
@@ -165,25 +163,12 @@ namespace SkillAssessmentPlatform.Application.Services
             await _unitOfWork.TrackRepository.AddAsync(track);
             await _unitOfWork.SaveChangesAsync();
 
-            List<CreateAssociatedSkillDTO> associatedSkills = new();
-            if (!string.IsNullOrEmpty(trackDto.AssociatedSkillsJson))
+            // إضافة المهارات المرتبطة
+            if (trackDto.AssociatedSkillsJson?.Any() == true)
             {
-                try
-                {
-                    associatedSkills = JsonSerializer.Deserialize<List<CreateAssociatedSkillDTO>>(trackDto.AssociatedSkillsJson)
-                                       ?? new List<CreateAssociatedSkillDTO>();
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogError("Failed to deserialize AssociatedSkillsJson: " + ex.Message);
-                    throw new Exception("Invalid format for AssociatedSkillsJson.");
-                }
-            }
+                _logger.LogInformation($"Number of associated skills: {trackDto.AssociatedSkillsJson.Count}");
 
-            if (associatedSkills.Any())
-            {
-                //_logger.LogInformation($"Number of associated skills: {associatedSkills.Count}");
-                foreach (var skill in associatedSkills)
+                foreach (var skill in trackDto.AssociatedSkillsJson) // استخدم trackDto.AssociatedSkillsJson بدلاً من associatedSkills
                 {
                     var newSkill = new AssociatedSkill
                     {
@@ -196,9 +181,9 @@ namespace SkillAssessmentPlatform.Application.Services
 
                 await _unitOfWork.SaveChangesAsync();
             }
+
             return trackDto;
         }
-
         public async Task<bool> CreateTrackStructureAsync(TrackStructureDTO structureDTO)
         {
 
@@ -582,6 +567,28 @@ namespace SkillAssessmentPlatform.Application.Services
             };
 
             return await _unitOfWork.TrackRepository.AddLevelToTrackAsync(trackId, level);
+        }
+
+        public async Task<IEnumerable<StageDetailDTO>> GetTaskStagesByTrackIdAsync(int trackId)
+        {
+            var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(trackId);
+            if (track == null) throw new KeyNotFoundException("Track not found");
+
+            var taskStages = track.Levels
+                .SelectMany(l => l.Stages)
+                .Where(s => s.Type == StageType.Task && s.IsActive)
+                .Select(stage => new StageDetailDTO
+                {
+                    Id = stage.Id,
+                    Name = stage.Name,
+                    Description = stage.Description,
+                    Type = stage.Type,
+                    Order = stage.Order,
+                    PassingScore = stage.PassingScore,
+                    IsActive = stage.IsActive
+                });
+
+            return taskStages;
         }
 
     }

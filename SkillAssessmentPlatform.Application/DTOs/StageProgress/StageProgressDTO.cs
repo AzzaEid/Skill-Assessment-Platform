@@ -1,11 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkillAssessmentPlatform.Application.DTOs
+namespace SkillAssessmentPlatform.Application.DTOs.StageProgress
 {
     public class StageProgressDTO
     {
@@ -20,16 +14,10 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public DateTime StartDate { get; set; }
         public DateTime? CompletionDate { get; set; }
         public int Attempts { get; set; }
+        public StageActionStatus ActionStatus { get; set; }
+        public object AdditionalData { get; set; }
     }
 
-    public class UpdateStageStatusDTO
-    {
-        public ProgressStatus Status { get; set; }
-        public int Score { get; set; }
-    }
 
-    public class AssignExaminerDTO
-    {
-        public string ExaminerId { get; set; }
-    }
+
 }

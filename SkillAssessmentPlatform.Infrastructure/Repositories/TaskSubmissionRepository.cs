@@ -35,6 +35,25 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Where(s => s.TaskApplicant.ApplicantId == applicantId)
                 .ToListAsync();
         }
+
+        /* 
+         public async Task<TaskSubmission?> GetByStageProgressIdAsync(int stageProgressId)
+         {
+             return await _context.TaskSubmissions
+                 .Include(ts => ts.TaskApplicant)
+                     .ThenInclude(ta => ta.Task)
+                         .ThenInclude(t => t.TasksPool)
+                 .FirstOrDefaultAsync(ts => ts.TaskApplicant.StageProgressId == stageProgressId);
+         }
+
+        */
+        public async Task<TaskSubmission> GetLatestByTaskApplicantIdAsync(int taskApplicantId)
+        {
+            return await _context.TaskSubmissions
+                .Where(ts => ts.TaskApplicantId == taskApplicantId)
+                .OrderByDescending(ts => ts.SubmissionDate)
+                .FirstOrDefaultAsync();
+        }
     }
 
 }

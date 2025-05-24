@@ -13,6 +13,7 @@ namespace SkillAssessmentPlatform.Application.DTOs.ExamReques
         public ExamRequestStatus Status { get; set; }
         public ExamDto Exam { get; set; }
         public ApplicantDTO Applicant { get; set; }
-        // public FeedbackDTO Feedback { get; set; }
+
+        public FeedbackDTO Feedback { get; set; }
     }
 }

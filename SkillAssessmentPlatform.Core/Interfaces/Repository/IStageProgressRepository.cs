@@ -15,13 +15,11 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<int> GetLevelProgressIdofStageAsync(int stageId);
         Task<StageProgress> CreateNewAttemptAsync(int enrollmentId, int stageId, string freeExaminerId);
         Task<IEnumerable<StageProgress>> GetCompletedStagesLPIdAsync(int enrollmentId);
-
         Task<StageProgress> GetLatestSPinLPAsync(int levelProgressId);
         Task<IEnumerable<StageProgress>> GetFailedStagesByEnrollmentIdAsync(int enrollmentId);
         Task<StageProgress> GetByApplicantAndStageAsync(string applicantId, int stageId);
-
-
-
+        Task<StageProgress> GetDetailedStageProgressAsync(int stageProgressId);
+        Task<IEnumerable<StageProgress>> GetDetailedByLevelProgressIdAsync(int levelProgressId);
 
     }
 }

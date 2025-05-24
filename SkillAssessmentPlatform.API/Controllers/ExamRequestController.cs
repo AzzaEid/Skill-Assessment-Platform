@@ -33,6 +33,12 @@ namespace SkillAssessmentPlatform.API.Controllers
             var result = await _examRequestService.GetExamRequestByIdAsync(id);
             return _responseHandler.Success(result);
         }
+        [HttpGet("{id}/info")]
+        public async Task<IActionResult> GetInfoById(int id)
+        {
+            var result = await _examRequestService.GetExamRequestByIdAsync(id);
+            return _responseHandler.Success(result);
+        }
 
         [HttpGet("applicant/{applicantId}")]
         public async Task<IActionResult> GetByApplicant(string applicantId)

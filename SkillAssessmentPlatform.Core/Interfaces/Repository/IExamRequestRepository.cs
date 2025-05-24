@@ -11,5 +11,6 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<Dictionary<int, int>> GetPendingExamRequestCountsByStageAsync(string trackId);
         Task<IEnumerable<ExamRequest>> GetByStageIdAsync(int stageId);
         Task<ExamRequest> GetWithApplicantAndExamAsync(int requestId);
+        Task<ExamRequest> GetByStageProgressIdAsync(int stageProgressId);
     }
 }

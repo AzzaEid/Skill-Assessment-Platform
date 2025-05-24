@@ -16,6 +16,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task AddAsync(Stage stage);
 
         Task<Stage> GetByIdWithCriteriaAsync(int stageId);
+        Task<IEnumerable<Stage>> GetTaskStagesByTrackIdAsync(int trackId);
+
 
     }
 

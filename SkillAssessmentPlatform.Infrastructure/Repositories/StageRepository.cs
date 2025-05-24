@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 using System;
@@ -49,6 +50,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.Stages
                 .FirstOrDefaultAsync(s => s.LevelId == levelId && s.Order == 1);
         }
+        public async Task<IEnumerable<Stage>> GetTaskStagesByTrackIdAsync(int trackId)
+        {
+            return await _context.Stages
+                .Include(s => s.Level)
+                .Where(s => s.Level.TrackId == trackId && s.Type == StageType.Task && s.IsActive)
+                .ToListAsync();
+        }
+
 
     }
 

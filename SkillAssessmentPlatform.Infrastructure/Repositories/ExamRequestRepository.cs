@@ -111,5 +111,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return examRequest;
         }
+        public async Task<ExamRequest> GetByStageProgressIdAsync(int stageProgressId)
+        {
+            return await _context.ExamRequests
+                .Where(er => er.Exam.Stage.StageProgresses
+                    .Any(sp => sp.Id == stageProgressId && sp.LevelProgress.Enrollment.ApplicantId == er.ApplicantId))
+                .OrderByDescending(er => er.Id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

@@ -43,8 +43,9 @@ namespace SkillAssessmentPlatform.Application
             services.AddTransient<InterviewBookService>();
             services.AddTransient<TaskApplicantService>();
             services.AddTransient<TaskSubmissionService>();
-          
-          
+            services.AddTransient<AppCertificateService>();
+            services.AddTransient<FeedbackService>();
+            services.AddTransient<DetailedFeedbackService>();
 
             return services;
 

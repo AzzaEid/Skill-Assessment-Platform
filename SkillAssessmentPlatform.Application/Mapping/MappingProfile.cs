@@ -2,7 +2,9 @@
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.Appointment;
 using SkillAssessmentPlatform.Application.DTOs.Auth;
+using SkillAssessmentPlatform.Application.DTOs.ExamReques;
 using SkillAssessmentPlatform.Application.DTOs.InterviewBook;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
@@ -66,7 +68,7 @@ namespace SkillAssessmentPlatform.Application.Mapping
             // Appointment
             CreateMap<Appointment, AppointmentDTO>()
                 .ForMember(dest => dest.ExaminerName, opt => opt.MapFrom(src => src.Examiner.FullName));
-            CreateMap<AppointmentSingleCreateDTO, Appointment>();
+            CreateMap<AppointmentSingleCreateDTO, Appointment>().ReverseMap();
 
             // InterviewBook Mappings
             CreateMap<InterviewBook, InterviewBookDTO>()
@@ -77,6 +79,11 @@ namespace SkillAssessmentPlatform.Application.Mapping
                 .ForMember(dest => dest.ExaminerName, opt => opt.MapFrom(src =>
                     src.Appointment != null && src.Appointment.Examiner != null ?
                     src.Appointment.Examiner.FullName : string.Empty));
+
+
+            CreateMap<ExamRequestInfoDTO, ExamRequest>().ReverseMap();
+            CreateMap<ExamRequestDTO, ExamRequest>().ReverseMap();
+
         }
     }
 }

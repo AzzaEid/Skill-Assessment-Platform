@@ -137,6 +137,12 @@ public class TracksController : ControllerBase
         var result = await _trackService.GetActiveTrackListAsync();
         return _responseHandler.Success(result, "Active tracks fetched successfully");
     }
+    [HttpGet("{trackId}/task-stages")]
+    public async Task<IActionResult> GetTaskStages(int trackId)
+    {
+        var result = await _trackService.GetTaskStagesByTrackIdAsync(trackId);
+        return _responseHandler.Success(result);
+    }
 
 
     [HttpPost("{trackId}/levels")]

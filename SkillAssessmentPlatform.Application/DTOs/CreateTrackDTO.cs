@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using SkillAssessmentPlatform.Application.DTOs;
 
 using System.Text.Json;
@@ -10,17 +10,28 @@ public class CreateTrackDTO
     public string? Objectives { get; set; }
     public IFormFile? ImageFile { get; set; }
 
-    public string? AssociatedSkillsJson { get; set; }
+    // جديد - لاستقبال JSON كـ string من FormData
+    public string? AssociatedSkillsJsonString { get; set; }
 
-    // json to list
-    public List<CreateAssociatedSkillDTO> GetAssociatedSkills()
+    // محسوبة - لتحويل JSON string إلى قائمة
+    public List<CreateAssociatedSkillDTO>? AssociatedSkillsJson
     {
-        return string.IsNullOrEmpty(AssociatedSkillsJson)
-            ? new List<CreateAssociatedSkillDTO>()
-            : JsonSerializer.Deserialize<List<CreateAssociatedSkillDTO>>(AssociatedSkillsJson)
-              ?? new List<CreateAssociatedSkillDTO>();
-    }
+        get
+        {
+            if (string.IsNullOrEmpty(AssociatedSkillsJsonString))
+                return new List<CreateAssociatedSkillDTO>();
 
+            try
+            {
+                return JsonSerializer.Deserialize<List<CreateAssociatedSkillDTO>>(AssociatedSkillsJsonString)
+                       ?? new List<CreateAssociatedSkillDTO>();
+            }
+            catch
+            {
+                return new List<CreateAssociatedSkillDTO>();
+            }
+        }
+    }
 
     public string? SeniorExaminerID { get; set; }
 }

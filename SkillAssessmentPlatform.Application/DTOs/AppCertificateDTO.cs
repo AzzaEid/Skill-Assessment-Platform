@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
-
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
-    public class TaskApplicantDTO
+    public class AppCertificateDTO
     {
         public int Id { get; set; }
-        public int TaskId { get; set; }
         public string ApplicantId { get; set; }
-        public DateTime AssignedDate { get; set; }
-        public DateTime DueDate { get; set; }
+        public int LevelProgressId { get; set; }
+        public DateTime IssueDate { get; set; }
+        public string VerificationCode { get; set; }
     }
-
 }

@@ -39,6 +39,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<AssociatedSkill> AssociatedSkills { get; set; }
 
+
         #endregion
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

@@ -19,25 +19,25 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<TaskSubmissionDTO> SubmitTaskAsync(CreateTaskSubmissionDTO dto)
         {
             var taskApplicant = await _unitOfWork.TaskApplicantRepository.GetByIdAsync(dto.TaskApplicantId)
-                                ?? throw new KeyNotFoundException("TaskApplicant not found");
+                                    ?? throw new KeyNotFoundException("TaskApplicant not found");
 
             var submission = new TaskSubmission
             {
                 TaskApplicantId = dto.TaskApplicantId,
                 SubmissionUrl = dto.SubmissionUrl,
-                SubmissionDate = DateTime.UtcNow // يتم تعيينها تلقائيًا هنا
+                SubmissionDate = DateTime.UtcNow
             };
 
             await _unitOfWork.TaskSubmissionRepository.AddAsync(submission);
             await _unitOfWork.SaveChangesAsync();
 
-            // Get StageProgress → ExaminerId
+            // Get StageProgress using ApplicantId from TaskApplicant
             var stageProgress = await _unitOfWork.StageProgressRepository
                 .GetByApplicantAndStageAsync(taskApplicant.ApplicantId, taskApplicant.Task.TasksPool.StageId);
+
             if (stageProgress == null)
                 throw new Exception("StageProgress not found");
 
-            // Send Notification to Examiner
             await _notificationService.SendNotificationAsync(
                 stageProgress.ExaminerId,
                 NotificationType.TaskSubmitted,
@@ -51,5 +51,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 SubmissionDate = submission.SubmissionDate
             };
         }
+
     }
 }
