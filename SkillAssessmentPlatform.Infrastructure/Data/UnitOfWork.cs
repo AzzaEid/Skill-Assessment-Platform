@@ -31,6 +31,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IInterviewBookRepository _interviewBookRepository;
         private readonly IExamRequestRepository _examRequestRepository;
+        private readonly IAssociatedSkillsRepository _associatedSkillsRepository;
         private readonly ITaskApplicantRepository _taskApplicantRepository;
         private readonly ITaskSubmissionRepository _taskSubmissionRepository;
 
@@ -55,11 +56,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IAppTaskRepository appTaskRepository,
             ITasksPoolRepository tasksPoolRepository,
             IAppointmentRepository appointmentRepository,
-            IInterviewBookRepository interviewBookRepository,
-            IExamRequestRepository examRequestRepository)
+            IExamRequestRepository examRequestRepository,
             IInterviewBookRepository interviewBookRepository,
             ITaskApplicantRepository taskApplicantRepository,
-            ITaskSubmissionRepository taskSubmissionRepository)
+            ITaskSubmissionRepository taskSubmissionRepository,
+            IAssociatedSkillsRepository associatedSkillsRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -84,6 +85,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _taskApplicantRepository = taskApplicantRepository;
             _taskSubmissionRepository = taskSubmissionRepository;
             _examRequestRepository = examRequestRepository;
+            _associatedSkillsRepository = associatedSkillsRepository;
         }
 
         // Custom Repositories exposed
@@ -109,6 +111,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IExamRequestRepository ExamRequestRepository => _examRequestRepository;
         public ITaskApplicantRepository TaskApplicantRepository => _taskApplicantRepository;
         public ITaskSubmissionRepository TaskSubmissionRepository => _taskSubmissionRepository;
+
+        public IAssociatedSkillsRepository AssociatedSkillsRepository => _associatedSkillsRepository;
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

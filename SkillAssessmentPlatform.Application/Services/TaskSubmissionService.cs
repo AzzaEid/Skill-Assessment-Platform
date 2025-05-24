@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -37,7 +32,8 @@ namespace SkillAssessmentPlatform.Application.Services
             await _unitOfWork.SaveChangesAsync();
 
             // Get StageProgress → ExaminerId
-            var stageProgress = await _unitOfWork.StageProgressRepository.GetByIdAsync(taskApplicant.StageProgressId);
+            var stageProgress = await _unitOfWork.StageProgressRepository
+                .GetByApplicantAndStageAsync(taskApplicant.ApplicantId, taskApplicant.Task.TasksPool.StageId);
             if (stageProgress == null)
                 throw new Exception("StageProgress not found");
 

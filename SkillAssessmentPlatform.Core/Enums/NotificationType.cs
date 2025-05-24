@@ -14,7 +14,7 @@
         NewExamRequest = 9,
         ExamRequestApprove = 10,
         ExamRequestReject = 11,
-        ReviewExam = 12
+        ReviewExam = 12,
         TaskSubmitted = 9,
     }
 

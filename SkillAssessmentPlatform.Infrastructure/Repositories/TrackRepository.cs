@@ -16,13 +16,38 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         public async Task<Track> GetTrackWithDetailsAsync(int trackId)
         {
-            return await _context.Tracks
-            .Include(t => t.Levels)
-            .ThenInclude(l => l.Stages)
-            .ThenInclude(s => s.EvaluationCriteria)
-             .FirstOrDefaultAsync(t => t.Id == trackId);
+            var track = await _context.Tracks
+                .Include(t => t.Levels)
+                    .ThenInclude(l => l.Stages)
+                        .ThenInclude(s => s.Interview)
+                .Include(t => t.Levels)
+                    .ThenInclude(l => l.Stages)
+                        .ThenInclude(s => s.Exam)
+                .Include(t => t.Levels)
+                    .ThenInclude(l => l.Stages)
+                        .ThenInclude(s => s.TasksPool)
+                .Include(t => t.Levels)
+                    .ThenInclude(l => l.Stages)
+                        .ThenInclude(s => s.EvaluationCriteria)
+                .Include(t => t.AssociatedSkills)
+                .FirstOrDefaultAsync(t => t.Id == trackId);
 
+            if (track != null)
+            {
+                track.Levels = track.Levels
+                    .OrderBy(l => l.Order)
+                    .ToList();
+
+                foreach (var level in track.Levels)
+                {
+                    level.Stages = level.Stages
+                        .OrderBy(s => s.Order)
+                        .ToList();
+                }
+            }
+            return track;
         }
+
 
         public async Task<IEnumerable<Level>> GetLevelsByTrackIdAsync(int trackId)
         {
@@ -72,6 +97,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.Tracks
                 .Include(t => t.Levels)
                     .ThenInclude(l => l.Stages)
+                    .Include(t => t.AssociatedSkills)
                 //.Where(t => t.IsActive)
                 .ToListAsync();
         }

@@ -22,6 +22,12 @@ public class TracksController : ControllerBase
         var track = await _trackService.GetTrackByIdAsync(id);
         return _responseHandler.Success(track);
     }
+    [HttpGet("{id}/structure")]
+    public async Task<IActionResult> GetStructureById(int id)
+    {
+        var track = await _trackService.GetTrackStructure(id);
+        return _responseHandler.Success(track);
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAllTracksAsync()
@@ -41,7 +47,7 @@ public class TracksController : ControllerBase
      _responseHandler.Created(await _trackService.CreateTrackAsync(dto));
 
     [HttpPost("structure")]
-    public async Task<IActionResult> CreateTrackStructure([FromForm] TrackStructureDTO structureDTO)
+    public async Task<IActionResult> CreateTrackStructure([FromBody] TrackStructureDTO structureDTO)
     {
         try
         {
@@ -83,6 +89,12 @@ public class TracksController : ControllerBase
         var result = await _trackService.GetOnlyActiveTracksAsync();
         return _responseHandler.Success(result);
     }
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetTracksSummary()
+    {
+        var result = await _trackService.GetAllTracksSummaryAsync();
+        return _responseHandler.Success(result);
+    }
 
     [HttpGet("not-active")]
     public async Task<IActionResult> GetOnlyDeactivatedTracks()
@@ -109,6 +121,13 @@ public class TracksController : ControllerBase
     public async Task<IActionResult> GetWorkingExaminers(int trackId)
     {
         var result = await _trackService.GetWorkingExaminersByTrackIdAsync(trackId);
+        return _responseHandler.Success(result, "Working examiners fetched successfully");
+    }
+
+    [HttpGet("{trackId}/examiners-summary")]
+    public async Task<IActionResult> GetWorkingExaminersList(int trackId)
+    {
+        var result = await _trackService.GetTrackWorkingExaminersAsync(trackId);
         return _responseHandler.Success(result, "Working examiners fetched successfully");
     }
 
