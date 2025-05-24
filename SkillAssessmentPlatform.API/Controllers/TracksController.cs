@@ -35,13 +35,13 @@ public class TracksController : ControllerBase
         var result = await _trackService.GetNotActiveTracksAsync();
         return _responseHandler.Success(result);
     }
-
+    // fromform
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTrackDTO dto) =>
+    public async Task<IActionResult> Create([FromForm] CreateTrackDTO dto) =>
      _responseHandler.Created(await _trackService.CreateTrackAsync(dto));
 
     [HttpPost("structure")]
-    public async Task<IActionResult> CreateTrackStructure([FromBody] TrackStructureDTO structureDTO)
+    public async Task<IActionResult> CreateTrackStructure([FromForm] TrackStructureDTO structureDTO)
     {
         try
         {
@@ -126,13 +126,14 @@ public class TracksController : ControllerBase
     }
 
 
-    //[HttpPost("{trackId}/levels")]
-    //public async AppTask<IActionResult> CreateLevel(int trackId, [FromBody] CreateLevelDTO dto)
-    //{
-    //    var created = await _trackService.CreateLevelAsync(trackId, dto);
-    //    if (created == null)
-    //        return NotFound(new { message = "Track not found" });
+    [HttpPost("{trackId}/levels")]
+    public async Task<IActionResult> AddLevelToTrack(int trackId, [FromBody] CreateLevelDTO dto)
+    {
+        var success = await _trackService.AddLevelToTrackAsync(trackId, dto);
+        if (!success)
+            return NotFound($"Track with ID {trackId} not found.");
 
-    //    return _responseHandler.Success(created, "Level created successfully");
-    //}
+        return Ok("Level added successfully to track.");
+    }
+
 }

@@ -2,6 +2,7 @@
 using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Application.Mapping;
 using SkillAssessmentPlatform.Application.Services;
+using SkillAssessmentPlatform.Core.Interfaces.Repository;
 
 namespace SkillAssessmentPlatform.Application
 {
@@ -40,6 +41,10 @@ namespace SkillAssessmentPlatform.Application
             ///==
             services.AddTransient<AppointmentService>();
             services.AddTransient<InterviewBookService>();
+            services.AddTransient<TaskApplicantService>();
+            services.AddTransient<TaskSubmissionService>();
+          
+          
 
             return services;
 

@@ -79,5 +79,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
       
 
 
+        public async Task<bool> AddLevelToTrackAsync(int trackId, Level level)
+        {
+            var track = await _context.Tracks.Include(t => t.Levels).FirstOrDefaultAsync(t => t.Id == trackId);
+            if (track == null) return false;
+
+            level.TrackId = trackId;
+            track.Levels.Add(level);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
     }
 }
