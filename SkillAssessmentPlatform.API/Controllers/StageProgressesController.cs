@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
-using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress;
 using SkillAssessmentPlatform.Application.Services;
-using SkillAssessmentPlatform.Core.Exceptions;
-using System.Security.Claims;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
@@ -29,14 +25,14 @@ namespace SkillAssessmentPlatform.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var stageProgress = await _stageProgressService.GetByIdAsync(id);
+            var stageProgress = await _stageProgressService.GetByIdWithActionStatusAsync(id);
             return _responseHandler.Success(stageProgress);
         }
 
         [HttpGet("level-progress/{levelprogressId}")]
         public async Task<IActionResult> GetBylevelprogressIdd(int levelprogressId)
         {
-            var stageProgresses = await _stageProgressService.GetByLevelProgressIdAsync(levelprogressId);
+            var stageProgresses = await _stageProgressService.GetByLevelProgressIdWithActionStatusAsync(levelprogressId);
             return _responseHandler.Success(stageProgresses);
         }
         [HttpGet("level-progress/{levelprogressId}/current")]
@@ -61,13 +57,13 @@ namespace SkillAssessmentPlatform.API.Controllers
             var updatedStageProgress = await _stageProgressService.UpdateStatusAsync(id, updateDto);
             return _responseHandler.Success(updatedStageProgress, "Stage progress status updated successfully");
         }
-
+        /*
         [HttpGet("applicant/{applicantId}")]
         public async Task<IActionResult> GetByApplicantId(string applicantId)
         {
             var stageProgresses = await _stageProgressService.GetByApplicantIdAsync(applicantId);
             return _responseHandler.Success(stageProgresses);
-        }
+        }*/
 
         [HttpGet("applicant/{applicantId}/current")]
         public async Task<IActionResult> GetCurrentStageForApplicant(string applicantId)

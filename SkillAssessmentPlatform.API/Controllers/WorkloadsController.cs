@@ -39,7 +39,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin,SeniorExaminer")]
-        public async Task<IActionResult> CreateWorkload([FromBody] CreateExaminerLoadDTO createDto)
+        public async Task<IActionResult> CreateWorkload([FromBody] CreateExaminerLoadListDTO createDto)
         {
             if (!ModelState.IsValid)
             {

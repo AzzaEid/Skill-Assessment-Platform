@@ -10,7 +10,5 @@
         public bool IsActive { get; set; }
         public List<StageDetailDTO> Stages { get; set; }
 
-
-
     }
 }

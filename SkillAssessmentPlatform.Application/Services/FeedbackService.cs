@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
-using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Core.Interfaces.Repository;
 
 
 namespace SkillAssessmentPlatform.Application.Services
 {
-    using SkillAssessmentPlatform.Core.Interfaces.Repository;
-
     public class FeedbackService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -121,7 +112,7 @@ namespace SkillAssessmentPlatform.Application.Services
             };
         }
 
-
+        /*
         public async Task<FeedbackDTO?> GetByProgressIdAsync(int progressId)
         {
             var stageProgress = await _unitOfWork.StageProgressRepository.GetByIdAsync(progressId);
@@ -142,7 +133,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 FeedbackDate = feedback.FeedbackDate
             };
         }
-
+        /*/
 
 
 

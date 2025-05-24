@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
@@ -29,7 +24,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.TaskSubmissions
                 .Include(s => s.TaskApplicant)
-                .ThenInclude(ta => ta.StageProgress)
+                // .ThenInclude(ta => ta.StageProgress)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
@@ -37,21 +32,28 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.TaskSubmissions
                 .Include(s => s.TaskApplicant)
-                .Where(s => s.TaskApplicant.StageProgress.ApplicantId == applicantId)
+                .Where(s => s.TaskApplicant.ApplicantId == applicantId)
                 .ToListAsync();
         }
 
+        /* 
+         public async Task<TaskSubmission?> GetByStageProgressIdAsync(int stageProgressId)
+         {
+             return await _context.TaskSubmissions
+                 .Include(ts => ts.TaskApplicant)
+                     .ThenInclude(ta => ta.Task)
+                         .ThenInclude(t => t.TasksPool)
+                 .FirstOrDefaultAsync(ts => ts.TaskApplicant.StageProgressId == stageProgressId);
+         }
 
-        public async Task<TaskSubmission?> GetByStageProgressIdAsync(int stageProgressId)
+        */
+        public async Task<TaskSubmission> GetLatestByTaskApplicantIdAsync(int taskApplicantId)
         {
             return await _context.TaskSubmissions
-                .Include(ts => ts.TaskApplicant)
-                    .ThenInclude(ta => ta.Task)
-                        .ThenInclude(t => t.TasksPool)
-                .FirstOrDefaultAsync(ts => ts.TaskApplicant.StageProgressId == stageProgressId);
+                .Where(ts => ts.TaskApplicantId == taskApplicantId)
+                .OrderByDescending(ts => ts.SubmissionDate)
+                .FirstOrDefaultAsync();
         }
-
-
     }
 
 }

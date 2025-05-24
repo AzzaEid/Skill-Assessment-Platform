@@ -1,7 +1,4 @@
-﻿using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
-using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
-
-namespace SkillAssessmentPlatform.Application.DTOs
+﻿namespace SkillAssessmentPlatform.Application.DTOs
 {
     public class TrackDetialDto
     {
@@ -10,7 +7,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public string Name { get; set; }
         public string Description { get; set; }
         public string Objectives { get; set; }
-        public List<AssociatedSkill> AssociatedSkills { get; set; }
+        public List<AssociatedSkillDTO> AssociatedSkills { get; set; }
 
         public bool IsActive { get; set; }
         public string Image { get; set; }

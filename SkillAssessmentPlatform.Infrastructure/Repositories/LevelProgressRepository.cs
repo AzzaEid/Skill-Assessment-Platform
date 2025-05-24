@@ -4,11 +4,6 @@ using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
@@ -28,6 +23,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.LevelProgresses
                 .Where(lp => lp.EnrollmentId == enrollmentId)
                 .Include(lp => lp.Level)
+                .ThenInclude(l => l.Stages)
+                .Include(lp => lp.StageProgresses)
                 .ToListAsync();
         }
 
@@ -64,7 +61,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
         public async Task<LevelProgress> GetLatestActiveLPAsync(string applicantId)
         {
-            
+
             return await _context.LevelProgresses
                 .Where(e => e.Enrollment.ApplicantId == applicantId && e.Status == ProgressStatus.InProgress)
                 .Include(e => e.Level)
@@ -111,7 +108,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 {
                     //EnrollmentId = enrollmentId,
                     StageId = firstStage.Id,
-                    Status = ProgressStatus.InProgress ,
+                    Status = ProgressStatus.InProgress,
                     StartDate = DateTime.Now,
                     Attempts = 1
                 };

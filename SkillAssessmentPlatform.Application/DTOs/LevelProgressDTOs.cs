@@ -11,7 +11,10 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public ProgressStatus Status { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? CompletionDate { get; set; }
-        public LevelDetailDto Level { get; set; }
+        // public LevelDetailDto Level { get; set; }
+        public string Description { get; set; }
+        public int StagesCount { get; set; } = 0;
+        public int StagesProgressesCount { get; set; } = 0;
     }
 
     public class UpdateLevelStatusDTO

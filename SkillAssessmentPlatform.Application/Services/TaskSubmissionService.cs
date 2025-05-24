@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;

@@ -30,6 +30,7 @@ namespace SkillAssessmentPlatform.Infrastructure
             services.AddTransient<ILevelRepository, LevelRepository>();
             services.AddTransient<IStageRepository, StageRepository>();
             services.AddTransient<IEvaluationCriteriaRepository, EvaluationCriteriaRepository>();
+            services.AddTransient<IAssociatedSkillsRepository, AssociatedSkillsRepository>();
 
             services.AddTransient<IEnrollmentRepository, EnrollmentRepository>();
             services.AddTransient<ILevelProgressRepository, LevelProgressRepository>();
@@ -47,6 +48,9 @@ namespace SkillAssessmentPlatform.Infrastructure
             services.AddTransient<IAppCertificateRepository, AppCertificateRepository>();
             services.AddTransient<IFeedbackRepository, FeedbackRepository>();
             services.AddTransient<IDetailedFeedbackRepository, DetailedFeedbackRepository>();
+
+            // == 
+            services.AddTransient<IExamRequestRepository, ExamRequestRepository>();
 
             return services;
         }

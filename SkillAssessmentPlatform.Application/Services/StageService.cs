@@ -1,7 +1,7 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
-using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Core.Enums;
+using SkillAssessmentPlatform.Core.Interfaces;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -60,7 +60,6 @@ namespace SkillAssessmentPlatform.Application.Services
                             MaxDaysToBook = interview.MaxDaysToBook,
                             DurationMinutes = interview.DurationMinutes,
                             Instructions = interview.Instructions,
-                          //  Status = interview.Status
                         };
                     }
                     break;

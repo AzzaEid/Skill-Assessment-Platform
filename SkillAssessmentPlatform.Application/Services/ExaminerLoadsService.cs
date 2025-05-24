@@ -42,21 +42,34 @@ namespace SkillAssessmentPlatform.Application.Services
             return _mapper.Map<ExaminerLoadDTO>(load);
         }
 
-        public async Task<ExaminerLoadDTO> CreateExaminerLoadAsync(CreateExaminerLoadDTO createDto)
+
+        public async Task<IEnumerable<ExaminerLoadDTO>> CreateExaminerLoadAsync(CreateExaminerLoadListDTO createListDto)
         {
-            var load = _mapper.Map<ExaminerLoad>(createDto);
 
-            // Check if examiner exists
-            var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(createDto.ExaminerID);
+            var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(createListDto.ExaminerID);
             if (examiner == null)
-                throw new KeyNotFoundException($"Examiner with id {createDto.ExaminerID} not found");
+                throw new KeyNotFoundException($"Examiner with id {createListDto.ExaminerID} not found");
 
-            // Add the load
-            await _unitOfWork.ExaminerLoadRepository.AddAsync(load);
+            var result = new List<ExaminerLoadDTO>();
+
+            foreach (var loadDto in createListDto.examinerLoads)
+            {
+                var load = new ExaminerLoad
+                {
+                    ExaminerID = createListDto.ExaminerID,
+                    Type = loadDto.Type,
+                    MaxWorkLoad = loadDto.MaxWorkLoad
+                };
+
+                await _unitOfWork.ExaminerLoadRepository.AddAsync(load);
+                result.Add(_mapper.Map<ExaminerLoadDTO>(load));
+            }
+
             await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<ExaminerLoadDTO>(load);
+            return result;
         }
+
+
         public async Task DeleteLoad(int id)
         {
             var load = await _unitOfWork.ExaminerLoadRepository.GetByIdAsync(id);

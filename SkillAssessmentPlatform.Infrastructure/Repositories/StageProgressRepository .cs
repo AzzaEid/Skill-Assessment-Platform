@@ -172,5 +172,39 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .OrderByDescending(e => e.StartDate)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<StageProgress> GetDetailedStageProgressAsync(int stageProgressId)
+        {
+            return await _context.StageProgresses
+                .Where(sp => sp.Id == stageProgressId)
+                .Include(sp => sp.Stage)
+                    .ThenInclude(s => s.Exam)
+                .Include(sp => sp.Stage)
+                    .ThenInclude(s => s.Interview)
+                .Include(sp => sp.Stage)
+                    .ThenInclude(s => s.TasksPool)
+                        .ThenInclude(tp => tp.Tasks)
+                .Include(sp => sp.LevelProgress)
+                    .ThenInclude(lp => lp.Enrollment)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<StageProgress>> GetDetailedByLevelProgressIdAsync(int levelProgressId)
+        {
+            return await _context.StageProgresses
+                .Where(sp => sp.LevelProgressId == levelProgressId)
+                .Include(sp => sp.Stage)
+                    .ThenInclude(s => s.Exam)
+                .Include(sp => sp.Stage)
+                    .ThenInclude(s => s.Interview)
+                .Include(sp => sp.Stage)
+                    .ThenInclude(s => s.TasksPool)
+                        .ThenInclude(tp => tp.Tasks)
+                .Include(sp => sp.LevelProgress)
+                    .ThenInclude(lp => lp.Enrollment)
+                .OrderBy(sp => sp.Stage.Order)
+                .ToListAsync();
+        }
+
     }
 }

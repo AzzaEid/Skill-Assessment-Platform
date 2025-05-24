@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NuGet.Protocol.Plugins;
+﻿using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
-using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
-using SkillAssessmentPlatform.API.Common;
 namespace SkillAssessmentPlatform.API.Controllers
 {
     using SkillAssessmentPlatform.API.Common;
@@ -51,16 +47,16 @@ namespace SkillAssessmentPlatform.API.Controllers
                 return _responseHandler.NotFound("Feedback not found");
             return _responseHandler.Success(result, "Feedback updated");
         }
-
-        [HttpGet("progress/{id}")]
-        public async Task<IActionResult> GetByProgressId(int id)
-        {
-            var result = await _feedbackService.GetByProgressIdAsync(id);
-            if (result == null)
-                return _responseHandler.NotFound("No feedback for this progress ID");
-            return _responseHandler.Success(result);
-        }
-
+        /*
+                [HttpGet("progress/{id}")]
+                public async Task<IActionResult> GetByProgressId(int id)
+                {
+                    var result = await _feedbackService.GetByProgressIdAsync(id);
+                    if (result == null)
+                        return _responseHandler.NotFound("No feedback for this progress ID");
+                    return _responseHandler.Success(result);
+                }
+        */
         [HttpDelete("{feedbackId}")]
         public async Task<IActionResult> Delete(int feedbackId)
         {

@@ -1,15 +1,10 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
-using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress;
+using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -17,34 +12,250 @@ namespace SkillAssessmentPlatform.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly LevelProgressService _levelProgressService;
+        private readonly TaskApplicantService _taskApplicantService;
 
         public StageProgressService(
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            LevelProgressService levelProgressService,
+            TaskApplicantService taskApplicantService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _levelProgressService = levelProgressService;
+            _taskApplicantService = taskApplicantService;
         }
 
-        public async Task<StageProgressDTO> GetByIdAsync(int id)
+        public async Task<StageProgressDTO> GetByIdWithActionStatusAsync(int id)
         {
-            var stageProgress = await _unitOfWork.StageProgressRepository.GetByIdAsync(id);
+            var stageProgress = await _unitOfWork.StageProgressRepository.GetDetailedStageProgressAsync(id);
             if (stageProgress == null)
             {
-                throw new KeyNotFoundException($"KeyNotFoundException : There is no stage progress with id = {id} ");
+                throw new KeyNotFoundException($"There is no stage progress with id = {id}");
             }
-            return _mapper.Map<StageProgressDTO>(stageProgress);
+
+            var dto = _mapper.Map<StageProgressDTO>(stageProgress);
+
+            // حساب الـ Action Status
+            await SetActionStatusAsync(dto);
+
+            return dto;
         }
 
-        public async Task<IEnumerable<StageProgressDTO>> GetByLevelProgressIdAsync(int levelprogressId)
+        public async Task<IEnumerable<StageProgressDTO>> GetByLevelProgressIdWithActionStatusAsync(int levelProgressId)
         {
-            var stageProgresses = await _unitOfWork.StageProgressRepository.GetByLevelProgressIdAsync(levelprogressId);
+            var stageProgresses = await _unitOfWork.StageProgressRepository.GetDetailedByLevelProgressIdAsync(levelProgressId);
             if (stageProgresses == null)
             {
-                throw new KeyNotFoundException($"There is no stage progresses in level with id = {levelprogressId} ");
+                throw new KeyNotFoundException($"There is no stage progresses in level with id = {levelProgressId}");
             }
-            return _mapper.Map<IEnumerable<StageProgressDTO>>(stageProgresses);
+
+            var dtos = _mapper.Map<IEnumerable<StageProgressDTO>>(stageProgresses);
+
+            // حساب الـ Action Status لكل مرحلة
+            foreach (var dto in dtos)
+            {
+                await SetActionStatusAsync(dto);
+            }
+
+            return dtos;
         }
+
+
+
+        #region status mapping
+        private async Task SetActionStatusAsync(StageProgressDTO dto)
+        {
+            // إذا كانت المرحلة مكتملة بنجاح أو فاشلة
+            if (dto.Status == ProgressStatus.Successful)
+            {
+                dto.ActionStatus = StageActionStatus.Completed;
+                return;
+            }
+
+            if (dto.Status == ProgressStatus.Failed)
+            {
+                dto.ActionStatus = StageActionStatus.Failed;
+                return;
+            }
+
+            // إذا كانت قيد التقدم، نحدد حسب النوع
+            switch (dto.StageType)
+            {
+                case StageType.Exam:
+                    await SetExamActionStatusAsync(dto);
+                    break;
+                case StageType.Interview:
+                    await SetInterviewActionStatusAsync(dto);
+                    break;
+                case StageType.Task:
+                    await SetTaskActionStatusAsync(dto);
+                    break;
+            }
+        }
+
+        private async Task SetExamActionStatusAsync(StageProgressDTO dto)
+        {
+            // البحث عن طلب امتحان للمتقدم في هذه المرحلة
+            var examRequest = await _unitOfWork.ExamRequestRepository
+                .GetByStageProgressIdAsync(dto.Id);
+
+            if (examRequest == null)
+            {
+                dto.ActionStatus = StageActionStatus.ReadyToRequest;
+                return;
+            }
+
+            switch (examRequest.Status)
+            {
+                case ExamRequestStatus.Pending:
+                    dto.ActionStatus = StageActionStatus.RequestPending;
+                    dto.AdditionalData = new { ExamRequestId = examRequest.Id };
+                    break;
+                case ExamRequestStatus.Approved:
+                    // التحقق من وجود feedback
+                    if (examRequest.FeedbackId.HasValue)
+                    {
+                        dto.ActionStatus = StageActionStatus.Reviewed;
+                        dto.AdditionalData = new { FeedbackId = examRequest.FeedbackId };
+                    }
+                    else
+                    {
+                        dto.ActionStatus = StageActionStatus.ExamCompleted;
+                        dto.AdditionalData = new { ExamRequestId = examRequest.Id };
+                    }
+                    break;
+                case ExamRequestStatus.Rejected:
+                    dto.ActionStatus = StageActionStatus.RequestRejected;
+                    dto.AdditionalData = new { ExamRequestId = examRequest.Id };
+                    break;
+                case ExamRequestStatus.Canceled:
+                    dto.ActionStatus = StageActionStatus.ReadyToRequest;
+                    break;
+            }
+        }
+
+        private async Task SetInterviewActionStatusAsync(StageProgressDTO dto)
+        {
+            // البحث عن حجز مقابلة للمتقدم في هذه المرحلة
+            var interviewBook = await _unitOfWork.InterviewBookRepository
+                .GetByStageProgressIdAsync(dto.Id);
+
+            if (interviewBook == null)
+            {
+                dto.ActionStatus = StageActionStatus.ReadyToBook;
+                return;
+            }
+
+            switch (interviewBook.Status)
+            {
+                case InterviewStatus.Pending:
+                    dto.ActionStatus = StageActionStatus.BookingPending;
+                    dto.AdditionalData = new { InterviewBookId = interviewBook.Id };
+                    break;
+                case InterviewStatus.Scheduled:
+                    dto.ActionStatus = StageActionStatus.BookingScheduled;
+                    dto.AdditionalData = new
+                    {
+                        InterviewBookId = interviewBook.Id,
+                        ScheduledDate = interviewBook.ScheduledDate,
+                        MeetingLink = interviewBook.MeetingLink
+                    };
+                    break;
+                case InterviewStatus.Completed:
+                    if (interviewBook.FeedbackId.HasValue)
+                    {
+                        dto.ActionStatus = StageActionStatus.Reviewed;
+                        dto.AdditionalData = new { FeedbackId = interviewBook.FeedbackId };
+                    }
+                    else
+                    {
+                        dto.ActionStatus = StageActionStatus.InterviewCompleted;
+                        dto.AdditionalData = new { InterviewBookId = interviewBook.Id };
+                    }
+                    break;
+                case InterviewStatus.Canceled:
+                    dto.ActionStatus = StageActionStatus.BookingCanceled;
+                    dto.AdditionalData = new { InterviewBookId = interviewBook.Id };
+                    break;
+            }
+        }
+
+        private async Task SetTaskActionStatusAsync(StageProgressDTO dto)
+        {
+            // البحث عن المهمة المُخصصة للمتقدم
+            var taskApplicant = await _unitOfWork.TaskApplicantRepository
+                .GetByStageProgressIdAsync(dto.Id);
+
+            if (taskApplicant == null)
+            {
+                dto.ActionStatus = StageActionStatus.TaskNotAssigned;
+                return;
+            }
+
+            dto.AdditionalData = new
+            {
+                TaskApplicantId = taskApplicant.Id,
+                DueDate = taskApplicant.DueDate,
+                TaskId = taskApplicant.TaskId
+            };
+
+            // البحث عن آخر submission
+            var latestSubmission = await _unitOfWork.TaskSubmissionRepository
+                .GetLatestByTaskApplicantIdAsync(taskApplicant.Id);
+
+            if (latestSubmission == null)
+            {
+                dto.ActionStatus = StageActionStatus.TaskAssigned;
+                return;
+            }
+
+            switch (latestSubmission.Status)
+            {
+                case TaskSubmissionStatus.Submitted:
+                case TaskSubmissionStatus.UnderReview:
+                    dto.ActionStatus = StageActionStatus.TaskSubmitted;
+                    dto.AdditionalData = new
+                    {
+                        TaskApplicantId = taskApplicant.Id,
+                        SubmissionId = latestSubmission.Id,
+                        IsLate = false,
+                        SubmissionDate = latestSubmission.SubmissionDate
+                    };
+                    break;
+                case TaskSubmissionStatus.Accepted:
+                    if (latestSubmission.FeedbackId.HasValue)
+                    {
+                        dto.ActionStatus = StageActionStatus.Reviewed;
+                        dto.AdditionalData = new { FeedbackId = latestSubmission.FeedbackId };
+                    }
+                    else
+                    {
+                        dto.ActionStatus = StageActionStatus.TaskAccepted;
+                    }
+                    break;
+                case TaskSubmissionStatus.Rejected:
+                    dto.ActionStatus = StageActionStatus.TaskRejected;
+                    dto.AdditionalData = new
+                    {
+                        TaskApplicantId = taskApplicant.Id,
+                        SubmissionId = latestSubmission.Id,
+                        FeedbackId = latestSubmission.FeedbackId
+                    };
+                    break;
+                case TaskSubmissionStatus.Late:
+                    dto.ActionStatus = StageActionStatus.TaskSubmitted;
+                    dto.AdditionalData = new
+                    {
+                        TaskApplicantId = taskApplicant.Id,
+                        SubmissionId = latestSubmission.Id,
+                        IsLate = true
+                    };
+                    break;
+            }
+        }
+        #endregion
         public async Task<StageProgressDTO> GetByCurrEnrollmentIdAsync(int enrollmentId)
         {
             var stageProgresses = await _unitOfWork.StageProgressRepository.GetCurrentStageProgressByEnrollmentAsync(enrollmentId);
@@ -55,15 +266,20 @@ namespace SkillAssessmentPlatform.Application.Services
             return _mapper.Map<StageProgressDTO>(stageProgresses);
         }
 
-        public async Task<StageProgressDTO> GetCurrentStageProgressAsync(int levelprogressId)
+        public async Task<StageProgressDTO> GetCurrentStageProgressAsync(int levelProgressId)
         {
-            var stageProgress = await _unitOfWork.StageProgressRepository.GetCurrentStageProgressAsync(levelprogressId);
+            var stageProgress = await _unitOfWork.StageProgressRepository.GetCurrentStageProgressAsync(levelProgressId);
             if (stageProgress == null)
             {
-                throw new KeyNotFoundException($"There is no <In progress> stage in level with id = {levelprogressId} ");
+                throw new KeyNotFoundException($"There is no <In progress> stage in level with id = {levelProgressId}");
             }
-            return _mapper.Map<StageProgressDTO>(stageProgress);
+
+            var dto = _mapper.Map<StageProgressDTO>(stageProgress);
+            await SetActionStatusAsync(dto);
+
+            return dto;
         }
+
         //==> this method may be it can be combined with other endpoint (after examiner give thw applicant score)
         public async Task<StageProgressDTO> UpdateStatusAsync(int stageProgressId, UpdateStageStatusDTO updateDto)
         {
@@ -100,36 +316,27 @@ namespace SkillAssessmentPlatform.Application.Services
                     stageProgress.StageId,
                     freeExaminerId);
 
+
                 // If no next stage, level is completed
                 if (nextStageProgress == null)
                 {
-                    //Update level status to successful
+
                     var levelProgressId = stageProgress.LevelProgressId;
-                    var levelProgress = await _unitOfWork.LevelProgressRepository.GetByIdAsync(levelProgressId);
-                    await _unitOfWork.LevelProgressRepository.UpdateStatusAsync(levelProgressId, ProgressStatus.Successful);
-
-                    // add next level in level progress
-                    var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
-                    levelProgress.EnrollmentId,
-                    levelProgress.LevelId);
-                    if (result == null)  //// No next level, track completed
+                    var updateLevelDto = new UpdateLevelStatusDTO
                     {
-                        await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
-                        /* >>> ---
-                         * / Create certificate 
-                        var certificate = new AppCertificate
-                        {
-                            ApplicantId = enrollment.ApplicantId,
-                            LevelProgressID = levelProgress.Id,
-                            IssueDate = DateTime.UtcNow,
-                            VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
-                        };
+                        Status = ProgressStatus.Successful
+                    };
 
-                        await _context.Certificates.AddAsync(certificate);
-                        /*/
-                    }
-
+                    await _levelProgressService.UpdateStatusAsync(levelProgressId, updateLevelDto);
                 }
+                if (nextStageProgress.Stage.Type == StageType.Task)
+                {
+                    await _taskApplicantService.AssignRandomTaskAsync(
+                                    new AssignTaskDTO
+                                    { StageProgressId = nextStageProgress.Id }
+                                    );
+                }
+
             }
             else if (updateDto.Status == ProgressStatus.Failed)
             {
@@ -138,6 +345,44 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<StageProgressDTO>(stageProgress);
         }
+        public async Task<LevelProgressDTO> UpdateStatusAsync(int levelProgressId, UpdateLevelStatusDTO updateDto)
+        {
+            var levelProgress = await _unitOfWork.LevelProgressRepository.UpdateStatusAsync(levelProgressId, updateDto.Status);
+
+            // If level completed successfully, create progress for next level
+            if (updateDto.Status == ProgressStatus.Successful)
+            {
+                var enrollment = await _unitOfWork.EnrollmentRepository.GetByIdAsync(levelProgress.EnrollmentId);
+
+
+                var certificate = new AppCertificate
+                {
+                    ApplicantId = enrollment.ApplicantId,
+                    LeveProgressId = levelProgress.Id,
+                    IssueDate = DateTime.UtcNow,
+                    VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
+                };
+                await _unitOfWork.AppCertificateRepository.AddAsync(certificate);
+
+
+                var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
+                    levelProgress.EnrollmentId,
+                    levelProgress.LevelId);
+
+                //// No next level, track completed
+                if (result == null)
+                {
+                    await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
+                }
+
+
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            return _mapper.Map<LevelProgressDTO>(levelProgress);
+        }
+
+
         public async Task<StageProgressDTO> AssignExaminerAsync(int stageProgressId, AssignExaminerDTO assignDto)
         {
             // Get stage to check its type
@@ -181,45 +426,26 @@ namespace SkillAssessmentPlatform.Application.Services
         {
             // Get the latest active enrollment for the applicant
             var enrollment = await _unitOfWork.EnrollmentRepository
-                .GetLatestActiveEnrollmentAsync(applicantId);
+           .GetLatestActiveEnrollmentAsync(applicantId);
 
             if (enrollment == null)
                 throw new BadRequestException("No active enrollment found for the applicant");
 
-            var levelprogress = await _unitOfWork.LevelProgressRepository
+            var levelProgress = await _unitOfWork.LevelProgressRepository
                 .GetCurrentLevelProgressAsync(enrollment.Id);
-            if (levelprogress == null)
+            if (levelProgress == null)
                 throw new BadRequestException("No active level found for the applicant");
 
             var currentStage = await _unitOfWork.StageProgressRepository
-                .GetCurrentStageProgressAsync(levelprogress.Id);
+                .GetCurrentStageProgressAsync(levelProgress.Id);
 
             if (currentStage == null)
                 throw new BadRequestException("No current stage progress found for the enrollment");
 
-            return _mapper.Map<StageProgressDTO>(currentStage);
-        }
-        public async Task<IEnumerable<StageProgressDTO>> GetByApplicantIdAsync(string applicantId)
-        {
-            var enrollments = await _unitOfWork.EnrollmentRepository
-                .GetByApplicantIdAsync(applicantId);
+            var dto = _mapper.Map<StageProgressDTO>(currentStage);
+            await SetActionStatusAsync(dto);
 
-            var result = new List<StageProgressDTO>();
-
-            foreach (var enrollment in enrollments)
-            {
-                var levels = await _unitOfWork.LevelProgressRepository.GetByEnrollmentIdAsync(enrollment.Id);
-
-                foreach (var lp in levels)
-                {
-                    var progresses = await _unitOfWork.StageProgressRepository
-                    .GetByLevelProgressIdAsync(lp.Id);
-
-                    result.AddRange(_mapper.Map<IEnumerable<StageProgressDTO>>(progresses));
-                }
-            }
-
-            return result;
+            return dto;
         }
         public async Task<IEnumerable<StageProgressDTO>> GetCompletedStagesAsync(string applicantId)
         {

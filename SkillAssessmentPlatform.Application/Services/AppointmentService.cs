@@ -27,21 +27,15 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<IEnumerable<AppointmentDTO>> GetAvailableAppointmentsAsync(string examinerId, DateTime startDate, DateTime endDate)
         {
-            try
-            {
 
-                var appointments = await _unitOfWork.AppointmentRepository.GetAvailableAppointmentsAsync(examinerId, startDate, endDate);
-                if (appointments == null)
-                {
-                    throw new KeyNotFoundException($"There's no appointments for examiner {examinerId}");
-                }
-                return _mapper.Map<IEnumerable<AppointmentDTO>>(appointments);
-            }
-            catch (Exception ex)
+
+            var appointments = await _unitOfWork.AppointmentRepository.GetAvailableAppointmentsAsync(examinerId, startDate, endDate);
+            if (appointments == null)
             {
-                _logger.LogError(ex, "Error getting available appointments");
-                throw;
+                throw new KeyNotFoundException($"There's no appointments for examiner {examinerId}");
             }
+            return _mapper.Map<IEnumerable<AppointmentDTO>>(appointments);
+
         }
         public async Task<IEnumerable<DateSlotDTO>> GetAvailableSlotsAsync(string examinerId, DateTime startDate, DateTime endDate)
         {
@@ -55,29 +49,23 @@ namespace SkillAssessmentPlatform.Application.Services
         }
         public async Task<IEnumerable<AppointmentDTO>> CreateBulkAppointmentsAsync(AppointmentCreateDTO bulkDTO)
         {
-            try
-            {
-                var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(bulkDTO.ExaminerId);
-                if (examiner == null)
-                    throw new KeyNotFoundException($"Appointment with id {bulkDTO.ExaminerId} not found");
-                // Validations
-                if (bulkDTO.EndDate < bulkDTO.StartDate)
-                    throw new BadRequestException("End date must be after start date");
 
-                if (bulkDTO.StartDate < DateTime.Now.Date)
-                    throw new BadRequestException("Start date cannot be in the past");
+            var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(bulkDTO.ExaminerId);
+            if (examiner == null)
+                throw new KeyNotFoundException($"Appointment with id {bulkDTO.ExaminerId} not found");
+            // Validations
+            if (bulkDTO.EndDate < bulkDTO.StartDate)
+                throw new BadRequestException("End date must be after start date");
 
-                if (bulkDTO.SlotDurationMinutes <= 0)
-                    throw new BadRequestException("Slot duration must be greater than 0");
+            if (bulkDTO.StartDate < DateTime.Now.Date)
+                throw new BadRequestException("Start date cannot be in the past");
 
-                var appointments = await _unitOfWork.AppointmentRepository.CreateBulkAppointmentsAsync(bulkDTO);
-                return _mapper.Map<IEnumerable<AppointmentDTO>>(appointments);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating bulk appointments");
-                throw;
-            }
+            if (bulkDTO.SlotDurationMinutes <= 0)
+                throw new BadRequestException("Slot duration must be greater than 0");
+
+            var appointments = await _unitOfWork.AppointmentRepository.CreateBulkAppointmentsAsync(bulkDTO);
+            return _mapper.Map<IEnumerable<AppointmentDTO>>(appointments);
+
         }
         public async Task<AppointmentDTO> GetAppointmentByIdAsync(int id)
         {

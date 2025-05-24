@@ -1,12 +1,14 @@
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
-using SkillAssessmentPlatform.Core.Enums;
+using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Users;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
-using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
 
 
 namespace SkillAssessmentPlatform.Application.Services
@@ -15,11 +17,17 @@ namespace SkillAssessmentPlatform.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileService _fileService;
+        private readonly IMapper _mapper;
+        private readonly ILogger<TrackService> _logger;
 
-        public TrackService(IUnitOfWork unitOfWork, IFileService fileService)
+        public TrackService(IUnitOfWork unitOfWork,
+            IFileService fileService, IMapper mapper
+            , ILogger<TrackService> logger)
         {
             _unitOfWork = unitOfWork;
             _fileService = fileService;
+            _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<TrackDetialDto> GetTrackByIdAsync(int id)
@@ -34,7 +42,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Name = track.Name,
                 Description = track.Description,
                 Objectives = track.Objectives,
-                AssociatedSkills = track.AssociatedSkills.ToList(),
+                AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(track.AssociatedSkills),
                 IsActive = track.IsActive,
                 Image = track.Image,
                 Levels = track.Levels.Select(level => new LevelDetailDto
@@ -58,13 +66,17 @@ namespace SkillAssessmentPlatform.Application.Services
                 }).ToList()
             };
         }
+        public async Task<IEnumerable<TrackShortDto>> GetAllTracksSummaryAsync()
+        {
+            var traks = await _unitOfWork.TrackRepository.GetAllAsync();
+
+            return _mapper.Map<List<TrackShortDto>>(traks);
+        }
 
         public async Task<IEnumerable<TrackDetialDto>> GetAllTracksAsync()
         {
             var tracks = await _unitOfWork.TrackRepository.GetAllWithDetailsAsync();
-
             return tracks
-                .Where(t => t.IsActive == true)
                 .Select(t => new TrackDetialDto
                 {
                     Id = t.Id,
@@ -72,7 +84,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     Name = t.Name,
                     Description = t.Description,
                     Objectives = t.Objectives,
-                    AssociatedSkills = t.AssociatedSkills.ToList(),
+                    AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(t.AssociatedSkills),
                     IsActive = t.IsActive,
                     Image = t.Image,
                     Levels = t.Levels.Select(level => new LevelDetailDto
@@ -81,7 +93,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         TrackId = level.TrackId,
                         Name = level.Name,
                         Description = level.Description,
-                      //  Order = level.Order,
+                        //  Order = level.Order,
                         IsActive = level.IsActive,
                         Stages = level.Stages?.Select(stage => new StageDetailDTO
                         {
@@ -89,12 +101,18 @@ namespace SkillAssessmentPlatform.Application.Services
                             Name = stage.Name,
                             Description = stage.Description,
                             Type = stage.Type,
-                          //  Order = stage.Order,
+                            Order = stage.Order,
                             PassingScore = stage.PassingScore,
                             IsActive = stage.IsActive
                         }).ToList()
                     }).ToList()
                 });
+        }
+        public async Task<TrackDetialDto> GetTrackStructure(int id)
+        {
+            var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(id);
+            if (track == null) throw new KeyNotFoundException($"No thrack with id = {id} ");
+            return _mapper.Map<TrackDetialDto>(track);
         }
 
         public async Task<IEnumerable<TrackDetialDto>> GetNotActiveTracksAsync()
@@ -110,7 +128,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     Name = t.Name,
                     Description = t.Description,
                     Objectives = t.Objectives,
-                    AssociatedSkills = t.AssociatedSkills.ToList(),
+                    AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(t.AssociatedSkills),
                     IsActive = t.IsActive,
                     Image = t.Image
                 });
@@ -134,11 +152,10 @@ namespace SkillAssessmentPlatform.Application.Services
             var track = new Track
             {
                 SeniorExaminerID = trackDto.SeniorExaminerID,
-                SeniorExaminer = seniorExaminer, 
+                SeniorExaminer = seniorExaminer,
                 Name = trackDto.Name,
                 Description = trackDto.Description,
                 Objectives = trackDto.Objectives,
-                AssociatedSkills = trackDto.AssociatedSkills,
                 Image = imagePath,
                 CreatedAt = DateTime.UtcNow
             };
@@ -146,9 +163,27 @@ namespace SkillAssessmentPlatform.Application.Services
             await _unitOfWork.TrackRepository.AddAsync(track);
             await _unitOfWork.SaveChangesAsync();
 
+            // إضافة المهارات المرتبطة
+            if (trackDto.AssociatedSkillsJson?.Any() == true)
+            {
+                _logger.LogInformation($"Number of associated skills: {trackDto.AssociatedSkillsJson.Count}");
+
+                foreach (var skill in trackDto.AssociatedSkillsJson) // استخدم trackDto.AssociatedSkillsJson بدلاً من associatedSkills
+                {
+                    var newSkill = new AssociatedSkill
+                    {
+                        TrackId = track.Id,
+                        Name = skill.Name,
+                        Description = skill.Description,
+                    };
+                    await _unitOfWork.AssociatedSkillsRepository.AddAsync(newSkill);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+            }
+
             return trackDto;
         }
-
         public async Task<bool> CreateTrackStructureAsync(TrackStructureDTO structureDTO)
         {
 
@@ -406,7 +441,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Objectives = t.Objectives,
                 Image = t.Image,
                 IsActive = t.IsActive,
-                AssociatedSkills = t.AssociatedSkills.ToList(),
+                AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(t.AssociatedSkills),
                 SeniorExaminerID = t.SeniorExaminerID
             });
         }
@@ -423,7 +458,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Objectives = t.Objectives,
                 Image = t.Image,
                 IsActive = t.IsActive,
-                AssociatedSkills = t.AssociatedSkills.ToList(),
+                AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(t.AssociatedSkills),
                 SeniorExaminerID = t.SeniorExaminerID
             });
         }
@@ -492,6 +527,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Email = e.Email,
                 Image = e.Image,
                 Specialization = e.Specialization,
+                UserType = e.UserType,
                 ExaminerLoads = e.ExaminerLoads?.Select(load => new ExaminerLoadDTO
                 {
                     ID = load.ID.ToString(),
@@ -500,6 +536,12 @@ namespace SkillAssessmentPlatform.Application.Services
                     MaxWorkLoad = load.MaxWorkLoad
                 })
             });
+        }
+        public async Task<IEnumerable<ExaminerListDTO>> GetTrackWorkingExaminersAsync(int trackId)
+        {
+            var examiners = await _unitOfWork.ExaminerRepository.GetWorkingExaminersByTrackIdAsync(trackId);
+
+            return _mapper.Map<IEnumerable<ExaminerListDTO>>(examiners);
         }
 
         public async Task<IEnumerable<TrackShortDto>> GetActiveTrackListAsync()

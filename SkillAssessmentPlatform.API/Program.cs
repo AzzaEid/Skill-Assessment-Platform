@@ -64,6 +64,8 @@ public class Program
         app.UseCors("AllowAll");
         app.UseHttpsRedirection();
         app.UseMiddleware<ErrorHandlerMiddleware>();
+        app.UseStaticFiles();
+
         app.UseAuthentication();
         app.UseAuthorization();
 

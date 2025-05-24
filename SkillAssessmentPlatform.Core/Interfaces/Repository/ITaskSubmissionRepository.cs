@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+﻿using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
@@ -12,7 +7,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task AddAsync(TaskSubmission submission);
         Task<TaskSubmission?> GetByIdAsync(int id);
         Task<IEnumerable<TaskSubmission>> GetByApplicantIdAsync(string applicantId);
-        Task<TaskSubmission?> GetByStageProgressIdAsync(int stageProgressId);
+        //  Task<TaskSubmission?> GetByStageProgressIdAsync(int stageProgressId);
+        Task<TaskSubmission> GetLatestByTaskApplicantIdAsync(int taskApplicantId);
 
     }
 

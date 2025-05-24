@@ -165,5 +165,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 throw;
             }
         }
+
+        public async Task<InterviewBook> GetByStageProgressIdAsync(int stageProgressId)
+        {
+            return await _context.InterviewBooks
+                .Where(ib => ib.Interview.Stage.StageProgresses
+                    .Any(sp => sp.Id == stageProgressId && sp.LevelProgress.Enrollment.ApplicantId == ib.ApplicantId))
+                .OrderByDescending(ib => ib.Id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

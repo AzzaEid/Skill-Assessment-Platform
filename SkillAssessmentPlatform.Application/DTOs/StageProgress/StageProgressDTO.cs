@@ -1,25 +1,23 @@
-﻿using SkillAssessmentPlatform.Core.Entities.Users;
-using SkillAssessmentPlatform.Core.Enums;
-
-namespace SkillAssessmentPlatform.Core.Entities
+﻿using SkillAssessmentPlatform.Core.Enums;
+namespace SkillAssessmentPlatform.Application.DTOs.StageProgress
 {
     public class StageProgressDTO
     {
         public int Id { get; set; }
         public int LevelProgressId { get; set; }
         public int StageId { get; set; }
+        public string StageName { get; set; }
+        public StageType StageType { get; set; }
         public ProgressStatus Status { get; set; }
         public int Score { get; set; }
         public string ExaminerId { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime CompletionDate { get; set; }
+        public DateTime? CompletionDate { get; set; }
         public int Attempts { get; set; }
-
-      
-
-        // Navigation properties
-        public Examiner Examiner { get; set; }
-        public Stage Stage { get; set; }
-        public LevelProgress LevelProgress { get; set; }
+        public StageActionStatus ActionStatus { get; set; }
+        public object AdditionalData { get; set; }
     }
+
+
+
 }
