@@ -22,12 +22,6 @@ public class TracksController : ControllerBase
         var track = await _trackService.GetTrackByIdAsync(id);
         return _responseHandler.Success(track);
     }
-    [HttpGet("{id}/structure")]
-    public async Task<IActionResult> GetStructureById(int id)
-    {
-        var track = await _trackService.GetTrackStructure(id);
-        return _responseHandler.Success(track);
-    }
 
     [HttpGet]
     public async Task<IActionResult> GetAllTracksAsync()
@@ -41,9 +35,9 @@ public class TracksController : ControllerBase
         var result = await _trackService.GetNotActiveTracksAsync();
         return _responseHandler.Success(result);
     }
-    // fromform
+
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] CreateTrackDTO dto) =>
+    public async Task<IActionResult> Create([FromBody] CreateTrackDTO dto) =>
      _responseHandler.Created(await _trackService.CreateTrackAsync(dto));
 
     [HttpPost("structure")]
@@ -89,12 +83,6 @@ public class TracksController : ControllerBase
         var result = await _trackService.GetOnlyActiveTracksAsync();
         return _responseHandler.Success(result);
     }
-    [HttpGet("summary")]
-    public async Task<IActionResult> GetTracksSummary()
-    {
-        var result = await _trackService.GetAllTracksSummaryAsync();
-        return _responseHandler.Success(result);
-    }
 
     [HttpGet("not-active")]
     public async Task<IActionResult> GetOnlyDeactivatedTracks()
@@ -124,13 +112,6 @@ public class TracksController : ControllerBase
         return _responseHandler.Success(result, "Working examiners fetched successfully");
     }
 
-    [HttpGet("{trackId}/examiners-summary")]
-    public async Task<IActionResult> GetWorkingExaminersList(int trackId)
-    {
-        var result = await _trackService.GetTrackWorkingExaminersAsync(trackId);
-        return _responseHandler.Success(result, "Working examiners fetched successfully");
-    }
-
     [HttpGet("active-list")]
     public async Task<IActionResult> GetActiveTrackList()
     {
@@ -155,4 +136,13 @@ public class TracksController : ControllerBase
         return Ok("Level added successfully to track.");
     }
 
+    //[HttpPost("{trackId}/levels")]
+    //public async AppTask<IActionResult> CreateLevel(int trackId, [FromBody] CreateLevelDTO dto)
+    //{
+    //    var created = await _trackService.CreateLevelAsync(trackId, dto);
+    //    if (created == null)
+    //        return NotFound(new { message = "Track not found" });
+
+    //    return _responseHandler.Success(created, "Level created successfully");
+    //}
 }

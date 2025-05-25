@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
+//using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
@@ -10,8 +10,11 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public string Description { get; set; }
         public string Objectives { get; set; }
         public IFormFile? ImageFile { get; set; }
-        public List<AssociatedSkill> AssociatedSkills { get; set; }
+        public Dictionary<string, string> AssociatedSkills { get; set; } = new();
         public string? SeniorExaminerID { get; set; }
+        
+ 
 
+       
     }
 }

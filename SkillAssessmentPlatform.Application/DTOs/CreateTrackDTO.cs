@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using SkillAssessmentPlatform.Application.DTOs;
 
 public class CreateTrackDTO
@@ -10,3 +10,7 @@ public class CreateTrackDTO
     public string? SeniorExaminerID { get; set; }
     public List<CreateAssociatedSkillDTO> AssociatedSkills { get; set; } = new List<CreateAssociatedSkillDTO>();
 }
+
+
+}
+

@@ -30,7 +30,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IEnrollmentRepository EnrollmentRepository { get; }
         ILevelProgressRepository LevelProgressRepository { get; }
         IStageProgressRepository StageProgressRepository { get; }
-        IAssociatedSkillsRepository AssociatedSkillsRepository { get; }
+      
 
 
         IAppointmentRepository AppointmentRepository { get; }
