@@ -4,7 +4,7 @@ using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
-using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
+//using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -42,7 +42,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Name = track.Name,
                 Description = track.Description,
                 Objectives = track.Objectives,
-                AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(track.AssociatedSkills),
+                AssociatedSkills = track.AssociatedSkills,
                 IsActive = track.IsActive,
                 Image = track.Image,
                 Levels = track.Levels.Select(level => new LevelDetailDto
@@ -84,7 +84,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     Name = t.Name,
                     Description = t.Description,
                     Objectives = t.Objectives,
-                    AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(t.AssociatedSkills),
+                    AssociatedSkills = t.AssociatedSkills,
                     IsActive = t.IsActive,
                     Image = t.Image,
                     Levels = t.Levels.Select(level => new LevelDetailDto
@@ -108,6 +108,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     }).ToList()
                 });
         }
+
         public async Task<TrackDetialDto> GetTrackStructure(int id)
         {
             var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(id);
@@ -128,12 +129,13 @@ namespace SkillAssessmentPlatform.Application.Services
                     Name = t.Name,
                     Description = t.Description,
                     Objectives = t.Objectives,
-                    AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(t.AssociatedSkills),
+                    AssociatedSkills = t.AssociatedSkills,
                     IsActive = t.IsActive,
                     Image = t.Image
                 });
         }
 
+   
         public async Task<CreateTrackDTO> CreateTrackAsync(CreateTrackDTO trackDto)
         {
             string imagePath = "default-track.png";
@@ -156,31 +158,13 @@ namespace SkillAssessmentPlatform.Application.Services
                 Name = trackDto.Name,
                 Description = trackDto.Description,
                 Objectives = trackDto.Objectives,
+                AssociatedSkills = trackDto.AssociatedSkills,
                 Image = imagePath,
                 CreatedAt = DateTime.UtcNow
             };
 
             await _unitOfWork.TrackRepository.AddAsync(track);
             await _unitOfWork.SaveChangesAsync();
-
-            // إضافة المهارات المرتبطة
-            if (trackDto.AssociatedSkillsJson?.Any() == true)
-            {
-                _logger.LogInformation($"Number of associated skills: {trackDto.AssociatedSkillsJson.Count}");
-
-                foreach (var skill in trackDto.AssociatedSkillsJson) // استخدم trackDto.AssociatedSkillsJson بدلاً من associatedSkills
-                {
-                    var newSkill = new AssociatedSkill
-                    {
-                        TrackId = track.Id,
-                        Name = skill.Name,
-                        Description = skill.Description,
-                    };
-                    await _unitOfWork.AssociatedSkillsRepository.AddAsync(newSkill);
-                }
-
-                await _unitOfWork.SaveChangesAsync();
-            }
 
             return trackDto;
         }
@@ -441,7 +425,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Objectives = t.Objectives,
                 Image = t.Image,
                 IsActive = t.IsActive,
-                AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(t.AssociatedSkills),
+                AssociatedSkills = t.AssociatedSkills,
                 SeniorExaminerID = t.SeniorExaminerID
             });
         }
@@ -458,7 +442,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Objectives = t.Objectives,
                 Image = t.Image,
                 IsActive = t.IsActive,
-                AssociatedSkills = _mapper.Map<List<AssociatedSkillDTO>>(t.AssociatedSkills),
+                AssociatedSkills = t.AssociatedSkills,
                 SeniorExaminerID = t.SeniorExaminerID
             });
         }

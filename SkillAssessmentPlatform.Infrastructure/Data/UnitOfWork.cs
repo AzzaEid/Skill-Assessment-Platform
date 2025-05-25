@@ -31,7 +31,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IInterviewBookRepository _interviewBookRepository;
         private readonly IExamRequestRepository _examRequestRepository;
-        private readonly IAssociatedSkillsRepository _associatedSkillsRepository;
         private readonly ITaskApplicantRepository _taskApplicantRepository;
         private readonly ITaskSubmissionRepository _taskSubmissionRepository;
         private readonly IAppCertificateRepository _appCertificateRepository;
@@ -64,8 +63,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             ITaskSubmissionRepository taskSubmissionRepository,
             IAppCertificateRepository appCertificateRepository,
             IFeedbackRepository feedbackRepository,
-            IDetailedFeedbackRepository detailFeedbackRepository,
-            IAssociatedSkillsRepository associatedSkillsRepository)
+            IDetailedFeedbackRepository detailFeedbackRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -90,7 +88,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _taskApplicantRepository = taskApplicantRepository;
             _taskSubmissionRepository = taskSubmissionRepository;
             _examRequestRepository = examRequestRepository;
-            _associatedSkillsRepository = associatedSkillsRepository;
             _appCertificateRepository = appCertificateRepository;
             _feedbackRepository = feedbackRepository;
             _detailFeedbackRepository = detailFeedbackRepository;
@@ -124,7 +121,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IDetailedFeedbackRepository DetailedFeedbackRepository => _detailFeedbackRepository;
 
 
-        public IAssociatedSkillsRepository AssociatedSkillsRepository => _associatedSkillsRepository;
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
