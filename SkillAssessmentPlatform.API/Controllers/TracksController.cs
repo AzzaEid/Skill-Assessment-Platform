@@ -66,9 +66,9 @@ public class TracksController : ControllerBase
         }
     }
 
-    [HttpPut]
-    public async Task<IActionResult> Update([FromBody] TrackDto dto) =>
-        _responseHandler.Success(await _trackService.UpdateTrackAsync(dto), "Track updated successfully");
+    [HttpPut("{trackId}")]
+    public async Task<IActionResult> Update([FromBody] CreateTrackDTO dto, int trackId) =>
+        _responseHandler.Success(await _trackService.UpdateTrackAsync(dto, trackId), "Track updated successfully");
 
 
     [HttpDelete("{id}")]
