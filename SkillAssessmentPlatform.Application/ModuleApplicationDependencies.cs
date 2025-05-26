@@ -2,7 +2,6 @@
 using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Application.Mapping;
 using SkillAssessmentPlatform.Application.Services;
-using SkillAssessmentPlatform.Core.Interfaces.Repository;
 
 namespace SkillAssessmentPlatform.Application
 {
@@ -46,6 +45,7 @@ namespace SkillAssessmentPlatform.Application
             services.AddTransient<AppCertificateService>();
             services.AddTransient<FeedbackService>();
             services.AddTransient<DetailedFeedbackService>();
+            services.AddTransient<ExamRequestService>();
 
             return services;
 

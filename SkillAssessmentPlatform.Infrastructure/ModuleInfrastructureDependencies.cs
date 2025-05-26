@@ -50,6 +50,11 @@ namespace SkillAssessmentPlatform.Infrastructure
 
             // == 
             services.AddTransient<IExamRequestRepository, ExamRequestRepository>();
+            services.AddTransient<IInterviewBookRepository, InterviewBookRepository>();
+            services.AddTransient<IAssociatedSkillsRepository, AssociatedSkillsRepository>();
+
+
+
 
             return services;
         }

@@ -30,8 +30,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IEnrollmentRepository EnrollmentRepository { get; }
         ILevelProgressRepository LevelProgressRepository { get; }
         IStageProgressRepository StageProgressRepository { get; }
-      
 
+        IAssociatedSkillsRepository AssociatedSkillsRepository { get; }
 
         IAppointmentRepository AppointmentRepository { get; }
         IInterviewBookRepository InterviewBookRepository { get; }
@@ -39,7 +39,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         ITaskSubmissionRepository TaskSubmissionRepository { get; }
         IAppCertificateRepository AppCertificateRepository { get; }
         IFeedbackRepository FeedbackRepository { get; }
-        IDetailedFeedbackRepository DetailedFeedbackRepository { get; } 
+        IDetailedFeedbackRepository DetailedFeedbackRepository { get; }
 
         //  IExamRepository ExamRepository { get; }
 

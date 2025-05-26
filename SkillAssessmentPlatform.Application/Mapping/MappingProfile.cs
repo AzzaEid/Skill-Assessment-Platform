@@ -8,6 +8,8 @@ using SkillAssessmentPlatform.Application.DTOs.StageProgress;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
+
 //using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Users;
 
@@ -40,7 +42,7 @@ namespace SkillAssessmentPlatform.Application.Mapping
 
             CreateMap<TrackDetialDto, Track>().ReverseMap();
             CreateMap<TrackShortDto, Track>().ReverseMap();
-           
+
 
             ///tracking
             CreateMap<Enrollment, EnrollmentDTO>().ReverseMap();
@@ -82,6 +84,11 @@ namespace SkillAssessmentPlatform.Application.Mapping
 
             CreateMap<ExamRequestInfoDTO, ExamRequest>().ReverseMap();
             CreateMap<ExamRequestDTO, ExamRequest>().ReverseMap();
+
+            CreateMap<AssociatedSkillDTO, AssociatedSkill>().ReverseMap();
+
+            CreateMap<CreateAssociatedSkillDTO, AssociatedSkill>().ReverseMap();
+
 
         }
     }
