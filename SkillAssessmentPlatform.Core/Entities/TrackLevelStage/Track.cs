@@ -1,4 +1,5 @@
-﻿using SkillAssessmentPlatform.Core.Entities.Users;
+﻿using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
+using SkillAssessmentPlatform.Core.Entities.Users;
 
 namespace SkillAssessmentPlatform.Core.Entities
 {
@@ -9,7 +10,6 @@ namespace SkillAssessmentPlatform.Core.Entities
         public string Name { get; set; }
         public string Description { get; set; }
         public string Objectives { get; set; }
-        public Dictionary<string, string> AssociatedSkills { get; set; }
         public bool IsActive { get; set; } = true;
         public string? Image { get; set; }
         public DateTime? CreatedAt { get; set; }
@@ -19,6 +19,8 @@ namespace SkillAssessmentPlatform.Core.Entities
         public ICollection<Examiner> Examiners { get; set; }
         public ICollection<Level> Levels { get; set; }
         public ICollection<Enrollment> Enrollments { get; set; }
+        public ICollection<AssociatedSkill> AssociatedSkills { get; set; }
+
 
     }
 }

@@ -36,6 +36,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IAppCertificateRepository _appCertificateRepository;
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IDetailedFeedbackRepository _detailFeedbackRepository;
+        private readonly IAssociatedSkillsRepository _associatedSkillsRepository;
 
         public UnitOfWork(
             AppDbContext context,
@@ -63,7 +64,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             ITaskSubmissionRepository taskSubmissionRepository,
             IAppCertificateRepository appCertificateRepository,
             IFeedbackRepository feedbackRepository,
-            IDetailedFeedbackRepository detailFeedbackRepository)
+            IDetailedFeedbackRepository detailFeedbackRepository,
+              IAssociatedSkillsRepository associatedSkillsRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -119,7 +121,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IAppCertificateRepository AppCertificateRepository => _appCertificateRepository;
         public IFeedbackRepository FeedbackRepository => _feedbackRepository;
         public IDetailedFeedbackRepository DetailedFeedbackRepository => _detailFeedbackRepository;
-
+        public IAssociatedSkillsRepository AssociatedSkillsRepository => _associatedSkillsRepository;
 
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
