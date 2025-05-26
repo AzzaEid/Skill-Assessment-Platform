@@ -174,5 +174,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .OrderByDescending(ib => ib.Id)
                 .FirstOrDefaultAsync();
         }
+        public async Task<InterviewBook> GetPendingByApplicantIdAsync(string applicantId)
+        {
+            return await _context.InterviewBooks
+                .Where(ib => ib.ApplicantId == applicantId && ib.Status == InterviewStatus.Pending)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<InterviewBook> GetScheduledByApplicantIdAsync(string applicantId)
+        {
+            return await _context.InterviewBooks
+                .Where(ib => ib.ApplicantId == applicantId && ib.Status == InterviewStatus.Scheduled)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

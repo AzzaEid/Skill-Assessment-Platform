@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard;
 using SkillAssessmentPlatform.Core.Entities.Users;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
 
@@ -77,6 +79,216 @@ namespace SkillAssessmentPlatform.Application.Services
                 throw new KeyNotFoundException($"no examiner load with id : {id}");
             await _unitOfWork.ExaminerLoadRepository.DeleteAsync(id);
         }
+
+
+        //// ========================== Examiner Dashboard =============================/////
+        public async Task<ExaminerDashboardSummaryDTO> GetDashboardSummaryAsync(string examinerId)
+        {
+            var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(examinerId);
+            if (examiner == null)
+                throw new KeyNotFoundException($"Examiner with id {examinerId} not found");
+
+            var summary = new ExaminerDashboardSummaryDTO();
+
+            // Get supervised stage progresses
+            var supervisedStages = await _unitOfWork.StageProgressRepository
+                .GetPendingByExaminerIdAsync(examinerId);
+
+            foreach (var stageProgress in supervisedStages)
+            {
+                var stage = await _unitOfWork.StageRepository.GetByIdAsync(stageProgress.StageId);
+                var applicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
+                switch (stage.Type)
+                {
+                    case StageType.Task:
+                        var taskSubmissions = await _unitOfWork.TaskSubmissionRepository
+                            .GetPendingByApplicantIdAsync(applicantId);
+                        summary.PendingTaskSubmissions += taskSubmissions == null ? 0 : 1;
+                        break;
+
+                    case StageType.Interview:
+                        var pendingRequests = await _unitOfWork.InterviewBookRepository
+                            .GetPendingByApplicantIdAsync(applicantId);
+                        summary.PendingInterviewRequests += pendingRequests == null ? 0 : 1;
+
+                        var scheduledInterviews = await _unitOfWork.InterviewBookRepository
+                            .GetScheduledByApplicantIdAsync(applicantId);
+                        summary.ScheduledInterviews += scheduledInterviews == null ? 0 : 1;
+                        break;
+
+                    case StageType.Exam:
+                        var examReviews = await _unitOfWork.ExamRequestRepository
+                            .GetCompletedPendingReviewByApplicantAsync(applicantId);
+                        summary.PendingExamReviews += examReviews == null ? 0 : 1;
+                        break;
+                }
+            }
+            /*
+            // Get creation tasks assignments
+            var taskCreationAssignments = await _unitOfWork.ExaminerLoadRepository
+                .GetTaskCreationAssignmentsAsync(examinerId);
+            summary.PendingTaskCreations = taskCreationAssignments.Count();
+
+            var examCreationAssignments = await _unitOfWork.ExaminerLoadRepository
+                .GetExamCreationAssignmentsAsync(examinerId);
+            summary.PendingExamCreations = examCreationAssignments.Count();
+            */
+            return summary;
+        }
+
+        // Detailed methods for each task type
+        public async Task<IEnumerable<ExaminerTaskSubmissionDTO>> GetPendingTaskSubmissionsAsync(string examinerId)
+        {
+            var supervisedStages = await _unitOfWork.StageProgressRepository
+                .GetByPendingExaminerIdAndTypeAsync(examinerId, StageType.Task);
+
+            var result = new List<ExaminerTaskSubmissionDTO>();
+
+            foreach (var stageProgress in supervisedStages)
+            {
+                var applicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
+                var submission = await _unitOfWork.TaskSubmissionRepository
+                    .GetPendingByApplicantIdAsync(applicantId);
+
+                if (submission != null)
+                {
+                    var taskApplicant = await _unitOfWork.TaskApplicantRepository
+                        .GetByIdAsync(submission.TaskApplicantId);
+                    var task = await _unitOfWork.AppTaskRepository.GetByIdAsync(taskApplicant.TaskId);
+
+                    var dto = new ExaminerTaskSubmissionDTO
+                    {
+                        Id = submission.Id,
+                        TaskId = task.Id,
+                        TaskTitle = task.Title,
+                        ApplicantId = applicantId,
+                        SubmissionUrl = submission.SubmissionUrl,
+                        SubmissionDate = submission.SubmissionDate,
+                        DueDate = taskApplicant.DueDate,
+                        DaysWaiting = (DateTime.Now - submission.SubmissionDate).Days,
+                        IsLate = submission.SubmissionDate > taskApplicant.DueDate,
+                        Status = submission.Status,
+                        StageName = stageProgress.Stage.Name,
+                        TrackName = stageProgress.LevelProgress.Enrollment.Track.Name
+                    };
+
+                    result.Add(dto);
+                }
+            }
+
+            return result.OrderBy(x => x.SubmissionDate);
+        }
+
+        public async Task<IEnumerable<ExaminerInterviewRequestDTO>> GetPendingInterviewRequestsAsync(string examinerId)
+        {
+            var supervisedStages = await _unitOfWork.StageProgressRepository
+                .GetByPendingExaminerIdAndTypeAsync(examinerId, StageType.Interview);
+
+            var result = new List<ExaminerInterviewRequestDTO>();
+
+            foreach (var stageProgress in supervisedStages)
+            {
+                var applicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
+                var interviewBook = await _unitOfWork.InterviewBookRepository
+                    .GetPendingByApplicantIdAsync(applicantId);
+
+                if (interviewBook != null)
+                {
+                    var interview = await _unitOfWork.InterviewRepository.GetByIdAsync(interviewBook.InterviewId);
+
+                    var dto = new ExaminerInterviewRequestDTO
+                    {
+                        Id = interviewBook.Id,
+                        InterviewId = interview.Id,
+                        ApplicantId = applicantId,
+                        RequestDate = stageProgress.StartDate,
+                        DaysWaiting = (DateTime.Now - stageProgress.StartDate).Days,
+                        Status = interviewBook.Status,
+                        StageName = stageProgress.Stage.Name,
+                        TrackName = stageProgress.LevelProgress.Enrollment.Track.Name,
+                        MaxDaysToBook = interview.MaxDaysToBook
+                    };
+
+                    result.Add(dto);
+                }
+            }
+
+            return result.OrderBy(x => x.RequestDate);
+        }
+
+        public async Task<IEnumerable<ExaminerScheduledInterviewDTO>> GetScheduledInterviewsAsync(string examinerId)
+        {
+            var supervisedStages = await _unitOfWork.StageProgressRepository
+                .GetByPendingExaminerIdAndTypeAsync(examinerId, StageType.Interview);
+
+            var result = new List<ExaminerScheduledInterviewDTO>();
+
+            foreach (var stageProgress in supervisedStages)
+            {
+                var applicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
+                var interviewBook = await _unitOfWork.InterviewBookRepository
+                    .GetScheduledByApplicantIdAsync(applicantId);
+
+                if (interviewBook != null)
+                {
+                    var interview = await _unitOfWork.InterviewRepository.GetByIdAsync(interviewBook.InterviewId);
+
+                    var dto = new ExaminerScheduledInterviewDTO
+                    {
+                        Id = interviewBook.Id,
+                        ApplicantId = applicantId,
+                        ScheduledDate = interviewBook.ScheduledDate.Value,
+                        MeetingLink = interviewBook.MeetingLink,
+                        Status = interviewBook.Status,
+                        StageName = stageProgress.Stage.Name,
+                        TrackName = stageProgress.LevelProgress.Enrollment.Track.Name,
+                        DurationMinutes = interview.DurationMinutes
+                    };
+
+                    result.Add(dto);
+                }
+            }
+
+            return result.OrderBy(x => x.ScheduledDate);
+        }
+
+        public async Task<IEnumerable<ExaminerExamReviewDTO>> GetPendingExamReviewsAsync(string examinerId)
+        {
+            var supervisedStages = await _unitOfWork.StageProgressRepository
+                .GetByPendingExaminerIdAndTypeAsync(examinerId, StageType.Exam);
+
+            var result = new List<ExaminerExamReviewDTO>();
+
+            foreach (var stageProgress in supervisedStages)
+            {
+                var applicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
+                var request = await _unitOfWork.ExamRequestRepository
+                    .GetCompletedPendingReviewByApplicantAsync(applicantId);
+
+                if (request != null)
+                {
+                    var exam = await _unitOfWork.ExamRepository.GetByIdAsync(request.ExamId);
+
+                    var dto = new ExaminerExamReviewDTO
+                    {
+                        Id = request.Id,
+                        ExamId = exam.Id,
+                        ApplicantId = applicantId,
+                        ScheduledDate = request.ScheduledDate,
+                        DaysWaiting = (DateTime.Now - request.ScheduledDate).Days,
+                        Status = request.Status,
+                        StageName = stageProgress.Stage.Name,
+                        TrackName = stageProgress.LevelProgress.Enrollment.Track.Name,
+                        Difficulty = exam.Difficulty
+                    };
+
+                    result.Add(dto);
+                }
+            }
+
+            return result.OrderBy(x => x.ScheduledDate);
+        }
+
 
     }
 }

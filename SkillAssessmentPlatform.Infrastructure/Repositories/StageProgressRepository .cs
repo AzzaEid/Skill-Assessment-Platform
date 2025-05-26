@@ -206,5 +206,29 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+
+        public async Task<IEnumerable<StageProgress>> GetPendingByExaminerIdAsync(string examinerId)
+        {
+            return await _context.StageProgresses
+                .Where(sp => sp.ExaminerId == examinerId && sp.Status == ProgressStatus.InProgress)
+                .Include(sp => sp.Stage)
+                .Include(sp => sp.LevelProgress)
+                    .ThenInclude(lp => lp.Enrollment)
+                        .ThenInclude(e => e.Track)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<StageProgress>> GetByPendingExaminerIdAndTypeAsync(string examinerId, StageType stageType)
+        {
+            return await _context.StageProgresses
+                .Where(sp => sp.ExaminerId == examinerId
+                        && sp.Status == ProgressStatus.InProgress
+                        && sp.Stage.Type == stageType)
+                .Include(sp => sp.Stage)
+                .Include(sp => sp.LevelProgress)
+                    .ThenInclude(lp => lp.Enrollment)
+                        .ThenInclude(e => e.Track)
+                .ToListAsync();
+        }
+
     }
 }

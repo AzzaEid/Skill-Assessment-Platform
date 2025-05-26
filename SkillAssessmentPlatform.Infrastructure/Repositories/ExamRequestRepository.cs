@@ -119,5 +119,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .OrderByDescending(er => er.Id)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<ExamRequest> GetCompletedPendingReviewByApplicantAsync(string applicantId)
+        {
+            return await _context.ExamRequests
+                .Where(er => er.ApplicantId == applicantId
+                            && er.Status == ExamRequestStatus.Approved
+                            && er.ScheduledDate < DateTime.Now)
+                .FirstOrDefaultAsync();
+        }
     }
 }
