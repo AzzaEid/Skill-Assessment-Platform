@@ -1,4 +1,6 @@
-﻿namespace SkillAssessmentPlatform.Core.Interfaces.Repository
+﻿using System.Linq.Expressions;
+
+namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
     public interface IGenericRepository<T> where T : class
     {
@@ -14,6 +16,8 @@
         Task<bool> DeleteAsync(int id);
         void DeleteEntity(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+
         // AppTask<int> GetTotalCountAsync();
         void RemoveRange(IEnumerable<T> entities);
 

@@ -52,6 +52,8 @@ namespace SkillAssessmentPlatform.Infrastructure
             services.AddTransient<IExamRequestRepository, ExamRequestRepository>();
             services.AddTransient<IInterviewBookRepository, InterviewBookRepository>();
             services.AddTransient<IAssociatedSkillsRepository, AssociatedSkillsRepository>();
+            services.AddTransient<IEvaluationCriteriaRepository, EvaluationCriteriaRepository>();
+
             services.AddTransient<ICreationAssignmentRepository, CreationAssignmentRepository>();
 
 

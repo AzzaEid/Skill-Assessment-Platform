@@ -45,7 +45,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
 
 
 
-
         #endregion
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

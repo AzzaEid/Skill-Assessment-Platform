@@ -11,7 +11,9 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
     public interface IEvaluationCriteriaRepository : IGenericRepository<EvaluationCriteria>
     {
         Task<IEnumerable<EvaluationCriteria>> GetByStageIdAsync(int stageId);
+        Task<IEnumerable<EvaluationCriteria>> GetActiveByStageIdAsync(int stageId);
 
+        
         Task AddAsync(EvaluationCriteria evaluationCriteria);
     }
 

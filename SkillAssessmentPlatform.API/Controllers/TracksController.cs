@@ -19,7 +19,7 @@ public class TracksController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var track = await _trackService.GetTrackByIdAsync(id);
+        var track = await _trackService.GetTrackByIdAsync(id, _trackService.Get_mapper());
         return _responseHandler.Success(track);
     }
 
