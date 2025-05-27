@@ -37,6 +37,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IDetailedFeedbackRepository _detailFeedbackRepository;
         private readonly IAssociatedSkillsRepository _associatedSkillsRepository;
+        private readonly ICreationAssignmentRepository _creationAssignmentRepository;
 
         public UnitOfWork(
             AppDbContext context,
@@ -65,8 +66,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IAppCertificateRepository appCertificateRepository,
             IFeedbackRepository feedbackRepository,
             IDetailedFeedbackRepository detailFeedbackRepository,
-              IAssociatedSkillsRepository associatedSkillsRepository
-              )
+            ICreationAssignmentRepository creationAssignmentRepository,
+            IAssociatedSkillsRepository associatedSkillsRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -94,6 +95,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _appCertificateRepository = appCertificateRepository;
             _feedbackRepository = feedbackRepository;
             _detailFeedbackRepository = detailFeedbackRepository;
+            _associatedSkillsRepository = associatedSkillsRepository;
+            _creationAssignmentRepository = creationAssignmentRepository;
         }
 
         // Custom Repositories exposed
@@ -123,7 +126,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IFeedbackRepository FeedbackRepository => _feedbackRepository;
         public IDetailedFeedbackRepository DetailedFeedbackRepository => _detailFeedbackRepository;
         public IAssociatedSkillsRepository AssociatedSkillsRepository => _associatedSkillsRepository;
-
+        public ICreationAssignmentRepository CreationAssignmentRepository => _creationAssignmentRepository;
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

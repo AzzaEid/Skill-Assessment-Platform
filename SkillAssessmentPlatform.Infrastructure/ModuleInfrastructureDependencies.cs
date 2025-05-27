@@ -54,6 +54,9 @@ namespace SkillAssessmentPlatform.Infrastructure
             services.AddTransient<IAssociatedSkillsRepository, AssociatedSkillsRepository>();
             services.AddTransient<IEvaluationCriteriaRepository, EvaluationCriteriaRepository>();
 
+            services.AddTransient<ICreationAssignmentRepository, CreationAssignmentRepository>();
+
+
 
 
 

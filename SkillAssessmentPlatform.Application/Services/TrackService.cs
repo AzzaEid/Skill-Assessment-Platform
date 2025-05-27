@@ -344,36 +344,34 @@ namespace SkillAssessmentPlatform.Application.Services
             if (existingTrack == null)
                 throw new Exception($"Track with ID {trackId} not found.");
 
-            // تحديث الصورة إذا تم رفع صورة جديدة
             if (trackDto.ImageFile != null && trackDto.ImageFile.Length > 0)
             {
-                existingTrack.Image = await _fileService.UploadFileAsync(trackDto.ImageFile, "track-images");
+                // upload image
+                var uploadedImagePath = await _fileService.UploadFileAsync(trackDto.ImageFile, "track-images");
+                existingTrack.Image = uploadedImagePath;
             }
 
-            // تحديث البيانات الأساسية
+
             existingTrack.Name = trackDto.Name;
             existingTrack.Description = trackDto.Description;
             existingTrack.Objectives = trackDto.Objectives;
-            existingTrack.SeniorExaminerID = trackDto.SeniorExaminerID;
+            // existingTrack.SeniorExaminerID = trackDto.SeniorExaminerID;
 
-            // تحديث Senior Examiner إذا تم تغييره
+
             if (!string.IsNullOrEmpty(trackDto.SeniorExaminerID))
             {
                 var seniorExaminer = await _unitOfWork.ExaminerRepository.GetByIdAsync(trackDto.SeniorExaminerID);
                 if (seniorExaminer == null)
                     throw new Exception($"Senior Examiner with ID {trackDto.SeniorExaminerID} not found.");
-                existingTrack.SeniorExaminer = seniorExaminer;
+                await _unitOfWork.SeniorRepository.ChangeTrackSeniorAsync(seniorExaminer, existingTrack);
             }
 
-            // حذف المهارات القديمة
-            /*
             var existingSkills = await _unitOfWork.AssociatedSkillsRepository.GetByTrackIdAsync(trackId);
             if (existingSkills.Any())
             {
-                _unitOfWork.AssociatedSkillRepository.RemoveRange(existingSkills);
-            }/*/
+                _unitOfWork.AssociatedSkillsRepository.RemoveRange(existingSkills);
+            }
 
-            // إضافة المهارات الجديدة
             if (trackDto.AssociatedSkills != null && trackDto.AssociatedSkills.Any())
             {
                 var newAssociatedSkills = trackDto.AssociatedSkills.Select(skill => new AssociatedSkill
@@ -386,12 +384,12 @@ namespace SkillAssessmentPlatform.Application.Services
                 await _unitOfWork.AssociatedSkillsRepository.AddRangeAsync(newAssociatedSkills);
             }
 
-            //_unitOfWork.TrackRepository.Update(existingTrack); لازم التراك يورث من الجنرك
+            await _unitOfWork.TrackRepository.UpdateAsync(existingTrack);
+
             await _unitOfWork.SaveChangesAsync();
 
             return trackDto;
         }
-
 
 
         public async Task<bool> DeActivateTrackAsync(int id)
@@ -580,7 +578,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 ExaminerLoads = e.ExaminerLoads?.Select(load => new ExaminerLoadDTO
                 {
                     ID = load.ID.ToString(),
-                    Type = load.Type.ToString(),
+                    Type = load.Type,
                     CurrWorkLoad = load.CurrWorkLoad,
                     MaxWorkLoad = load.MaxWorkLoad
                 })

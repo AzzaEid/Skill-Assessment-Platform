@@ -154,19 +154,16 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return true;
         }
 
-        public async Task<string?> GetAvailableExaminerAsync(StageType stageType)
+        public async Task<string?> GetAvailableExaminerAsync(int trackId, LoadType type)
         {
-            return await _context.Examiners
-                .Where(e => _context.ExaminerLoads
-                    .Any(l => l.ExaminerID == e.Id &&
-                              l.Type == stageType &&
-                              l.CurrWorkLoad < l.MaxWorkLoad))
-                .OrderBy(e => _context.ExaminerLoads
-                    .Where(l => l.ExaminerID == e.Id && l.Type == stageType)
-                    .Select(l => l.CurrWorkLoad)
-                    .FirstOrDefault())
-                .Select(e => e.Id)
-                .FirstOrDefaultAsync();
+            return await _context.ExaminerLoads
+                    .AsNoTracking()
+                    .Where(l => l.Type == type &&
+                                l.CurrWorkLoad < l.MaxWorkLoad &&
+                                 l.Examiner.WorkingTracks.Any(t => t.Id == trackId))
+                    .OrderBy(l => l.CurrWorkLoad)
+                    .Select(l => l.ExaminerID)
+                    .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Examiner>> GetWorkingExaminersByTrackIdAsync(int trackId)

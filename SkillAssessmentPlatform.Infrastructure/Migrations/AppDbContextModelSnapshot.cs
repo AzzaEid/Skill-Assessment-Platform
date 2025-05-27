@@ -426,6 +426,51 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.ToTable("LevelProgresses");
                 });
 
+            modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Management.CreationAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AssignedBySeniorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExaminerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedBySeniorId");
+
+                    b.HasIndex("ExaminerId");
+
+                    b.HasIndex("StageId");
+
+                    b.ToTable("CreationAssignments");
+                });
+
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Stage", b =>
                 {
                     b.Property<int>("Id")
@@ -896,6 +941,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.HasIndex("TrackId");
 
                     b.ToTable("AssociatedSkill");
+
                 });
 
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Users.ExaminerLoad", b =>
@@ -1223,6 +1269,33 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                     b.Navigation("Level");
                 });
 
+            modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Management.CreationAssignment", b =>
+                {
+                    b.HasOne("SkillAssessmentPlatform.Core.Entities.Users.Examiner", "AssignedBySenior")
+                        .WithMany("CreatedAssignmentsAsSenior")
+                        .HasForeignKey("AssignedBySeniorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillAssessmentPlatform.Core.Entities.Users.Examiner", "Examiner")
+                        .WithMany("AssignedCreations")
+                        .HasForeignKey("ExaminerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SkillAssessmentPlatform.Core.Entities.Stage", "Stage")
+                        .WithMany("AssignedCreations")
+                        .HasForeignKey("StageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedBySenior");
+
+                    b.Navigation("Examiner");
+
+                    b.Navigation("Stage");
+                });
+
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Stage", b =>
                 {
                     b.HasOne("SkillAssessmentPlatform.Core.Entities.Level", "Level")
@@ -1506,6 +1579,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Stage", b =>
                 {
+                    b.Navigation("AssignedCreations");
+
                     b.Navigation("EvaluationCriteria");
 
                     b.Navigation("Exam")
@@ -1582,6 +1657,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Users.Examiner", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("AssignedCreations");
+
+                    b.Navigation("CreatedAssignmentsAsSenior");
 
                     b.Navigation("ExaminerLoads");
 

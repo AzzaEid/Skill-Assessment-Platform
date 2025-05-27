@@ -8,6 +8,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<T> GetByIdAsync(string id);
         Task<T> GetByIdAsync(int id);
         Task<int> GetTotalCountAsync();
+        IQueryable<T> GetAllQueryable();
         Task<IEnumerable<T>> GetAllAsync();
         IQueryable<T> GetPagedQueryable(int page, int pageSize);
         Task<T> UpdateAsync(T entity);
@@ -18,5 +19,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
 
         // AppTask<int> GetTotalCountAsync();
+        void RemoveRange(IEnumerable<T> entities);
+
     }
 }

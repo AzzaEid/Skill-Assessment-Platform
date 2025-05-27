@@ -12,5 +12,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<InterviewBook> UpdateInterviewStatusAsync(int interviewBookId, InterviewStatus status);
         Task<InterviewBook> GenerateMeetingLinkAsync(int interviewBookId);
         Task<InterviewBook> GetByStageProgressIdAsync(int stageProgressId);
+        Task<InterviewBook> GetPendingByApplicantIdAsync(string applicantId);
+        Task<InterviewBook> GetScheduledByApplicantIdAsync(string applicantId);
     }
 }

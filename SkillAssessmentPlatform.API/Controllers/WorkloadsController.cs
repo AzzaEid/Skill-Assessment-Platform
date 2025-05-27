@@ -4,6 +4,7 @@ using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
 using SkillAssessmentPlatform.Core.Exceptions;
+using System.Security.Claims;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
@@ -82,5 +83,77 @@ namespace SkillAssessmentPlatform.API.Controllers
                 .Select(e => e.ErrorMessage)
                 .ToList();
         }
+
+
+        ////////// DASHBOARD ///////////////////////
+        [HttpGet("summary")]
+        public async Task<IActionResult> GetDashboardSummary()
+        {
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var summary = await _workloadService.GetDashboardSummaryAsync(examinerId);
+            return _responseHandler.Success(summary);
+        }
+
+        [HttpGet("task-submissions")]
+        public async Task<IActionResult> GetPendingTaskSubmissions()
+        {
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var submissions = await _workloadService.GetPendingTaskSubmissionsAsync(examinerId);
+            return _responseHandler.Success(submissions);
+        }
+
+        [HttpGet("interview-requests")]
+        public async Task<IActionResult> GetPendingInterviewRequests()
+        {
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var requests = await _workloadService.GetPendingInterviewRequestsAsync(examinerId);
+            return _responseHandler.Success(requests);
+        }
+
+        [HttpGet("scheduled-interviews")]
+        public async Task<IActionResult> GetScheduledInterviews()
+        {
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var interviews = await _workloadService.GetScheduledInterviewsAsync(examinerId);
+            return _responseHandler.Success(interviews);
+        }
+
+        [HttpGet("exam-reviews")]
+        public async Task<IActionResult> GetPendingExamReviews()
+        {
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var reviews = await _workloadService.GetPendingExamReviewsAsync(examinerId);
+            return _responseHandler.Success(reviews);
+        }
+        [HttpGet("task-creations")]
+        public async Task<IActionResult> GetTaskCreationAssignments()
+        {
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var assignments = await _workloadService.GetExaminerTaskAssignmentsAsync(examinerId);
+            return _responseHandler.Success(assignments);
+        }
+
+        [HttpGet("exam-creations")]
+        public async Task<IActionResult> GetExamCreationAssignments()
+        {
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var assignments = await _workloadService.GetExaminerExamAssignmentsAsync(examinerId);
+            return _responseHandler.Success(assignments);
+        }
+
     }
 }

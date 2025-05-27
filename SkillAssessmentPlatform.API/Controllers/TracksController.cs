@@ -59,9 +59,26 @@ public class TracksController : ControllerBase
 
         }
     }
-
+    [HttpGet("{id}/structure")]
+    public async Task<IActionResult> GetStructureById(int id)
+    {
+        var track = await _trackService.GetTrackStructure(id);
+        return _responseHandler.Success(track);
+    }
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetTracksSummary()
+    {
+        var result = await _trackService.GetAllTracksSummaryAsync();
+        return _responseHandler.Success(result);
+    }
+    [HttpGet("{trackId}/examiners-summary")]
+    public async Task<IActionResult> GetWorkingExaminersList(int trackId)
+    {
+        var result = await _trackService.GetTrackWorkingExaminersAsync(trackId);
+        return _responseHandler.Success(result, "Working examiners fetched successfully");
+    }
     [HttpPut("{trackId}")]
-    public async Task<IActionResult> Update([FromBody] CreateTrackDTO dto, int trackId) =>
+    public async Task<IActionResult> Update([FromForm] CreateTrackDTO dto, int trackId) =>
         _responseHandler.Success(await _trackService.UpdateTrackAsync(dto, trackId), "Track updated successfully");
 
 
@@ -71,12 +88,12 @@ public class TracksController : ControllerBase
         await _trackService.DeActivateTrackAsync(id);
         return _responseHandler.Deleted();
     }
-    [HttpPut("{id}")]
-    public async Task<IActionResult> ActivateTrackAsync(int id)
-    {
-        await _trackService.ActivateTrackAsync(id);
-        return _responseHandler.Deleted();
-    }
+    /* [HttpPut("{id}/active")]
+     public async Task<IActionResult> ActivateTrackAsync(int id)
+     {
+         await _trackService.ActivateTrackAsync(id);
+         return _responseHandler.Deleted();
+     }*/
     [HttpGet("active")]
     public async Task<IActionResult> GetOnlyActiveTracks()
     {
