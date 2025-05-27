@@ -65,7 +65,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IAppCertificateRepository appCertificateRepository,
             IFeedbackRepository feedbackRepository,
             IDetailedFeedbackRepository detailFeedbackRepository,
-              IAssociatedSkillsRepository associatedSkillsRepository)
+              IAssociatedSkillsRepository associatedSkillsRepository
+              )
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;

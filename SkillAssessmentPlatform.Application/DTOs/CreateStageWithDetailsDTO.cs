@@ -14,12 +14,13 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public StageType Type { get; set; }
         public int Order { get; set; }
         public int PassingScore { get; set; }
-
-        public ExamDto? Exam { get; set; }
-        public InterviewDto? Interview { get; set; }
-        public TasksPoolDto? TasksPool { get; set; }
+      //  public int NoOfAttempts { get; set; } = 3;
+        public CreateExamDetailsDto? Exam { get; set; }
+        public CreateInterviewDetailsDto? Interview { get; set; }
+        public CreateTasksPoolDetailsDto? TasksPool { get; set; }
 
         public List<EvaluationCriteriaDTO> EvaluationCriteria { get; set; }
     }
+
 
 }

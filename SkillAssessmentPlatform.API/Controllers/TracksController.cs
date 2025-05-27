@@ -19,7 +19,7 @@ public class TracksController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var track = await _trackService.GetTrackByIdAsync(id);
+        var track = await _trackService.GetTrackByIdAsync(id, _trackService.Get_mapper());
         return _responseHandler.Success(track);
     }
 
@@ -37,7 +37,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTrackDTO dto) =>
+    public async Task<IActionResult> Create([FromForm] CreateTrackDTO dto) =>
      _responseHandler.Created(await _trackService.CreateTrackAsync(dto));
 
     [HttpPost("structure")]

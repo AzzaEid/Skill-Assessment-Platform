@@ -35,6 +35,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Where(c => c.StageId == stageId)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<EvaluationCriteria>> GetActiveByStageIdAsync(int stageId)
+        {
+            return await _context.EvaluationCriteria
+                .Where(ec => ec.StageId == stageId && ec.IsActive)
+                .ToListAsync();
+        }
 
         public async Task AddAsync(EvaluationCriteria evaluationCriteria)
         {

@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
-    public class CreateExamDto
+    public class CreateExamDetailsDto
     {
-        public int StageId { get; set; }
         public int DurationMinutes { get; set; }
         public string Difficulty { get; set; }
-        public List<string> QuestionsType { get; set; }
-
-
+        public QuestionType QuestionsType { get; set; }
     }
 }

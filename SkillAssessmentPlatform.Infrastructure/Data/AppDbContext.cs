@@ -37,6 +37,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public DbSet<Exam> Exams { get; set; }
         public DbSet<AppCertificate> Certificates { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<EvaluationCriteria> evaluationCriterias { get; set; }
 
 
         #endregion
