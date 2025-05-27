@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Entities;
-using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 
@@ -66,11 +65,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
 
 
-        public async Task AddAsync(Track track)
-        {
-            await _context.Tracks.AddAsync(track);
-            _context.SaveChanges();
-        }
         public async Task<List<Track>> GetByExaminerIdAsync(string examinerId)
         {
             return await _context.Tracks
@@ -82,6 +76,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.Tracks
                 .Where(t => t.IsActive)
+                .Include(t => t.AssociatedSkills)
                 .ToListAsync();
         }
 
@@ -90,6 +85,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.Tracks
                 .Where(t => !t.IsActive)
+                   .Include(t => t.AssociatedSkills)
                 .ToListAsync();
         }
 
@@ -99,10 +95,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Include(t => t.Levels)
                     .ThenInclude(l => l.Stages)
                     .Include(t => t.AssociatedSkills)
+
                 //.Where(t => t.IsActive)
                 .ToListAsync();
         }
-      
+
 
 
         public async Task<bool> AddLevelToTrackAsync(int trackId, Level level)

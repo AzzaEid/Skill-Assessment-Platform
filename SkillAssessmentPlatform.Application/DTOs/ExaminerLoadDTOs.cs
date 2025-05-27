@@ -5,7 +5,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
     public class ExaminerLoadDTO
     {
         public string ID { get; set; }
-        public string Type { get; set; }
+        public LoadType Type { get; set; }
         public int MaxWorkLoad { get; set; }
         public int CurrWorkLoad { get; set; }
     }
@@ -22,7 +22,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
     }
     public class CreateExaminerLoadDTO
     {
-        public StageType Type { get; set; }
+        public LoadType Type { get; set; }
         public int MaxWorkLoad { get; set; }
     }
 }

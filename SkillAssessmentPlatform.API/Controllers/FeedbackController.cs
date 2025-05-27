@@ -4,7 +4,8 @@ using SkillAssessmentPlatform.Application.Services;
 namespace SkillAssessmentPlatform.API.Controllers
 {
     using SkillAssessmentPlatform.API.Common;
-
+    [ApiController]
+    [Route("api/[controller]")]
     public class FeedbackController : ControllerBase
     {
         private readonly FeedbackService _feedbackService;

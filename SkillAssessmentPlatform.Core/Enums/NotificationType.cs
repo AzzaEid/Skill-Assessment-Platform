@@ -16,6 +16,7 @@
         ExamRequestReject = 11,
         ReviewExam = 12,
         TaskSubmitted = 9,
+        TaskCreationCompleted,
     }
 
 }

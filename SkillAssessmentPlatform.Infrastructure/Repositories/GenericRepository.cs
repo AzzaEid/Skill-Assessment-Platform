@@ -58,6 +58,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
         }
+        public virtual IQueryable<T> GetAllQueryable()
+        {
+            return _dbSet.AsQueryable();
+
+        }
 
         public virtual async Task<T> UpdateAsync(T entity)
         {
@@ -95,6 +100,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             await _dbSet.AddRangeAsync(entities);
         }
+        public virtual void RemoveRange(IEnumerable<T> entities)
+        {
+            _dbSet.RemoveRange(entities);
+        }
+
 
     }
 }

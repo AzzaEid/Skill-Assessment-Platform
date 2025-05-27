@@ -102,7 +102,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                     await trans.RollbackAsync();
                     return false;
                 }
-
+                track.SeniorExaminer = newSenior;
+                track.SeniorExaminerID = newSenior.Id;
+                _context.SaveChanges();
                 await trans.CommitAsync();
                 return true;
             }

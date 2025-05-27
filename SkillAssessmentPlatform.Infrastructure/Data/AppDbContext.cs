@@ -4,7 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
+using SkillAssessmentPlatform.Core.Entities.Management;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
+
 //using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using System.Reflection;
@@ -37,6 +40,10 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public DbSet<Exam> Exams { get; set; }
         public DbSet<AppCertificate> Certificates { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<AssociatedSkill> AssociatedSkills { get; set; }
+        public DbSet<CreationAssignment> CreationAssignments { get; set; }
+
+
 
 
         #endregion

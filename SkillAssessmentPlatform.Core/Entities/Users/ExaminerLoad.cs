@@ -7,7 +7,7 @@ namespace SkillAssessmentPlatform.Core.Entities.Users
         public int ID { get; set; }
 
         public string ExaminerID { get; set; }
-        public StageType Type { get; set; }
+        public LoadType Type { get; set; }
 
         public int MaxWorkLoad { get; set; }
 
