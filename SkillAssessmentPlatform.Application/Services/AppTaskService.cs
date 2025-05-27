@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Interfaces;
 
@@ -55,6 +50,21 @@ namespace SkillAssessmentPlatform.Application.Services
                 Requirements = t.Requirements,
                 Difficulty = t.Difficulty
             });
+        }
+        public async Task<AppTaskDto> GetByIdAsync(int taskId)
+        {
+            var task = await _unitOfWork.AppTaskRepository.GetByIdAsync(taskId);
+            if (task == null)
+                throw new KeyNotFoundException($"AppTask with id {taskId} not found");
+            return new AppTaskDto
+            {
+                Id = task.Id,
+                TaskPoolId = task.TaskPoolId,
+                Title = task.Title,
+                Description = task.Description,
+                Requirements = task.Requirements,
+                Difficulty = task.Difficulty
+            };
         }
 
         public async Task<AppTaskDto> UpdateAsync(UpdateAppTaskDto dto)

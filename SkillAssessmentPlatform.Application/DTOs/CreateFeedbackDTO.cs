@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
@@ -14,7 +10,8 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public int? TaskSubmissionId { get; set; }
         public int? ExamRequestId { get; set; }
         public int? InterviewBookId { get; set; }
-
+        public int StageProgressId { get; set; }
+        public ApplicantResultStatus ResultStatus { get; set; }
         public List<CreateDetailedFeedbackDTO> DetailedFeedbacks { get; set; }
     }
 

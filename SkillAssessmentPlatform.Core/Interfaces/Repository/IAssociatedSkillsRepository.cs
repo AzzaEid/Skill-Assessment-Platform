@@ -4,5 +4,6 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
     public interface IAssociatedSkillsRepository : IGenericRepository<AssociatedSkill>
     {
+        Task<IEnumerable<AssociatedSkill>> GetByTrackIdAsync(int trackId);
     }
 }

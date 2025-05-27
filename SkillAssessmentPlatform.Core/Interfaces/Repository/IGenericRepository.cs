@@ -6,6 +6,7 @@
         Task<T> GetByIdAsync(string id);
         Task<T> GetByIdAsync(int id);
         Task<int> GetTotalCountAsync();
+        IQueryable<T> GetAllQueryable();
         Task<IEnumerable<T>> GetAllAsync();
         IQueryable<T> GetPagedQueryable(int page, int pageSize);
         Task<T> UpdateAsync(T entity);
@@ -14,5 +15,7 @@
         void DeleteEntity(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         // AppTask<int> GetTotalCountAsync();
+        void RemoveRange(IEnumerable<T> entities);
+
     }
 }

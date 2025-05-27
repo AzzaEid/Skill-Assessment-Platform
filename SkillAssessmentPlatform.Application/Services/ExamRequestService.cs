@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs.ExamReques;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
@@ -15,19 +16,22 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly ILogger<ExamRequestService> _logger;
         private readonly EmailService _emailService;
         private readonly NotificationService _notificationService;
+        private readonly StageProgressService _stageProgressService;
 
         public ExamRequestService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<ExamRequestService> logger,
             EmailService emailService,
-            NotificationService notificationService)
+            NotificationService notificationService,
+            StageProgressService stageProgressService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _emailService = emailService;
             _notificationService = notificationService;
+            _stageProgressService = stageProgressService;
         }
 
         public async Task<ExamRequestDTO> CreateExamRequestAsync(ExamRequestCreateDTO requestDTO)
@@ -53,7 +57,9 @@ namespace SkillAssessmentPlatform.Application.Services
                 ExamId = exam.Id,
                 ApplicantId = requestDTO.ApplicantId,
                 Status = ExamRequestStatus.Pending,
-                ScheduledDate = DateTime.Now // will be updated when approved
+                ScheduledDate = DateTime.Now, // will be updated when approved
+                Instructions = "--",
+
             };
 
             await _unitOfWork.ExamRequestRepository.AddAsync(examRequest);
@@ -221,7 +227,14 @@ namespace SkillAssessmentPlatform.Application.Services
                 message);
 
             await SendExamRejectionEmailAsync(examRequest, message);
-
+            var sp = examRequest.Exam.Stage.StageProgresses.OrderByDescending(x => x.StartDate).FirstOrDefault();
+            if (sp == null)
+            {
+                throw new Exception("error in update applicant progress");
+            }
+            // تحديث الستيج بروغريس
+            await _stageProgressService.UpdateStatusAsync(sp.Id,
+                new UpdateStageStatusDTO { Score = 0, Status = ApplicantResultStatus.Failed });
             // Create notification for applicant
             await _notificationService.SendNotificationAsync(
                 examRequest.ApplicantId,

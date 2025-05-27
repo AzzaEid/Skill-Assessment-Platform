@@ -34,6 +34,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Include(er => er.Applicant)
                 .Include(er => er.Exam)
                     .ThenInclude(e => e.Stage)
+                        .ThenInclude(s => s.StageProgresses)
                 .FirstOrDefaultAsync(er => er.Id == requestId);
         }
 
@@ -43,6 +44,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Where(er => er.Exam.StageId == stageId && er.Status == ExamRequestStatus.Pending)
                 .Include(er => er.Applicant)
                 .Include(er => er.Exam)
+                .ThenInclude(e => e.Stage)
                 .OrderByDescending(er => er.ScheduledDate)
                 .ToListAsync();
         }

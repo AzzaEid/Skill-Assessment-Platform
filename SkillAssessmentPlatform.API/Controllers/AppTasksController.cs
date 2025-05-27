@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
-using SkillAssessmentPlatform.API.Common;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
@@ -25,6 +25,12 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Created(result);
         }
 
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetBylId(int Id)
+        {
+            var result = await _service.GetByIdAsync(Id);
+            return _responseHandler.Success(result);
+        }
         [HttpGet("by-pool/{taskPoolId}")]
         public async Task<IActionResult> GetByPoolId(int taskPoolId)
         {
@@ -47,5 +53,5 @@ namespace SkillAssessmentPlatform.API.Controllers
             var deleted = await _service.DeleteAsync(id);
             return deleted ? _responseHandler.Deleted() : _responseHandler.NotFound();
         }
-    } 
+    }
 }

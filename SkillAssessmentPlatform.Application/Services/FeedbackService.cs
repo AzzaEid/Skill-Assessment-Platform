@@ -1,4 +1,5 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Interfaces;
 
@@ -8,10 +9,12 @@ namespace SkillAssessmentPlatform.Application.Services
     public class FeedbackService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public FeedbackService(IUnitOfWork unitOfWork)
+        private readonly StageProgressService _stageProgressService;
+        public FeedbackService(IUnitOfWork unitOfWork
+            , StageProgressService stageProgressService)
         {
             _unitOfWork = unitOfWork;
+            _stageProgressService = stageProgressService;
         }
 
         public async Task<FeedbackDTO> CreateAsync(CreateFeedbackDTO dto)
@@ -50,13 +53,17 @@ namespace SkillAssessmentPlatform.Application.Services
             await _unitOfWork.FeedbackRepository.AddAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
 
+            // update applicant progress
+            await _stageProgressService.UpdateStatusAsync(dto.StageProgressId,
+                                        new UpdateStageStatusDTO { Score = dto.TotalScore, Status = dto.ResultStatus });
+
             return new FeedbackDTO
             {
                 Id = feedback.Id,
                 ExaminerId = feedback.ExaminerId,
                 Comments = feedback.Comments,
                 TotalScore = feedback.TotalScore,
-                FeedbackDate = feedback.FeedbackDate
+                FeedbackDate = DateTime.UtcNow
             };
         }
 

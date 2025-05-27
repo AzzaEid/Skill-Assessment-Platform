@@ -159,6 +159,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.StageProgresses
                 .Where(sp => sp.LevelProgressId == levelProgressId)
                 .Include(sp => sp.Stage)
+                    .ThenInclude(s => s.Level)
                 .OrderByDescending(e => e.StartDate)
                 .FirstOrDefaultAsync();
         }

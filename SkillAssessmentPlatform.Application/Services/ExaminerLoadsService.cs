@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.CreateAssignment;
 using SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
@@ -123,16 +124,16 @@ namespace SkillAssessmentPlatform.Application.Services
                         break;
                 }
             }
-            /*
+
             // Get creation tasks assignments
-            var taskCreationAssignments = await _unitOfWork.ExaminerLoadRepository
-                .GetTaskCreationAssignmentsAsync(examinerId);
+            var taskCreationAssignments = await _unitOfWork.CreationAssignmentRepository
+                .GetPendingTasksByExaminerIdAsync(examinerId);
             summary.PendingTaskCreations = taskCreationAssignments.Count();
 
-            var examCreationAssignments = await _unitOfWork.ExaminerLoadRepository
-                .GetExamCreationAssignmentsAsync(examinerId);
+            var examCreationAssignments = await _unitOfWork.CreationAssignmentRepository
+                .GetPendingExamsByExaminerIdAsync(examinerId);
             summary.PendingExamCreations = examCreationAssignments.Count();
-            */
+
             return summary;
         }
 
@@ -159,6 +160,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     var dto = new ExaminerTaskSubmissionDTO
                     {
                         Id = submission.Id,
+                        StageProgressId = stageProgress.Id,
                         TaskId = task.Id,
                         TaskTitle = task.Title,
                         ApplicantId = applicantId,
@@ -199,6 +201,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     var dto = new ExaminerInterviewRequestDTO
                     {
                         Id = interviewBook.Id,
+                        StageProgressId = stageProgress.Id,
                         InterviewId = interview.Id,
                         ApplicantId = applicantId,
                         RequestDate = stageProgress.StartDate,
@@ -232,11 +235,14 @@ namespace SkillAssessmentPlatform.Application.Services
                 if (interviewBook != null)
                 {
                     var interview = await _unitOfWork.InterviewRepository.GetByIdAsync(interviewBook.InterviewId);
+                    var applicant = await _unitOfWork.ApplicantRepository.GetByIdAsync(applicantId);
 
                     var dto = new ExaminerScheduledInterviewDTO
                     {
                         Id = interviewBook.Id,
+                        StageProgressId = stageProgress.Id,
                         ApplicantId = applicantId,
+                        ApplicantName = applicant.FullName,
                         ScheduledDate = interviewBook.ScheduledDate.Value,
                         MeetingLink = interviewBook.MeetingLink,
                         Status = interviewBook.Status,
@@ -272,6 +278,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     var dto = new ExaminerExamReviewDTO
                     {
                         Id = request.Id,
+                        StageProgressId = stageProgress.Id,
                         ExamId = exam.Id,
                         ApplicantId = applicantId,
                         ScheduledDate = request.ScheduledDate,
@@ -288,6 +295,23 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return result.OrderBy(x => x.ScheduledDate);
         }
+
+        public async Task<IEnumerable<CreationAssignmentDTO>> GetExaminerTaskAssignmentsAsync(string examinerId)
+        {
+            var assignments = await _unitOfWork.CreationAssignmentRepository
+                .GetPendingTasksByExaminerIdAsync(examinerId);
+            return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(assignments);
+
+        }
+        public async Task<IEnumerable<CreationAssignmentDTO>> GetExaminerExamAssignmentsAsync(string examinerId)
+        {
+            var assignments = await _unitOfWork.CreationAssignmentRepository
+                .GetPendingExamsByExaminerIdAsync(examinerId);
+
+            return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(assignments);
+        }
+
+
 
 
     }

@@ -5,6 +5,7 @@ namespace SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard
     public class ExaminerInterviewRequestDTO
     {
         public int Id { get; set; }
+        public int StageProgressId { get; set; }
         public int InterviewId { get; set; }
         public string ApplicantId { get; set; }
         public DateTime RequestDate { get; set; }

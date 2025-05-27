@@ -5,6 +5,7 @@ namespace SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard
     public class ExaminerTaskSubmissionDTO
     {
         public int Id { get; set; }
+        public int StageProgressId { get; set; }
         public int TaskId { get; set; }
         public string TaskTitle { get; set; }
         public string ApplicantId { get; set; }

@@ -1,4 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
+using SkillAssessmentPlatform.Core.Entities.Management;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 
@@ -23,5 +24,6 @@ namespace SkillAssessmentPlatform.Core.Entities
         public Interview Interview { get; set; }
         public Exam Exam { get; set; }
         public TasksPool TasksPool { get; set; }
+        public ICollection<CreationAssignment> AssignedCreations { get; set; }
     }
 }
