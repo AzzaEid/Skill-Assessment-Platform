@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkillAssessmentPlatform.Application.DTOs
+﻿namespace SkillAssessmentPlatform.Application.DTOs
 {
     public class FeedbackDTO
     {
@@ -13,5 +7,6 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public string Comments { get; set; }
         public decimal TotalScore { get; set; }
         public DateTime FeedbackDate { get; set; }
+        public ICollection<DetailedFeedbackDTO> DetailedFeedbacks { get; set; } = new List<DetailedFeedbackDTO>();
     }
 }

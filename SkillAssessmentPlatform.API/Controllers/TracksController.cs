@@ -142,6 +142,12 @@ public class TracksController : ControllerBase
         return _responseHandler.Success(result);
     }
 
+    [HttpGet("{trackId}/exam-stages")]
+    public async Task<IActionResult> GetExamStages(int trackId)
+    {
+        var result = await _trackService.GetExamStagesByTrackId(trackId);
+        return _responseHandler.Success(result);
+    }
 
     [HttpPost("{trackId}/levels")]
     public async Task<IActionResult> AddLevelToTrack(int trackId, [FromBody] CreateLevelDTO dto)

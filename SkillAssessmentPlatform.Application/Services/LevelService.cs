@@ -81,7 +81,7 @@ namespace SkillAssessmentPlatform.Application.Services
             return true;
         }
 
-        public async Task<List<StageDetailDTO>> GetStagesByLevelIdAsync(int levelId)
+        public async Task<List<DTOs.StageDetailDTO>> GetStagesByLevelIdAsync(int levelId)
         {
             var level = await _unitOfWork.LevelRepository.GetLevelWithStagesAsync(levelId);
             if (level == null || level.Stages == null)
@@ -105,7 +105,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
             var level = await _unitOfWork.LevelRepository.GetByIdAsync(levelId);
 
-            var stage = new Stage
+            var stage = new Core.Entities.Stage
             {
                 LevelId = levelId,
                 Name = dto.Name,
@@ -249,7 +249,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     }
 
                     
-                    var stage = new Stage
+                    var stage = new Core.Entities.Stage
                     {
                         LevelId = levelId,
                         Name = dto.Name,
@@ -388,7 +388,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     break;
             }
 
-            var stage = new Stage
+            var stage = new Core.Entities.Stage
             {
                 LevelId = levelId,
                 Name = dto.Name,

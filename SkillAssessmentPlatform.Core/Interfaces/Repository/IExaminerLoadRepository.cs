@@ -9,7 +9,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<ExaminerLoad> UpdateWorkLoadAsync(int id, int workLoad);
         Task<bool> CanTakeMoreLoadAsync(string examinerId, LoadType type);
         Task<ExaminerLoad> IncrementWorkloadAsync(string examinerId, LoadType type);
-        Task<ExaminerLoad> DecrementWorkloadAsync(string examinerId, LoadType type);
+        Task<ExaminerLoad>? DecrementWorkloadAsync(string examinerId, LoadType type);
 
     }
 }

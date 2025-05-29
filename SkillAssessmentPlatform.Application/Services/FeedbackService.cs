@@ -1,6 +1,7 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.StageProgress;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 
 
@@ -10,11 +11,14 @@ namespace SkillAssessmentPlatform.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly StageProgressService _stageProgressService;
+        private readonly DetailedFeedbackService _detailedFeedbackService;
         public FeedbackService(IUnitOfWork unitOfWork
-            , StageProgressService stageProgressService)
+            , StageProgressService stageProgressService,
+            DetailedFeedbackService detailedFeedbackService)
         {
             _unitOfWork = unitOfWork;
             _stageProgressService = stageProgressService;
+            _detailedFeedbackService = detailedFeedbackService;
         }
 
         public async Task<FeedbackDTO> CreateAsync(CreateFeedbackDTO dto)
@@ -38,6 +42,11 @@ namespace SkillAssessmentPlatform.Application.Services
             {
                 var submission = await _unitOfWork.TaskSubmissionRepository.GetByIdAsync(dto.TaskSubmissionId.Value);
                 submission.Feedback = feedback;
+                // if Status is ResubmissionAllowed change TaskSubmission status
+                if (dto.ResultStatus == ApplicantResultStatus.ResubmissionAllowed)
+                {
+                    submission.Status = TaskSubmissionStatus.Rejected;
+                }
             }
             else if (dto.ExamRequestId.HasValue)
             {
@@ -79,7 +88,8 @@ namespace SkillAssessmentPlatform.Application.Services
                 ExaminerId = feedback.ExaminerId,
                 Comments = feedback.Comments,
                 TotalScore = feedback.TotalScore,
-                FeedbackDate = feedback.FeedbackDate
+                FeedbackDate = feedback.FeedbackDate,
+                DetailedFeedbacks = (await _detailedFeedbackService.GetByFeedbackIdAsync(feedback.Id)).ToList()
             };
         }
 

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
     public class TrackRepository : GenericRepository<Track>, ITrackRepository
@@ -88,6 +88,15 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                    .Include(t => t.AssociatedSkills)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Stage>> GetStagesByTrackAndTypeAsync(int trackId, StageType type)
+        {
+            return await _context.Tracks
+                .Where(t => t.Id == trackId)
+                .SelectMany(t => t.Levels)
+                .SelectMany(l => l.Stages)
+                .Where(s => s.Type == type)
+                .ToListAsync();
+        }
 
         public async Task<IEnumerable<Track>> GetAllWithDetailsAsync()
         {
@@ -113,7 +122,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
-
 
     }
 }

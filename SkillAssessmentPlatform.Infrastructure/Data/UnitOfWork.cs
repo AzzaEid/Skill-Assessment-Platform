@@ -38,7 +38,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         private readonly IDetailedFeedbackRepository _detailFeedbackRepository;
         private readonly IAssociatedSkillsRepository _associatedSkillsRepository;
         private readonly ICreationAssignmentRepository _creationAssignmentRepository;
-
+        private readonly INotificationRepository _notificationRepository;
         public UnitOfWork(
             AppDbContext context,
             IAuthRepository authRepository,
@@ -67,7 +67,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             IFeedbackRepository feedbackRepository,
             IDetailedFeedbackRepository detailFeedbackRepository,
             ICreationAssignmentRepository creationAssignmentRepository,
-            IAssociatedSkillsRepository associatedSkillsRepository)
+            IAssociatedSkillsRepository associatedSkillsRepository,
+            INotificationRepository notificationRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _authRepository = authRepository;
@@ -97,6 +98,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
             _detailFeedbackRepository = detailFeedbackRepository;
             _associatedSkillsRepository = associatedSkillsRepository;
             _creationAssignmentRepository = creationAssignmentRepository;
+            _notificationRepository = notificationRepository;
         }
 
         // Custom Repositories exposed
@@ -127,6 +129,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         public IDetailedFeedbackRepository DetailedFeedbackRepository => _detailFeedbackRepository;
         public IAssociatedSkillsRepository AssociatedSkillsRepository => _associatedSkillsRepository;
         public ICreationAssignmentRepository CreationAssignmentRepository => _creationAssignmentRepository;
+
+        public INotificationRepository NotificationRepository => _notificationRepository;
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

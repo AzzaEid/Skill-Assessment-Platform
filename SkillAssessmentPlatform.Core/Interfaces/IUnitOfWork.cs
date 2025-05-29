@@ -40,6 +40,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces
         IAppCertificateRepository AppCertificateRepository { get; }
         IFeedbackRepository FeedbackRepository { get; }
         IDetailedFeedbackRepository DetailedFeedbackRepository { get; }
+        INotificationRepository NotificationRepository { get; }
 
         //  IExamRepository ExamRepository { get; }
 
