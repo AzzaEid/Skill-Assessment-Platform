@@ -7,6 +7,7 @@ using SkillAssessmentPlatform.Application.DTOs.ExamReques;
 using SkillAssessmentPlatform.Application.DTOs.InterviewBook;
 using SkillAssessmentPlatform.Application.DTOs.StageProgress;
 using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Management;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
@@ -62,7 +63,7 @@ namespace SkillAssessmentPlatform.Application.Mapping
             CreateMap<Track, TrackDto>().ReverseMap();
             CreateMap<Track, TrackBaseDTO>().ReverseMap();
             CreateMap<Level, LevelDetailDto>().ReverseMap();
-            CreateMap<Stage, StageDetailDTO>().ReverseMap();
+            CreateMap<StageDetailDTO, StageDetailDTO>().ReverseMap();
             CreateMap<EvaluationCriteriaDTO, EvaluationCriteria>().ReverseMap();
 
             CreateMap<Exam, ExamDto>().ReverseMap();
@@ -95,11 +96,13 @@ namespace SkillAssessmentPlatform.Application.Mapping
                 .ForMember(dest => dest.ExaminerName, opt => opt.MapFrom(src => src.Examiner.FullName))
                 .ForMember(dest => dest.StageName, opt => opt.MapFrom(src => src.Stage.Name))
                 .ForMember(dest => dest.TrackName, opt => opt.MapFrom(src => src.Stage.Level.Track.Name))
+                .ForMember(dest => dest.TasksPool, opt => opt.MapFrom(src => src.Stage.TasksPool))
+                .ForMember(dest => dest.Exam, opt => opt.MapFrom(src => src.Stage.Exam))
                 ;
 
 
-
-
+            CreateMap<StageDetailDTO, Stage>().ReverseMap();
+            CreateMap<NotificationDTO, Notification>().ReverseMap();
         }
     }
 }

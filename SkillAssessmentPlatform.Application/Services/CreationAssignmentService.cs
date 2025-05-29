@@ -22,6 +22,18 @@ namespace SkillAssessmentPlatform.Application.Services
             _mapper = mapper;
             _notificationService = notificationService;
         }
+        public async Task<IEnumerable<CreationAssignmentDTO>> GetAll()
+        {
+            var results = await _unitOfWork.CreationAssignmentRepository.GetOverdueAssignmentsAsync();
+            return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(results);
+        }
+        public async Task<IEnumerable<CreationAssignmentDTO>> GetBySeniorId(string seniorId)
+        {
+            var assignments = await _unitOfWork.CreationAssignmentRepository
+                 .GetPendingBySeniorAsync(seniorId);
+
+            return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(assignments);
+        }
 
         // إنشاء تكليف جديد (يستخدمه Senior Examiner)
         public async Task<CreationAssignmentDTO> CreateAssignmentAsync(CreateAssignmentDTO createDto)
@@ -45,12 +57,12 @@ namespace SkillAssessmentPlatform.Application.Services
             if (createDto.Type == CreationType.Exam)
             {
                 var relatedExam = await _unitOfWork.ExamRepository.GetByStageIdAsync(createDto.StageId);
-                dto.ExamInfo = _mapper.Map<ExamDto>(relatedExam);
+                dto.Exam = _mapper.Map<ExamDto>(relatedExam);
             }
             else
             {
                 var relatedTask = await _unitOfWork.TasksPoolRepository.GetByStageIdAsync(createDto.StageId);
-                dto.TasksPoolInfo = _mapper.Map<TasksPoolDto>(relatedTask);
+                dto.TasksPool = _mapper.Map<TasksPoolDto>(relatedTask);
             }
             return dto;
         }
@@ -92,17 +104,17 @@ namespace SkillAssessmentPlatform.Application.Services
                 $"Examiner {assignment.Examiner.FullName} create task for staeg {assignment.Stage.Name}");
 
         }
-        public async Task UpdateExamCreationAssignmentStatusAsync(int assignmentId, AssignmentStatus newStatus)
+        public async Task UpdateExamCreationAssignmentStatusAsync(int assignmentId)
         {
 
-            var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, newStatus);
+            var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, AssignmentStatus.Completed);
 
             await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
         }
-        public async Task CancelCreationAssignmentStatusAsync(int assignmentId, AssignmentStatus newStatus)
+        public async Task CancelCreationAssignmentStatusAsync(int assignmentId)
         {
 
-            var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, newStatus);
+            var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, AssignmentStatus.Cancelled);
 
             await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
         }

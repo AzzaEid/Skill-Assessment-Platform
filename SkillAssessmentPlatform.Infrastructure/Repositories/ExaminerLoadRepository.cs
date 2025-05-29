@@ -61,13 +61,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return examinerLoad;
         }
 
-        public async Task<ExaminerLoad> DecrementWorkloadAsync(string examinerId, LoadType type)
+        public async Task<ExaminerLoad>? DecrementWorkloadAsync(string examinerId, LoadType type)
         {
             var examinerLoad = await _context.ExaminerLoads
                 .FirstOrDefaultAsync(el => el.ExaminerID == examinerId && el.Type == type);
 
-            if (examinerLoad == null)
-                throw new KeyNotFoundException($"Examiner load for examiner {examinerId} and type {type} not found");
+            if (examinerLoad == null) return null;
+            //throw new KeyNotFoundException($"Examiner load for examiner {examinerId} and type {type} not found");
 
             if (examinerLoad.CurrWorkLoad > 0)
                 examinerLoad.CurrWorkLoad -= 1;

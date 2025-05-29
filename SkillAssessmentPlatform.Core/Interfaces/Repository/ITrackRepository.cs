@@ -1,4 +1,5 @@
 ﻿using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
@@ -17,11 +18,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<List<Track>> GetByExaminerIdAsync(string examinerId);
         Task<IEnumerable<Track>> GetAllWithDetailsAsync();
         Task<bool> AddLevelToTrackAsync(int trackId, Level level);
-
-
-
-
-
+        Task<IEnumerable<Stage>> GetStagesByTrackAndTypeAsync(int trackId, StageType type);
 
     }
 }

@@ -47,6 +47,8 @@ namespace SkillAssessmentPlatform.Application
             services.AddTransient<DetailedFeedbackService>();
             services.AddTransient<ExamRequestService>();
             services.AddTransient<EvaluationCriteriaService>();
+            services.AddTransient<CreationAssignmentService>();
+
 
             return services;
 

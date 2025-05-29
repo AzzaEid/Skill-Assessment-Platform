@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs;
@@ -65,6 +66,7 @@ public class TracksController : ControllerBase
         var track = await _trackService.GetTrackStructure(id);
         return _responseHandler.Success(track);
     }
+    [Authorize]
     [HttpGet("summary")]
     public async Task<IActionResult> GetTracksSummary()
     {
@@ -142,6 +144,12 @@ public class TracksController : ControllerBase
         return _responseHandler.Success(result);
     }
 
+    [HttpGet("{trackId}/exam-stages")]
+    public async Task<IActionResult> GetExamStages(int trackId)
+    {
+        var result = await _trackService.GetExamStagesByTrackId(trackId);
+        return _responseHandler.Success(result);
+    }
 
     [HttpPost("{trackId}/levels")]
     public async Task<IActionResult> AddLevelToTrack(int trackId, [FromBody] CreateLevelDTO dto)

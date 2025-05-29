@@ -18,9 +18,8 @@ namespace SkillAssessmentPlatform.Application.DTOs.CreateAssignment
         public string AssignedBySeniorName { get; set; }
         public string? Notes { get; set; }
 
-
-        public TasksPoolDto TasksPoolInfo { get; set; }
-        public ExamDto ExamInfo { get; set; }
+        public TasksPoolDto TasksPool { get; set; }
+        public ExamDto Exam { get; set; }
 
     }
 }

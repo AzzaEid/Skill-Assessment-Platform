@@ -16,6 +16,12 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // إضافة appsettings.Local.json للـ configuration
+        var localSettingsFile = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Local.json");
+        if (File.Exists(localSettingsFile))
+        {
+            builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+        }
 
         // Database
         builder.Services.AddDbContext<AppDbContext>(options =>

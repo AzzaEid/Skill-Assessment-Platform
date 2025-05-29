@@ -13,6 +13,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 
         Task<IEnumerable<CreationAssignment>> GetOverdueAssignmentsAsync();
         Task<CreationAssignment> UpdateStatusAsync(int assignmentId, AssignmentStatus status);
+        Task<IEnumerable<CreationAssignment>> GetPendingBySeniorAsync(string seniorId);
 
     }
 }

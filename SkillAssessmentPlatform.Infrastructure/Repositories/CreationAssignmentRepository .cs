@@ -46,40 +46,104 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
         public async Task<IEnumerable<CreationAssignment>> GetPendingTasksByExaminerIdAsync(string examinerId)
         {
-            return await _context.CreationAssignments
-                .Where(ca => ca.ExaminerId == examinerId &&
-                            ca.Status == AssignmentStatus.Assigned &&
-                            ca.Type == CreationType.Task)
+            var assignments = await _context.CreationAssignments
+                .Where(ca => ca.ExaminerId == examinerId && ca.Type == CreationType.Task &&
+                  (ca.DueDate < DateTime.UtcNow || ca.Status == AssignmentStatus.Overdue || ca.Status == AssignmentStatus.Assigned))
+                .Include(ca => ca.Examiner)
                 .Include(ca => ca.Stage)
-                    .ThenInclude(s => s.Level)
-                    .ThenInclude(l => l.Track)
-                .OrderBy(ca => ca.DueDate)
-            .ToListAsync();
+                    .ThenInclude(s => s.TasksPool)
+                .Include(ca => ca.Stage)
+                    .ThenInclude(s => s.Exam)
+                .OrderByDescending(ca => ca.AssignedDate)
+                .ToListAsync();
+
+            foreach (var assignment in assignments)
+            {
+                if (assignment.DueDate < DateTime.UtcNow)
+                {
+                    assignment.Status = AssignmentStatus.Overdue;
+                }
+            }
+            return assignments;
         }
         public async Task<IEnumerable<CreationAssignment>> GetPendingExamsByExaminerIdAsync(string examinerId)
         {
-            return await _context.CreationAssignments
-                .Where(ca => ca.ExaminerId == examinerId &&
-                            ca.Status == AssignmentStatus.Assigned &&
-                             ca.Type == CreationType.Exam)
+            var assignments = await _context.CreationAssignments
+                .Where(ca => ca.ExaminerId == examinerId && ca.Type == CreationType.Exam &&
+                            (ca.DueDate < DateTime.UtcNow || ca.Status == AssignmentStatus.Overdue || ca.Status == AssignmentStatus.Assigned))
                 .Include(ca => ca.Stage)
                     .ThenInclude(s => s.Level)
                     .ThenInclude(l => l.Track)
                 .OrderBy(ca => ca.DueDate)
             .ToListAsync();
+            foreach (var assignment in assignments)
+            {
+                if (assignment.DueDate < DateTime.UtcNow)
+                {
+                    assignment.Status = AssignmentStatus.Overdue;
+                }
+            }
+            return assignments;
         }
+        public async Task<IEnumerable<CreationAssignment>> GetPendingBySeniorAsync(string seniorId)
+        {
+            var now = DateTime.Now;
+            var assignments = await _context.CreationAssignments
+                .Where(ca => ca.AssignedBySeniorId == seniorId &&
+                (ca.DueDate < now || ca.Status == AssignmentStatus.Overdue || ca.Status == AssignmentStatus.Assigned))
+                .Include(ca => ca.Examiner)
+                .Include(ca => ca.Stage)
+                    .ThenInclude(s => s.TasksPool)
+                .Include(ca => ca.Stage)
+                    .ThenInclude(s => s.Exam)
+                .OrderByDescending(ca => ca.AssignedDate)
+                .ToListAsync();
 
+            foreach (var assignment in assignments)
+            {
+                if (assignment.DueDate < now)
+                {
+                    assignment.Status = AssignmentStatus.Overdue;
+                }
+            }
+
+            return assignments;
+        }
         public async Task<IEnumerable<CreationAssignment>> GetOverdueAssignmentsAsync()
         {
             var now = DateTime.Now;
-            return await _context.CreationAssignments
-                .Where(ca => ca.DueDate < now &&
-                            (ca.Status == AssignmentStatus.Assigned))
+            var assignments = await _context.CreationAssignments
+                .Where(ca => ca.DueDate < now || ca.Status == AssignmentStatus.Overdue || ca.Status == AssignmentStatus.Assigned)
                 .Include(ca => ca.Examiner)
                 .Include(ca => ca.Stage)
+                    .ThenInclude(s => s.TasksPool)
+                .Include(ca => ca.Stage)
+                    .ThenInclude(s => s.Exam)
+                .OrderByDescending(ca => ca.AssignedDate)
+                .ToListAsync();
+
+            foreach (var assignment in assignments)
+            {
+                if (assignment.DueDate < now)
+                {
+                    assignment.Status = AssignmentStatus.Overdue;
+                }
+            }
+
+            return assignments;
+        }
+        public override async Task<IEnumerable<CreationAssignment>> GetAllAsync()
+        {
+            return await _context.CreationAssignments
+                .Where(ca => ca.Status == AssignmentStatus.Assigned ||
+                 ca.Status == AssignmentStatus.Overdue)
+                .Include(ca => ca.Stage)
+                    .ThenInclude(s => s.Level)
+                    .ThenInclude(l => l.Track)
+                .Include(ca => ca.AssignedBySenior)
+                .OrderByDescending(ca => ca.AssignedDate)
             .ToListAsync();
         }
-
 
         public async Task<CreationAssignment> UpdateStatusAsync(int assignmentId, AssignmentStatus status)
         {

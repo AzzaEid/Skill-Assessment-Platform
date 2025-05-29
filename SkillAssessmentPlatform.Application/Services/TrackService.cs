@@ -7,7 +7,6 @@ using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
 
 //using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
-using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
@@ -162,7 +161,7 @@ namespace SkillAssessmentPlatform.Application.Services
             };
 
             await _unitOfWork.TrackRepository.AddAsync(track);
-            await _unitOfWork.SaveChangesAsync(); 
+            await _unitOfWork.SaveChangesAsync();
 
             if (!string.IsNullOrEmpty(trackDto.SeniorExaminerID))
             {
@@ -223,7 +222,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
                         foreach (var stageDTO in levelDTO.Stages)
                         {
-                            var stage = new Stage
+                            var stage = new Core.Entities.Stage
                             {
                                 LevelId = level.Id,
                                 Name = stageDTO.Name,
@@ -616,7 +615,7 @@ namespace SkillAssessmentPlatform.Application.Services
             return await _unitOfWork.TrackRepository.AddLevelToTrackAsync(trackId, level);
         }
 
-        public async Task<IEnumerable<StageDetailDTO>> GetTaskStagesByTrackIdAsync(int trackId)
+        public async Task<IEnumerable<DTOs.StageDetailDTO>> GetTaskStagesByTrackIdAsync(int trackId)
         {
             var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(trackId);
             if (track == null) throw new KeyNotFoundException("Track not found");
@@ -637,6 +636,19 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return taskStages;
         }
-
+        /*
+        public async Task<IEnumerable<StageDetailDTO>> GetTaskStagesByTrackId(int trackId)
+        {
+            var stages = await _unitOfWork.TrackRepository.GetStagesByTrackAndTypeAsync(trackId, StageType.Task);
+            //var dtos = 
+            return _mapper.Map<List<StageDetailDTO>>(stages);
+        }
+        */
+        public async Task<IEnumerable<StageDetailDTO>> GetExamStagesByTrackId(int trackId)
+        {
+            var stages = await _unitOfWork.TrackRepository.GetStagesByTrackAndTypeAsync(trackId, StageType.Exam);
+            //var dtos = 
+            return _mapper.Map<List<StageDetailDTO>>(stages);
+        }
     }
 }
