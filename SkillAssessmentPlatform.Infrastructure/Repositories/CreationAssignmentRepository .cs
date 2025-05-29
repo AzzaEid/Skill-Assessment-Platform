@@ -47,7 +47,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<IEnumerable<CreationAssignment>> GetPendingTasksByExaminerIdAsync(string examinerId)
         {
             var assignments = await _context.CreationAssignments
-                .Where(ca => ca.ExaminerId == examinerId && ca.Type == CreationType.Exam &&
+                .Where(ca => ca.ExaminerId == examinerId && ca.Type == CreationType.Task &&
                   (ca.DueDate < DateTime.UtcNow || ca.Status == AssignmentStatus.Overdue || ca.Status == AssignmentStatus.Assigned))
                 .Include(ca => ca.Examiner)
                 .Include(ca => ca.Stage)

@@ -98,6 +98,16 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
+# Ignore image files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.webp
+
 # Chutzpah Test files
 _Chutzpah*
 
@@ -361,3 +371,14 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Development settings
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+!appsettings.json

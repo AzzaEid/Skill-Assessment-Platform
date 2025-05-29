@@ -21,12 +21,12 @@ namespace SkillAssessmentPlatform.API.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
                 return _responseHandler.Unauthorized();
-            var result = _notificationService.GetByUserId(userId);
+            var result = await _notificationService.GetByUserId(userId);
             return _responseHandler.Success(result);
         }
     }
