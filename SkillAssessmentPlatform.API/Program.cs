@@ -9,6 +9,11 @@ using SkillAssessmentPlatform.Infrastructure;
 using SkillAssessmentPlatform.Infrastructure.Data;
 using SkillAssessmentPlatform.Infrastructure.Seeder;
 using System.Text.Json.Serialization;
+using DinkToPdf;
+using DinkToPdf.Contracts;
+using System.Runtime.InteropServices;
+using SkillAssessmentPlatform.Application.Services;
+
 
 public class Program
 {
@@ -44,6 +49,15 @@ public class Program
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        // تحميل المكتبة الأصلية wkhtmltox.dll
+        var context = new CustomAssemblyLoadContext();
+        context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "DinkToPdf", "libwkhtmltox.dll"));
+
+        // تسجيل خدمة DinkToPdf
+        builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+      
+
 
         // CORS
         builder.Services.AddCors(options =>
