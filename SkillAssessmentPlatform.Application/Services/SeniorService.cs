@@ -21,6 +21,12 @@ namespace SkillAssessmentPlatform.Application.Services
             var seniors = await _unitOfWork.SeniorRepository.GetSeniorListAsync();
             return _mapper.Map<List<ExaminerDTO>>(seniors);
         }
+        public async Task<List<TrackBaseDTO>> GetTracksBySeniorIdAsync(string seniorId)
+        {
+            var tracks = await _unitOfWork.TrackRepository.GetBySeniorIdAsync(seniorId);
+            return _mapper.Map<List<TrackBaseDTO>>(tracks);
+        }
+
 
         public async Task<ExaminerDTO?> GetSeniorByTrackIdAsync(int trackId)
         {
@@ -52,6 +58,7 @@ namespace SkillAssessmentPlatform.Application.Services
             if (track == null) return false;
             return await _unitOfWork.SeniorRepository.RemoveSeniorFromTrackAsync(track);
         }
+
     }
 
 }

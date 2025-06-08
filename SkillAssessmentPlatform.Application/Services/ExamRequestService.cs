@@ -160,7 +160,7 @@ namespace SkillAssessmentPlatform.Application.Services
          */
         public async Task<ExamRequestDTO> ApproveExamRequestAsync(int requestId, ExamRequestUpdateDTO updateDTO)
         {
-            if (!updateDTO.ScheduledDate.HasValue || updateDTO.ScheduledDate < DateTime.Now)
+            if (!updateDTO.ScheduledDate.HasValue || updateDTO.ScheduledDate < DateTime.UtcNow)
                 throw new BadRequestException("Scheduled date is required and must be in the future");
 
             if (string.IsNullOrWhiteSpace(updateDTO.Instructions))

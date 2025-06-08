@@ -859,6 +859,9 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Requirements")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -940,8 +943,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Migrations
 
                     b.HasIndex("TrackId");
 
-                    b.ToTable("AssociatedSkill");
-
+                    b.ToTable("AssociatedSkills");
                 });
 
             modelBuilder.Entity("SkillAssessmentPlatform.Core.Entities.Users.ExaminerLoad", b =>

@@ -108,6 +108,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 //.Where(t => t.IsActive)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Track>> GetBySeniorIdAsync(string seniorId)
+        {
+            return await _context.Tracks
+                .Where(t => t.SeniorExaminerID == seniorId && t.IsActive)
+                .ToListAsync();
+        }
 
 
 

@@ -1,15 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SkillAssessmentPlatform.Application.DTOs;
-using SkillAssessmentPlatform.Core.Entities;
+﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -99,8 +92,8 @@ namespace SkillAssessmentPlatform.Application.Services
             }).ToList();
         }
 
-        [HttpPost("{levelId}/stages")]
-        public async Task<CreateStageDTO> CreateStage(int levelId, [FromBody] CreateStageDTO dto)
+        // [HttpPost("{levelId}/stages")]
+        public async Task<CreateStageDTO> CreateStage(int levelId, CreateStageDTO dto)
         {
 
             var level = await _unitOfWork.LevelRepository.GetByIdAsync(levelId);
@@ -248,7 +241,7 @@ namespace SkillAssessmentPlatform.Application.Services
                             break;
                     }
 
-                    
+
                     var stage = new Core.Entities.Stage
                     {
                         LevelId = levelId,
@@ -327,9 +320,10 @@ namespace SkillAssessmentPlatform.Application.Services
                     var pool = new TasksPool
                     {
                         StageId = stageId,
-                     //   Title = dto.TasksPool.Title,
-                      //  Instructions = dto.TasksPool.Instructions,
-                     //   Difficulty = dto.TasksPool.Difficulty,
+                        //   Title = dto.TasksPool.Title,
+                        //  Instructions = dto.TasksPool.Instructions,
+                        //   Difficulty = dto.TasksPool.Difficulty,
+                        Description = dto.TasksPool.Description,
                         Requirements = dto.TasksPool.Requirements,
                         DaysToSubmit = dto.TasksPool.DaysToSubmit
                     };
