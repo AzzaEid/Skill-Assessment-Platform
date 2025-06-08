@@ -100,5 +100,16 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
             return levelProgress;
         }
+
+        public async Task<LevelProgress> GetByIdWithLevelAndTrack(int levelProgressId)
+        {
+            return await _context.LevelProgresses
+                .Include(lp => lp.Level)
+                    .ThenInclude(l => l.Track)
+                .FirstOrDefaultAsync(lp => lp.Id == levelProgressId);
+        }
+
+
+
     }
 }

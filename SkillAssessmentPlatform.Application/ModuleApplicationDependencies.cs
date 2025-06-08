@@ -48,6 +48,8 @@ namespace SkillAssessmentPlatform.Application
             services.AddTransient<ExamRequestService>();
             services.AddTransient<EvaluationCriteriaService>();
             services.AddTransient<CreationAssignmentService>();
+            services.AddTransient<PdfGeneratorService>();
+
 
 
             return services;
