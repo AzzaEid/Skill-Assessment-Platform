@@ -2,6 +2,7 @@
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
+using System.Security.Claims;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
@@ -21,7 +22,10 @@ namespace SkillAssessmentPlatform.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateAppTaskDto dto)
         {
-            var result = await _service.CreateAsync(dto);
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var result = await _service.CreateAsync(examinerId, dto);
             return _responseHandler.Created(result);
         }
 

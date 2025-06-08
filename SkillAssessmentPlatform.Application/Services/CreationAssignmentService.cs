@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.CreateAssignment;
 using SkillAssessmentPlatform.Core.Entities.Management;
@@ -76,23 +75,15 @@ namespace SkillAssessmentPlatform.Application.Services
             return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(assignments);
         }
 
-        public async Task UpdateTaskCreationProgressAsync(int taskId)
+        public async Task UpdateTaskCreationProgressAsync(int taskPoolId, string examinerId)
         {
-            var task = await _unitOfWork.AppTaskRepository.GetByIdAsync(taskId);
-            var tasksPool = await _unitOfWork.TasksPoolRepository.GetByIdAsync(task.TaskPoolId);
-
-            var assignment = _unitOfWork.CreationAssignmentRepository
-                .GetAllQueryable()
-                .Where(ca => ca.StageId == tasksPool.StageId &&
-                            ca.Type == CreationType.Task &&
-                            ca.Status != AssignmentStatus.Completed)
-                .Include(a => a.Examiner)
-                .Include(a => a.Stage)
-                .FirstOrDefault();
+            var tasksPool = await _unitOfWork.TasksPoolRepository.GetByIdAsync(taskPoolId);
+            if (tasksPool == null) throw new Exception("no related taskPool Id");
+            var assignment = await _unitOfWork.CreationAssignmentRepository.GetByExaminerAndStageAsync(examinerId, tasksPool.StageId);
 
             if (assignment == null)
                 throw new Exception("This Task id not related to any assignments!");
-            //نغير حالة الاسسمنت - نزيد الكرنت وورك لود
+            //نغير حالة الاسسمنت - نقلل الكرنت وورك لود
             await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignment.Id, AssignmentStatus.Completed);
 
             await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(assignment.ExaminerId, LoadType.TaskCreation);

@@ -157,6 +157,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return assignment;
         }
+        public async Task<CreationAssignment>? GetByExaminerAndStageAsync(string examinerId, int stageId)
+        {
+            return await _context.CreationAssignments
+               .Where(ca => ca.StageId == stageId &&
+                           ca.ExaminerId == examinerId &&
+                           ca.Type == CreationType.Task &&
+                           ca.Status != AssignmentStatus.Completed)
+               .Include(a => a.Examiner)
+               .Include(a => a.Stage)
+               .FirstOrDefaultAsync();
+
+        }
 
     }
 

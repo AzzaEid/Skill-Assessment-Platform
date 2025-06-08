@@ -7,14 +7,18 @@ namespace SkillAssessmentPlatform.Application.Services
     public class AppTaskService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly CreationAssignmentService _creationAssignmentService;
 
-        public AppTaskService(IUnitOfWork unitOfWork)
+        public AppTaskService(IUnitOfWork unitOfWork, CreationAssignmentService creationAssignmentService)
         {
             _unitOfWork = unitOfWork;
+            _creationAssignmentService = creationAssignmentService;
         }
 
-        public async Task<AppTaskDto> CreateAsync(CreateAppTaskDto dto)
+        public async Task<AppTaskDto> CreateAsync(string examinerId, CreateAppTaskDto dto)
         {
+            var tasksPool = await _unitOfWork.TasksPoolRepository.GetByIdAsync(dto.TaskPoolId);
+            if (tasksPool == null) throw new Exception("no related taskPool Id");
             var task = new AppTask
             {
                 TaskPoolId = dto.TaskPoolId,
@@ -26,6 +30,8 @@ namespace SkillAssessmentPlatform.Application.Services
 
             await _unitOfWork.AppTaskRepository.AddAsync(task);
             await _unitOfWork.SaveChangesAsync();
+
+            await _creationAssignmentService.UpdateTaskCreationProgressAsync(dto.TaskPoolId, examinerId);
 
             return new AppTaskDto
             {

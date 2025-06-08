@@ -54,10 +54,10 @@ namespace SkillAssessmentPlatform.Application.Services
             if (examiner == null)
                 throw new KeyNotFoundException($"Appointment with id {bulkDTO.ExaminerId} not found");
             // Validations
-            if (bulkDTO.EndDate < bulkDTO.StartDate)
+            if (bulkDTO.EndDate > bulkDTO.StartDate)
                 throw new BadRequestException("End date must be after start date");
 
-            if (bulkDTO.StartDate < DateTime.Now.Date)
+            if (bulkDTO.StartDate < DateTime.UtcNow.Date)
                 throw new BadRequestException("Start date cannot be in the past");
 
             if (bulkDTO.SlotDurationMinutes <= 0)
@@ -85,9 +85,11 @@ namespace SkillAssessmentPlatform.Application.Services
             if (examiner == null)
                 throw new KeyNotFoundException($"Appointment with id {appointmentDTO.ExaminerId} not found");
 
-            // Validate appointment
-            if (appointmentDTO.EndTime <= appointmentDTO.StartTime || appointmentDTO.StartTime < DateTime.Now)
-                return null; // Validate End time and start time
+            if (appointmentDTO.EndTime <= appointmentDTO.StartTime)
+                throw new BadRequestException("End time must be after start time");
+
+            if (appointmentDTO.StartTime <= DateTime.UtcNow)
+                throw new BadRequestException("Start time must be in the future");
 
 
             var appointment = _mapper.Map<Appointment>(appointmentDTO);
@@ -150,7 +152,7 @@ namespace SkillAssessmentPlatform.Application.Services
             if (appointment.IsBooked)
                 throw new BadRequestException("Cannot delete a booked appointment");
 
-            if (appointment.StartTime <= DateTime.Now)
+            if (appointment.StartTime <= DateTime.UtcNow)
                 throw new BadRequestException("Cannot delete a past appointment");
 
             return await _unitOfWork.AppointmentRepository.DeleteAsync(id);

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
+﻿namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
 {
     public class TasksPool
     {
@@ -13,6 +7,7 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public int DaysToSubmit { get; set; }
         public string Description { get; set; }
         public string Requirements { get; set; }
+        public bool IsActive { get; set; } = true;
         // Navigation properties
         public Stage Stage { get; set; }
         public ICollection<AppTask> Tasks { get; set; } = new List<AppTask>();
