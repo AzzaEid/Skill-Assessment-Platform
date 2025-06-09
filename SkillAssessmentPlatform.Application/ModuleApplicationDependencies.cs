@@ -51,7 +51,6 @@ namespace SkillAssessmentPlatform.Application
             services.AddTransient<PdfGeneratorService>();
 
 
-
             return services;
 
         }
