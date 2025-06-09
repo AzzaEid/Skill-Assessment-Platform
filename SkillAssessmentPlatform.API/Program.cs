@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.API.Bases;
 using SkillAssessmentPlatform.API.Common;
+using SkillAssessmentPlatform.API.Helpers;
 using SkillAssessmentPlatform.API.Middleware;
 using SkillAssessmentPlatform.Application;
 using SkillAssessmentPlatform.Core.Entities.Users;
@@ -9,10 +12,6 @@ using SkillAssessmentPlatform.Infrastructure;
 using SkillAssessmentPlatform.Infrastructure.Data;
 using SkillAssessmentPlatform.Infrastructure.Seeder;
 using System.Text.Json.Serialization;
-using DinkToPdf;
-using DinkToPdf.Contracts;
-using System.Runtime.InteropServices;
-using SkillAssessmentPlatform.Application.Services;
 
 
 public class Program
@@ -27,6 +26,7 @@ public class Program
         {
             builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
         }
+        builder.Services.AddControllersWithViews();
 
         // Database
         builder.Services.AddDbContext<AppDbContext>(options =>
@@ -35,6 +35,7 @@ public class Program
 
         // Shared
         builder.Services.AddScoped<IResponseHandler, ResponseHandler>();
+        builder.Services.AddScoped<ViewRender>();
 
         builder.Services.AddApplicationDependencies()
                         .AddInfrastructureDependencies()
@@ -56,7 +57,8 @@ public class Program
 
         // تسجيل خدمة DinkToPdf
         builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-      
+
+        builder.Services.AddRazorPages();
 
 
         // CORS
@@ -80,6 +82,7 @@ public class Program
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             await UsersSeeder.SeedAsync(userManager);
         }
+        app.MapRazorPages();
 
         app.UseCors("AllowAll");
         app.UseHttpsRedirection();

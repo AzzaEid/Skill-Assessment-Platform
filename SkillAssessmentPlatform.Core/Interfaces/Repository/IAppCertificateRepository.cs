@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
+﻿using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
@@ -13,6 +8,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<AppCertificate?> GetByIdAsync(int id);
         Task<IEnumerable<AppCertificate>> GetByApplicantIdAsync(string applicantId);
         Task<AppCertificate?> GetByVerificationCodeAsync(string code);
+        Task<AppCertificate?> GetByLevelIdAndApplicantId(int levelId, string applicantId);
 
     }
 }
