@@ -225,8 +225,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 requestId,
                 ExamRequestStatus.Rejected,
                 message);
-
-            await SendExamRejectionEmailAsync(examRequest, message);
             var sp = examRequest.Exam.Stage.StageProgresses.OrderByDescending(x => x.StartDate).FirstOrDefault();
             if (sp == null)
             {
@@ -235,6 +233,8 @@ namespace SkillAssessmentPlatform.Application.Services
             // تحديث الستيج بروغريس
             await _stageProgressService.UpdateStatusAsync(sp.Id,
                 new UpdateStageStatusDTO { Score = 0, Status = ApplicantResultStatus.Failed });
+            await SendExamRejectionEmailAsync(examRequest, message);
+
             // Create notification for applicant
             await _notificationService.SendNotificationAsync(
                 examRequest.ApplicantId,

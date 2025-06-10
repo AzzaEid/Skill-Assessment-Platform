@@ -18,7 +18,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateFeedbackDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateFeedbackDTO dto)
         {
             var result = await _feedbackService.CreateAsync(dto);
             return _responseHandler.Success(result);

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.CreateAssignment;
 using SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard;
@@ -13,13 +14,15 @@ namespace SkillAssessmentPlatform.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
+        private readonly ILogger<ExaminerLoadsService> _logger;
         public ExaminerLoadsService(
         IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<ExaminerLoadsService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<ExaminerLoadDTO>> GetByExaminerIdAsync(string examinerId)
@@ -85,6 +88,7 @@ namespace SkillAssessmentPlatform.Application.Services
         //// ========================== Examiner Dashboard =============================/////
         public async Task<ExaminerDashboardSummaryDTO> GetDashboardSummaryAsync(string examinerId)
         {
+            _logger.LogWarning($"examiner no {examinerId}");
             var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(examinerId);
             if (examiner == null)
                 throw new KeyNotFoundException($"Examiner with id {examinerId} not found");
@@ -94,11 +98,12 @@ namespace SkillAssessmentPlatform.Application.Services
             // Get supervised stage progresses
             var supervisedStages = await _unitOfWork.StageProgressRepository
                 .GetPendingByExaminerIdAsync(examinerId);
-
+            _logger.LogWarning($"supervisedStages no {supervisedStages.Count()}");
             foreach (var stageProgress in supervisedStages)
             {
                 var stage = await _unitOfWork.StageRepository.GetByIdAsync(stageProgress.StageId);
                 var applicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
+                _logger.LogWarning($"==============>>> stage type {stage.Type.ToString()} - no {stage.Id} applicant {applicantId}");
                 switch (stage.Type)
                 {
                     case StageType.Task:
@@ -170,6 +175,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         DaysWaiting = (DateTime.Now - submission.SubmissionDate).Days,
                         IsLate = submission.SubmissionDate > taskApplicant.DueDate,
                         Status = submission.Status,
+                        StageId = stageProgress.StageId,
                         StageName = stageProgress.Stage.Name,
                         TrackName = stageProgress.LevelProgress.Enrollment.Track.Name
                     };
@@ -197,16 +203,18 @@ namespace SkillAssessmentPlatform.Application.Services
                 if (interviewBook != null)
                 {
                     var interview = await _unitOfWork.InterviewRepository.GetByIdAsync(interviewBook.InterviewId);
-
+                    var applicant = await _unitOfWork.ApplicantRepository.GetByIdAsync(applicantId);
                     var dto = new ExaminerInterviewRequestDTO
                     {
                         Id = interviewBook.Id,
                         StageProgressId = stageProgress.Id,
                         InterviewId = interview.Id,
                         ApplicantId = applicantId,
+                        ApplicantName = applicant.FullName,
                         RequestDate = stageProgress.StartDate,
                         DaysWaiting = (DateTime.Now - stageProgress.StartDate).Days,
                         Status = interviewBook.Status,
+                        StageId = stageProgress.StageId,
                         StageName = stageProgress.Stage.Name,
                         TrackName = stageProgress.LevelProgress.Enrollment.Track.Name,
                         MaxDaysToBook = interview.MaxDaysToBook
@@ -246,6 +254,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         ScheduledDate = interviewBook.ScheduledDate.Value,
                         MeetingLink = interviewBook.MeetingLink,
                         Status = interviewBook.Status,
+                        StageId = stageProgress.StageId,
                         StageName = stageProgress.Stage.Name,
                         TrackName = stageProgress.LevelProgress.Enrollment.Track.Name,
                         DurationMinutes = interview.DurationMinutes
@@ -274,16 +283,18 @@ namespace SkillAssessmentPlatform.Application.Services
                 if (request != null)
                 {
                     var exam = await _unitOfWork.ExamRepository.GetByIdAsync(request.ExamId);
-
+                    var applicant = await _unitOfWork.ApplicantRepository.GetByIdAsync(applicantId);
                     var dto = new ExaminerExamReviewDTO
                     {
                         Id = request.Id,
                         StageProgressId = stageProgress.Id,
                         ExamId = exam.Id,
                         ApplicantId = applicantId,
+                        ApplicantName = applicant.FullName,
                         ScheduledDate = request.ScheduledDate,
                         DaysWaiting = (DateTime.Now - request.ScheduledDate).Days,
                         Status = request.Status,
+                        StageId = stageProgress.StageId,
                         StageName = stageProgress.Stage.Name,
                         TrackName = stageProgress.LevelProgress.Enrollment.Track.Name,
                         Difficulty = exam.Difficulty

@@ -13,7 +13,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             //_context = context; 
         }
+        public override async Task<Track> GetByIdAsync(int id)
+        {
+            return await _context.Tracks
+                     .Include(t => t.SeniorExaminer)
+                     .FirstOrDefaultAsync(t => t.Id == id);
 
+        }
         public async Task<Track> GetTrackWithDetailsAsync(int trackId)
         {
             var track = await _context.Tracks

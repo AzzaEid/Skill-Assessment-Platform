@@ -54,7 +54,7 @@ namespace SkillAssessmentPlatform.Application.Services
             if (examiner == null)
                 throw new KeyNotFoundException($"Appointment with id {bulkDTO.ExaminerId} not found");
             // Validations
-            if (bulkDTO.EndDate > bulkDTO.StartDate)
+            if (bulkDTO.EndDate < bulkDTO.StartDate)
                 throw new BadRequestException("End date must be after start date");
 
             if (bulkDTO.StartDate < DateTime.UtcNow.Date)

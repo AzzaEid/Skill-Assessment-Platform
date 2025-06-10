@@ -23,25 +23,32 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<FeedbackDTO> CreateAsync(CreateFeedbackDTO dto)
         {
+            if (dto.DetailedFeedbacks == null)
+                throw new ArgumentException("DetailedFeedbacks cannot be null");
+
             var feedback = new Feedback
             {
                 ExaminerId = dto.ExaminerId,
                 Comments = dto.Comments,
                 TotalScore = dto.TotalScore,
                 FeedbackDate = DateTime.UtcNow,
-                DetailedFeedbacks = dto.DetailedFeedbacks.Select(df => new DetailedFeedback
+                DetailedFeedbacks = dto.DetailedFeedbacks?.Select(df => new DetailedFeedback
                 {
                     CriterionId = df.EvaluationCriteriaId,
                     Comments = df.Comments,
                     Score = df.Score
-                }).ToList()
+                }).ToList() ?? new List<DetailedFeedback>()
             };
 
             // Assign to the right entity
             if (dto.TaskSubmissionId.HasValue)
             {
                 var submission = await _unitOfWork.TaskSubmissionRepository.GetByIdAsync(dto.TaskSubmissionId.Value);
+                if (submission == null)
+                    throw new Exception("Task Submission not found.");  // أو رجع BadRequest
+
                 submission.Feedback = feedback;
+
                 // if Status is ResubmissionAllowed change TaskSubmission status
                 if (dto.ResultStatus == ApplicantResultStatus.ResubmissionAllowed)
                 {
@@ -51,6 +58,9 @@ namespace SkillAssessmentPlatform.Application.Services
             else if (dto.ExamRequestId.HasValue)
             {
                 var request = await _unitOfWork.ExamRequestRepository.GetByIdAsync(dto.ExamRequestId.Value);
+                if (request == null)
+                    throw new Exception($"ExamRequest with ID {dto.ExamRequestId.Value} not found.");
+
                 request.Feedback = feedback;
             }
             else if (dto.InterviewBookId.HasValue)

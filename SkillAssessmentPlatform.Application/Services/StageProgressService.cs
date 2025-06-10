@@ -151,6 +151,8 @@ namespace SkillAssessmentPlatform.Application.Services
             if (interviewBook == null)
             {
                 dto.ActionStatus = StageActionStatus.ReadyToBook;
+                var interview = await _unitOfWork.InterviewRepository.GetByStageIdAsync(dto.StageId);
+                dto.AdditionalData = new { InterviewId = interview.Id };
                 return;
             }
 
@@ -183,7 +185,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     break;
                 case InterviewStatus.Canceled:
                     dto.ActionStatus = StageActionStatus.BookingCanceled;
-                    dto.AdditionalData = new { InterviewBookId = interviewBook.Id };
+                    dto.AdditionalData = new { InterviewBookId = interviewBook.Id, InterviewId = interviewBook.InterviewId };
                     break;
             }
         }
