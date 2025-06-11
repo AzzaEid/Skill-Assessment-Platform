@@ -1,5 +1,5 @@
-﻿using SkillAssessmentPlatform.Application.DTOs;
-using SkillAssessmentPlatform.Application.DTOs.Certificates;
+﻿using SkillAssessmentPlatform.Application.DTOs.Certificate.Input;
+using SkillAssessmentPlatform.Application.DTOs.Certificate.Output;
 using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Interfaces;
 

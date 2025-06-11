@@ -178,12 +178,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.InterviewBooks
                 .Where(ib => ib.ApplicantId == applicantId && ib.Status == InterviewStatus.Pending)
+                .Include(ib => ib.Appointment)
                 .FirstOrDefaultAsync();
         }
         public async Task<InterviewBook> GetScheduledByApplicantIdAsync(string applicantId)
         {
             return await _context.InterviewBooks
                 .Where(ib => ib.ApplicantId == applicantId && ib.Status == InterviewStatus.Scheduled)
+                .Include(ib => ib.Appointment)
                 .FirstOrDefaultAsync();
         }
 

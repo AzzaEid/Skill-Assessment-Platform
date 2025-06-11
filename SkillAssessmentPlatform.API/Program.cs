@@ -71,9 +71,9 @@ public class Program
                       .AllowAnyHeader();
             });
         });
-
         var app = builder.Build();
 
+        // Seeder logic
         using (var scope = app.Services.CreateScope())
         {
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -82,15 +82,6 @@ public class Program
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             await UsersSeeder.SeedAsync(userManager);
         }
-        app.MapRazorPages();
-
-        app.UseCors("AllowAll");
-        app.UseHttpsRedirection();
-        app.UseMiddleware<ErrorHandlerMiddleware>();
-        app.UseStaticFiles();
-
-        app.UseAuthentication();
-        app.UseAuthorization();
 
         if (app.Environment.IsDevelopment())
         {
@@ -98,7 +89,22 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseHttpsRedirection();
+
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.UseCors("AllowAll");
+        app.UseMiddleware<ErrorHandlerMiddleware>();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapRazorPages();
         app.MapControllers();
+
         app.Run();
+
     }
 }

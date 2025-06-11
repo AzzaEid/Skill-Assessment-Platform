@@ -4,11 +4,6 @@ using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
@@ -42,7 +37,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<Enrollment> GetByApplicantAndTrackAsync(string applicantId, int trackId)
         {
             return await _context.Enrollments
+                .Include(e => e.Track)
                 .FirstOrDefaultAsync(e => e.ApplicantId == applicantId && e.TrackId == trackId);
+        }
+        public override async Task<Enrollment> GetByIdAsync(int id)
+        {
+            return await _context.Enrollments
+                .Include(e => e.Track)
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<Enrollment> UpdateStatusAsync(int enrollmentId, EnrollmentStatus status)

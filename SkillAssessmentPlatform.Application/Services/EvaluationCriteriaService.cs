@@ -1,4 +1,7 @@
-﻿using SkillAssessmentPlatform.Application.DTOs;
+﻿using AutoMapper;
+using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Input;
+using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Output;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
@@ -10,10 +13,12 @@ namespace SkillAssessmentPlatform.Application.Services
     public class EvaluationCriteriaService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public EvaluationCriteriaService(IUnitOfWork unitOfWork)
+        public EvaluationCriteriaService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<bool> CreateAsync(CreateEvaluationCriteriaDto dto)
@@ -32,9 +37,12 @@ namespace SkillAssessmentPlatform.Application.Services
             return true;
         }
 
-        public async Task<IEnumerable<EvaluationCriteria>> GetByStageIdAsync(int stageId)
+        public async Task<IEnumerable<EvaluationCriteriaDTO>> GetByStageIdAsync(int stageId)
         {
-            return await _unitOfWork.EvaluationCriteriaRepository.GetByStageIdAsync(stageId);
+
+            var list = await _unitOfWork.EvaluationCriteriaRepository.GetByStageIdAsync(stageId);
+            return _mapper.Map<IEnumerable<EvaluationCriteriaDTO>>(list);
+
         }
         public async Task<bool> UpdateAsync(UpdateEvaluationCriteriaDto dto)
         {

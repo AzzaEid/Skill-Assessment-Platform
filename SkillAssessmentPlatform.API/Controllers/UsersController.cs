@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs.Auth;
-using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
+using SkillAssessmentPlatform.Application.DTOs.Auth.Inputs;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.CreateAssignment;
+using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
 using SkillAssessmentPlatform.Core.Entities.Management;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -71,6 +72,13 @@ namespace SkillAssessmentPlatform.Application.Services
         {
             var assignments = await _unitOfWork.CreationAssignmentRepository
                 .GetPendingByExaminerIdAsync(examinerId);
+
+            return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(assignments);
+        }
+        public async Task<IEnumerable<CreationAssignmentDTO>> GetOverdueBySenior(string seniorId)
+        {
+            var assignments = await _unitOfWork.CreationAssignmentRepository
+                .GetOverdueBySeniorAsync(seniorId);
 
             return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(assignments);
         }

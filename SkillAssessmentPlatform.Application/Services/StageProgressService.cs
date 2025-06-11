@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
-using SkillAssessmentPlatform.Application.DTOs.StageProgress;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Output;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Enums;
@@ -72,12 +73,14 @@ namespace SkillAssessmentPlatform.Application.Services
             if (dto.Status == ProgressStatus.Successful)
             {
                 dto.ActionStatus = StageActionStatus.Completed;
-                return;
+
+                await SetCompletionDataAsync(dto);
             }
 
             if (dto.Status == ProgressStatus.Failed)
             {
                 dto.ActionStatus = StageActionStatus.Failed;
+                await SetCompletionDataAsync(dto);
                 return;
             }
 
@@ -151,6 +154,8 @@ namespace SkillAssessmentPlatform.Application.Services
             if (interviewBook == null)
             {
                 dto.ActionStatus = StageActionStatus.ReadyToBook;
+                var interview = await _unitOfWork.InterviewRepository.GetByStageIdAsync(dto.StageId);
+                dto.AdditionalData = new { InterviewId = interview.Id };
                 return;
             }
 
@@ -183,7 +188,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     break;
                 case InterviewStatus.Canceled:
                     dto.ActionStatus = StageActionStatus.BookingCanceled;
-                    dto.AdditionalData = new { InterviewBookId = interviewBook.Id };
+                    dto.AdditionalData = new { InterviewBookId = interviewBook.Id, InterviewId = interviewBook.InterviewId };
                     break;
             }
         }
@@ -261,6 +266,53 @@ namespace SkillAssessmentPlatform.Application.Services
                     break;
             }
         }
+        private async Task SetCompletionDataAsync(StageProgressDTO dto)
+        {
+            switch (dto.StageType)
+            {
+                case StageType.Exam:
+                    var examRequest = await _unitOfWork.ExamRequestRepository.GetByStageProgressIdAsync(dto.Id);
+                    if (examRequest != null)
+                    {
+                        dto.AdditionalData = new
+                        {
+                            ExamRequestId = examRequest.Id,
+                            FeedbackId = examRequest.FeedbackId
+                        };
+                    }
+                    break;
+
+                case StageType.Interview:
+                    var interviewBook = await _unitOfWork.InterviewBookRepository.GetByStageProgressIdAsync(dto.Id);
+                    if (interviewBook != null)
+                    {
+                        dto.AdditionalData = new
+                        {
+                            InterviewBookId = interviewBook.Id,
+                            InterviewId = interviewBook.InterviewId,
+                            FeedbackId = interviewBook.FeedbackId
+                        };
+                    }
+                    break;
+
+                case StageType.Task:
+                    var taskApplicant = await _unitOfWork.TaskApplicantRepository.GetByStageProgressIdAsync(dto.Id);
+                    if (taskApplicant != null)
+                    {
+                        var latestSubmission = await _unitOfWork.TaskSubmissionRepository
+                            .GetLatestByTaskApplicantIdAsync(taskApplicant.Id);
+
+                        dto.AdditionalData = new
+                        {
+                            TaskApplicantId = taskApplicant.Id,
+                            SubmissionId = latestSubmission?.Id,
+                            FeedbackId = latestSubmission?.FeedbackId
+                        };
+                    }
+                    break;
+            }
+        }
+
         #endregion
         public async Task<StageProgressDTO> GetByCurrEnrollmentIdAsync(int enrollmentId)
         {

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Output;
 using SkillAssessmentPlatform.Core.Interfaces;
 
 namespace SkillAssessmentPlatform.Application.Services
@@ -9,11 +11,13 @@ namespace SkillAssessmentPlatform.Application.Services
         //private readonly ISeniorRepository _seniorRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ILogger<SeniorService> _logger;
 
-        public SeniorService(IUnitOfWork unitOfWork, IMapper mapper)
+        public SeniorService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<SeniorService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<List<ExaminerDTO>> GetAllSeniorsAsync()
@@ -55,7 +59,12 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<bool> RemoveSeniorAsync(int trackId)
         {
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackId);
-            if (track == null) return false;
+            if (track == null)
+            {
+                _logger.LogError("track null");
+
+                return false;
+            }
             return await _unitOfWork.SeniorRepository.RemoveSeniorFromTrackAsync(track);
         }
 

@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using SkillAssessmentPlatform.Application.DTOs.ExamReques;
-using SkillAssessmentPlatform.Application.DTOs.StageProgress;
+using SkillAssessmentPlatform.Application.DTOs.ExamReques.Input;
+using SkillAssessmentPlatform.Application.DTOs.ExamReques.Output;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
@@ -225,8 +226,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 requestId,
                 ExamRequestStatus.Rejected,
                 message);
-
-            await SendExamRejectionEmailAsync(examRequest, message);
             var sp = examRequest.Exam.Stage.StageProgresses.OrderByDescending(x => x.StartDate).FirstOrDefault();
             if (sp == null)
             {
@@ -235,6 +234,8 @@ namespace SkillAssessmentPlatform.Application.Services
             // تحديث الستيج بروغريس
             await _stageProgressService.UpdateStatusAsync(sp.Id,
                 new UpdateStageStatusDTO { Score = 0, Status = ApplicantResultStatus.Failed });
+            await SendExamRejectionEmailAsync(examRequest, message);
+
             // Create notification for applicant
             await _notificationService.SendNotificationAsync(
                 examRequest.ApplicantId,

@@ -19,9 +19,16 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.Feedbacks
                 .Where(f => f.ExaminerId == examinerId)
                 .Include(f => f.DetailedFeedbacks)
+                .Include(f => f.TaskSubmission)
+                    .ThenInclude(t => t.TaskApplicant)
+                        .ThenInclude(ta => ta.Task)
+                .Include(f => f.ExamRequest)
+                    .ThenInclude(er => er.Exam)
+                .Include(f => f.InterviewBook)
+                    .ThenInclude(ib => ib.Interview)
                 .ToListAsync();
         }
 
-       
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using SkillAssessmentPlatform.Application.DTOs;
+using Microsoft.EntityFrameworkCore;
+using SkillAssessmentPlatform.Application.DTOs.Enrollment;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
@@ -23,7 +24,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<PagedResponse<EnrollmentDTO>> GetAllEnrollmentsAsync(int page = 1, int pageSize = 10)
         {
-            var enrollments = _unitOfWork.EnrollmentRepository.GetPagedQueryable(page, pageSize).ToList();
+            var enrollments = _unitOfWork.EnrollmentRepository.GetPagedQueryable(page, pageSize).Include(e => e.Track).ToList();
             var totalCount = await _unitOfWork.EnrollmentRepository.GetTotalCountAsync();
 
             return new PagedResponse<EnrollmentDTO>(
