@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.CreateAssignment;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Input;
 using SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
@@ -217,7 +217,9 @@ namespace SkillAssessmentPlatform.Application.Services
                         StageId = stageProgress.StageId,
                         StageName = stageProgress.Stage.Name,
                         TrackName = stageProgress.LevelProgress.Enrollment.Track.Name,
-                        MaxDaysToBook = interview.MaxDaysToBook
+                        MaxDaysToBook = interview.MaxDaysToBook,
+                        StartDate = interviewBook.Appointment.StartTime,
+                        EndDate = interviewBook.Appointment.EndTime
                     };
 
                     result.Add(dto);
@@ -251,7 +253,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         StageProgressId = stageProgress.Id,
                         ApplicantId = applicantId,
                         ApplicantName = applicant.FullName,
-                        ScheduledDate = interviewBook.ScheduledDate.Value,
+                        ScheduledDate = interviewBook.Appointment.StartTime,
                         MeetingLink = interviewBook.MeetingLink,
                         Status = interviewBook.Status,
                         StageId = stageProgress.StageId,

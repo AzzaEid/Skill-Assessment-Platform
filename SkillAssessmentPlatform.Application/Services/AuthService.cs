@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using SkillAssessmentPlatform.Application.DTOs.Auth;
+using SkillAssessmentPlatform.Application.DTOs.Auth.Inputs;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;

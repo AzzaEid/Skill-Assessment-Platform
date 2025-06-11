@@ -1,4 +1,5 @@
-﻿using SkillAssessmentPlatform.Core.Enums;
+﻿using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Application.DTOs.CreateAssignment
 {

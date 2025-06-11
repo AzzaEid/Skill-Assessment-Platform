@@ -2,7 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.Abstract;
-using SkillAssessmentPlatform.Application.DTOs.InterviewBook;
+using SkillAssessmentPlatform.Application.DTOs.InterviewBook.Input;
+using SkillAssessmentPlatform.Application.DTOs.InterviewBook.Output;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
@@ -170,7 +171,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 booking.MeetingLink = zoomMeeting.StartUrl;
 
                 await _unitOfWork.InterviewBookRepository.UpdateAsync(booking);
-
+                await _unitOfWork.SaveChangesAsync();
                 await SendInterviewScheduledNotificationsAsync(booking, appointment, interview);
 
                 return _mapper.Map<InterviewBookDTO>(booking);

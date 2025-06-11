@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Input;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Output;
+using SkillAssessmentPlatform.Application.DTOs.Level.Output;
+using SkillAssessmentPlatform.Application.DTOs.Structure;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;

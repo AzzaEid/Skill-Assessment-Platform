@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Output;
 using SkillAssessmentPlatform.Core.Interfaces;
 
 namespace SkillAssessmentPlatform.Application.Services

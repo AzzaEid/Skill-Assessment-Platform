@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using SkillAssessmentPlatform.Application.DTOs.Appointment;
+using SkillAssessmentPlatform.Application.DTOs.Appointment.Inputs;
+using SkillAssessmentPlatform.Application.DTOs.Appointment.Outputs;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;

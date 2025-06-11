@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using SkillAssessmentPlatform.Application.DTOs.ExamReques;
-using SkillAssessmentPlatform.Application.DTOs.StageProgress;
+using SkillAssessmentPlatform.Application.DTOs.ExamReques.Input;
+using SkillAssessmentPlatform.Application.DTOs.ExamReques.Output;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;

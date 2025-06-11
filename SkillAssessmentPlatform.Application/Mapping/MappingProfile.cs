@@ -1,11 +1,20 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
-using SkillAssessmentPlatform.Application.DTOs.Appointment;
-using SkillAssessmentPlatform.Application.DTOs.Auth;
+using SkillAssessmentPlatform.Application.DTOs.Applicant.Outputs;
+using SkillAssessmentPlatform.Application.DTOs.Appointment.Inputs;
+using SkillAssessmentPlatform.Application.DTOs.Appointment.Outputs;
+using SkillAssessmentPlatform.Application.DTOs.Auth.Inputs;
+using SkillAssessmentPlatform.Application.DTOs.Auth.Output;
 using SkillAssessmentPlatform.Application.DTOs.CreateAssignment;
-using SkillAssessmentPlatform.Application.DTOs.ExamReques;
-using SkillAssessmentPlatform.Application.DTOs.InterviewBook;
-using SkillAssessmentPlatform.Application.DTOs.StageProgress;
+using SkillAssessmentPlatform.Application.DTOs.Enrollment;
+using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Output;
+using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Input;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Output;
+using SkillAssessmentPlatform.Application.DTOs.ExamReques.Output;
+using SkillAssessmentPlatform.Application.DTOs.InterviewBook.Output;
+using SkillAssessmentPlatform.Application.DTOs.Level.Output;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Output;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
@@ -48,7 +57,9 @@ namespace SkillAssessmentPlatform.Application.Mapping
 
 
             ///tracking
-            CreateMap<Enrollment, EnrollmentDTO>().ReverseMap();
+            CreateMap<EnrollmentDTO, Enrollment>().ReverseMap()
+                .ForMember(dest => dest.TrackName, op => op.MapFrom(src => src.Track.Name))
+                .ForMember(dest => dest.TrackImage, op => op.MapFrom(src => src.Track.Image));
             CreateMap<Enrollment, EnrollmentCreateDTO>().ReverseMap();
             CreateMap<LevelProgressDTO, LevelProgress>().ReverseMap()
                 .ForMember(dest => dest.LevelName, opt => opt.MapFrom(src => src.Level.Name))

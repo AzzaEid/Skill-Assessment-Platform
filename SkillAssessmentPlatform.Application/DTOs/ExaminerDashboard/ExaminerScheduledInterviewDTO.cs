@@ -8,7 +8,7 @@ namespace SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard
         public int StageProgressId { get; set; }
         public string ApplicantId { get; set; }
         public string ApplicantName { get; set; }
-        public DateTime ScheduledDate { get; set; }
+        public DateTime? ScheduledDate { get; set; }
         public string MeetingLink { get; set; }
         public InterviewStatus Status { get; set; }
         public int StageId { get; set; }

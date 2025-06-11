@@ -1,5 +1,5 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
-using SkillAssessmentPlatform.Application.DTOs.StageProgress;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;

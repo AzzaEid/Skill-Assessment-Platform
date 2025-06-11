@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
-using SkillAssessmentPlatform.Application.DTOs.Appointment;
+using SkillAssessmentPlatform.Application.DTOs.Appointment.Inputs;
 using SkillAssessmentPlatform.Application.Services;
 using SkillAssessmentPlatform.Core.Results;
 

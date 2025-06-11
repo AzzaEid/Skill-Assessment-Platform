@@ -16,5 +16,7 @@ namespace SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard
         public string StageName { get; set; }
         public string TrackName { get; set; }
         public int MaxDaysToBook { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

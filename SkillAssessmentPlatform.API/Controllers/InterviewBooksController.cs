@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
-using SkillAssessmentPlatform.Application.DTOs.InterviewBook;
+using SkillAssessmentPlatform.Application.DTOs.InterviewBook.Input;
 using SkillAssessmentPlatform.Application.Services;
 
 namespace SkillAssessmentPlatform.API.Controllers
