@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.API.Bases;
 using SkillAssessmentPlatform.API.Common;
+using SkillAssessmentPlatform.API.Extensions;
 using SkillAssessmentPlatform.API.Helpers;
 using SkillAssessmentPlatform.API.Middleware;
 using SkillAssessmentPlatform.Application;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Infrastructure;
 using SkillAssessmentPlatform.Infrastructure.Data;
+using SkillAssessmentPlatform.Infrastructure.Filters;
 using SkillAssessmentPlatform.Infrastructure.Seeder;
 using System.Text.Json.Serialization;
 
@@ -39,8 +41,14 @@ public class Program
 
         builder.Services.AddApplicationDependencies()
                         .AddInfrastructureDependencies()
+                        .AddValidationServices()
                         .AddServiceRegistration(builder.Configuration);
 
+
+        builder.Services.AddControllers(options =>
+        {
+            options.Filters.Add<ValidationActionFilter>();
+        });
         // Controllers & Enums
         builder.Services.AddControllers()
                         .AddJsonOptions(options =>
@@ -60,7 +68,6 @@ public class Program
 
         builder.Services.AddRazorPages();
 
-
         // CORS
         builder.Services.AddCors(options =>
         {
@@ -71,6 +78,9 @@ public class Program
                       .AllowAnyHeader();
             });
         });
+
+
+
         var app = builder.Build();
 
         // Seeder logic
