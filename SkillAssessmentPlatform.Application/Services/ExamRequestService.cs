@@ -92,13 +92,13 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<ExamRequestDTO>(examRequest);
         }
-        public async Task<ExamRequestInfoDTO> GetExamRequestInfoByIdAsync(int id)
+        public async Task<ExamRequestInfoApplicantDTO> GetExamRequestInfoByIdAsync(int id)
         {
             var examRequest = await _unitOfWork.ExamRequestRepository.GetWithApplicantAndExamAsync(id);
             if (examRequest == null)
                 throw new KeyNotFoundException($"ExamRequest with id {id} not found");
 
-            return _mapper.Map<ExamRequestInfoDTO>(examRequest);
+            return _mapper.Map<ExamRequestInfoApplicantDTO>(examRequest);
         }
 
         public async Task<IEnumerable<ExamRequestDTO>> GetExamRequestsByApplicantIdAsync(string applicantId)

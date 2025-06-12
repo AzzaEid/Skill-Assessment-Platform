@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Interfaces;
 
 namespace SkillAssessmentPlatform.Application.Services
@@ -25,6 +20,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 Id = df.Id,
                 FeedbackId = df.FeedbackId,
                 EvaluationCriteriaId = df.CriterionId,
+                CriterionName = df.EvaluationCriteria.Name,
                 Comments = df.Comments,
                 Score = df.Score
             });
