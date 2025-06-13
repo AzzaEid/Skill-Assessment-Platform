@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
-using SkillAssessmentPlatform.API.Common;
+using System.Security.Claims;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
@@ -21,10 +22,19 @@ namespace SkillAssessmentPlatform.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateAppTaskDto dto)
         {
-            var result = await _service.CreateAsync(dto);
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var result = await _service.CreateAsync(examinerId, dto);
             return _responseHandler.Created(result);
         }
 
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetBylId(int Id)
+        {
+            var result = await _service.GetByIdAsync(Id);
+            return _responseHandler.Success(result);
+        }
         [HttpGet("by-pool/{taskPoolId}")]
         public async Task<IActionResult> GetByPoolId(int taskPoolId)
         {
@@ -47,5 +57,5 @@ namespace SkillAssessmentPlatform.API.Controllers
             var deleted = await _service.DeleteAsync(id);
             return deleted ? _responseHandler.Deleted() : _responseHandler.NotFound();
         }
-    } 
+    }
 }

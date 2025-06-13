@@ -1,14 +1,13 @@
 ﻿using SkillAssessmentPlatform.Core.Entities;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
-    public interface ITrackRepository
+    public interface ITrackRepository : IGenericRepository<Track>
     {
-        Task<IEnumerable<Track>> GetAllAsync();
-        Task<Track> GetByIdAsync(int id);
+
         Task<Track> GetTrackWithDetailsAsync(int id);
 
-        Task AddAsync(Track track);
 
         Task<IEnumerable<Track>> GetOnlyActiveTracksAsync();
 
@@ -19,11 +18,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<List<Track>> GetByExaminerIdAsync(string examinerId);
         Task<IEnumerable<Track>> GetAllWithDetailsAsync();
         Task<bool> AddLevelToTrackAsync(int trackId, Level level);
-
-
-        
-
-
+        Task<IEnumerable<Track>> GetBySeniorIdAsync(string seniorId);
+        Task<IEnumerable<Stage>> GetStagesByTrackAndTypeAsync(int trackId, StageType type);
 
     }
 }

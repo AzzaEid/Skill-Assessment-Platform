@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
+using System.Linq.Expressions;
+
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
@@ -58,6 +61,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
         }
+        public virtual IQueryable<T> GetAllQueryable()
+        {
+            return _dbSet.AsQueryable();
+
+        }
 
         public virtual async Task<T> UpdateAsync(T entity)
         {
@@ -95,6 +103,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             await _dbSet.AddRangeAsync(entities);
         }
+        public virtual void RemoveRange(IEnumerable<T> entities)
+        {
+            _dbSet.RemoveRange(entities);
+        }
+
+
+        public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+
 
     }
 }

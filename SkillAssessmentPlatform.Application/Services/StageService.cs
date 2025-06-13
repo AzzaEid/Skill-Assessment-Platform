@@ -1,4 +1,6 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Output;
+using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -155,12 +157,24 @@ namespace SkillAssessmentPlatform.Application.Services
                 {
                     stage.IsActive = false;
 
+                    // Soft delete related EvaluationCriteria
                     if (stage.EvaluationCriteria != null)
                     {
                         foreach (var criteria in stage.EvaluationCriteria)
                         {
                             criteria.IsActive = false;
                         }
+                    }
+
+                    // Get all stages in the same level with higher Order and still active
+                    var stagesToUpdate = await _unitOfWork.StageRepository.FindAsync(s =>
+                        s.LevelId == stage.LevelId &&
+                        s.Order > stage.Order &&
+                        s.IsActive);
+
+                    foreach (var s in stagesToUpdate)
+                    {
+                        s.Order -= 1;
                     }
 
                     await _unitOfWork.SaveChangesAsync();
@@ -174,6 +188,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 }
             }
         }
+
 
         public async Task<string> RestoreStageAsync(int stageId)
         {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using SkillAssessmentPlatform.Application.DTOs;
+using Microsoft.EntityFrameworkCore;
+using SkillAssessmentPlatform.Application.DTOs.Enrollment;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
@@ -23,7 +24,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<PagedResponse<EnrollmentDTO>> GetAllEnrollmentsAsync(int page = 1, int pageSize = 10)
         {
-            var enrollments = _unitOfWork.EnrollmentRepository.GetPagedQueryable(page, pageSize).ToList();
+            var enrollments = _unitOfWork.EnrollmentRepository.GetPagedQueryable(page, pageSize).Include(e => e.Track).ToList();
             var totalCount = await _unitOfWork.EnrollmentRepository.GetTotalCountAsync();
 
             return new PagedResponse<EnrollmentDTO>(
@@ -98,7 +99,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     var firstStage = await _unitOfWork.StageRepository.GetFirstStageByLevelIdAsync(firstLevel.Id);
                     if (firstStage != null)
                     {
-                        var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(firstStage.Type);
+                        var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(enrollmentDto.TrackId, MapLoad(firstStage.Type));
                         if (freeExaminerId == null)
                             throw new InvalidOperationException("No available examiner found for this stage");
 
@@ -111,7 +112,7 @@ namespace SkillAssessmentPlatform.Application.Services
                             Attempts = 1,
                             ExaminerId = freeExaminerId.ToString()
                         };
-
+                        await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(freeExaminerId, MapLoad(firstStage.Type));
                         await _unitOfWork.StageProgressRepository.AddAsync(stageProgress);
                         await _unitOfWork.SaveChangesAsync();
                     }
@@ -127,7 +128,13 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<EnrollmentDTO>(enrollment);
         }
-
+        private LoadType MapLoad(StageType stageType)
+        {
+            var type = LoadType.Task;
+            if (stageType == StageType.Exam) { type = LoadType.Exam; }
+            else if (stageType == StageType.Interview) { type = LoadType.Interview; }
+            return type;
+        }
 
         public async Task<EnrollmentDTO> UpdateEnrollmentStatusAsync(int enrollmentId, UpdateEnrollmentStatusDTO updateDto)
         {

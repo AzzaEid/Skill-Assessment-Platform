@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.IdentityModel.Tokens;
 using SkillAssessmentPlatform.API.Common;
-using SkillAssessmentPlatform.Application.DTOs.Auth;
+using SkillAssessmentPlatform.Application.DTOs.Auth.Inputs;
 using SkillAssessmentPlatform.Application.Services;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities.Users;

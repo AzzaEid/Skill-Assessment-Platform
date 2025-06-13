@@ -2,7 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.Abstract;
-using SkillAssessmentPlatform.Application.DTOs.InterviewBook;
+using SkillAssessmentPlatform.Application.DTOs.InterviewBook.Input;
+using SkillAssessmentPlatform.Application.DTOs.InterviewBook.Output;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
@@ -19,6 +20,7 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly NotificationService _notificationService;
         private readonly EmailService _emailService;
         private readonly IMeetingService _meetingService;
+        private readonly StageProgressService _stageProgressService;
 
 
         public InterviewBookService(
@@ -27,7 +29,8 @@ namespace SkillAssessmentPlatform.Application.Services
             ILogger<InterviewBookService> logger,
             NotificationService notificationService,
             EmailService emailService,
-            IMeetingService meetingService)
+            IMeetingService meetingService,
+            StageProgressService stageProgressService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -35,6 +38,7 @@ namespace SkillAssessmentPlatform.Application.Services
             _notificationService = notificationService;
             _emailService = emailService;
             _meetingService = meetingService;
+            _stageProgressService = stageProgressService;
         }
 
         public async Task<PagedResponse<InterviewBookDTO>> GetAllInterviewBooksAsync(int page = 1, int pageSize = 10)
@@ -167,7 +171,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 booking.MeetingLink = zoomMeeting.StartUrl;
 
                 await _unitOfWork.InterviewBookRepository.UpdateAsync(booking);
-
+                await _unitOfWork.SaveChangesAsync();
                 await SendInterviewScheduledNotificationsAsync(booking, appointment, interview);
 
                 return _mapper.Map<InterviewBookDTO>(booking);
@@ -208,7 +212,18 @@ namespace SkillAssessmentPlatform.Application.Services
 
                 // change appointment status
                 var appointment = await _unitOfWork.AppointmentRepository.MarkAppointmentAsAvailableAsync(booking.AppointmentId);
+                /*
+                var stage = await _unitOfWork.StageRepository.GetByInterviewId(booking.InterviewId);
+                var sp = await _unitOfWork.StageProgressRepository.GetByApplicantAndStageAsync(booking.ApplicantId, stage.Id);
+                if (sp == null)
+                {
+                    throw new Exception("error in update applicant progress");
+                }
 
+                // تحديث الستيج بروغريس
+                await _stageProgressService.UpdateStatusAsync(sp.Id,
+                    new UpdateStageStatusDTO { Score = 0, Status = ApplicantResultStatus.Failed });
+                */
                 // Notify examiner
                 await _notificationService.SendNotificationAsync(
                     booking.ApplicantId,

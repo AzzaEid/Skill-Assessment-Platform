@@ -16,5 +16,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<LevelProgress> CreateNextLevelProgressAsync(int enrollmentId, int currentLevelId);
         Task<LevelProgress> GetLatestActiveLPAsync(string applicantId);
         Task<IEnumerable<LevelProgress>> GetCompletedLevelsByEnrollmentIdAsync(int enrollmentId);
+
+        Task<LevelProgress> GetByIdWithLevelAndTrack(int levelProgressId);
+
     }
 }

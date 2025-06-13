@@ -46,23 +46,26 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Success(stages);
         }
 
-      /*  [HttpPost("{levelId}/stages")]
-        public async Task<IActionResult> CreateStage(int levelId, [FromBody] CreateStageDTO dto)
-        {
-            var created = await _levelService.CreateStage(levelId, dto);
-            return _responseHandler.Created(created);
+        /*  [HttpPost("{levelId}/stages")]
+          public async Task<IActionResult> CreateStage(int levelId, [FromBody] CreateStageDTO dto)
+          {
+              var created = await _levelService.CreateStage(levelId, dto);
+              return _responseHandler.Created(created);
 
-        }
-      */
-        [HttpPost("{levelId}/stages")]
-        public async Task<IActionResult> AddStageWithDetails(int levelId, [FromBody] CreateStageWithDetailsDTO dto)
+          }
+        */
+        [HttpPost("{levelId}/stages/bulk")]
+        public async Task<IActionResult> AddMultipleStagesToLevel(int levelId, [FromBody] List<CreateStageWithDetailsDTO> dtos)
         {
-            var success = await _levelService.AddStageToLevelAsync(levelId, dto);
-            if (!success)
-                return NotFound($"Level with ID {levelId} not found");
+            var result = await _levelService.AddStagesToLevelAsync(levelId, dtos);
 
-            return Ok("Stage with details added successfully");
+            if (!result)
+                return _responseHandler.NotFound($"Level with ID {levelId} not found or is inactive.");
+
+            return _responseHandler.Success(message: "Stages added successfully.");
         }
+
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -86,6 +89,19 @@ namespace SkillAssessmentPlatform.API.Controllers
                 "Level is already active" => BadRequest(new { message = result }),
                 _ => _responseHandler.Success(message: result)
             };
+        }
+
+
+        [HttpPost("{levelId}/stage/optional")]
+        public async Task<IActionResult> AddStageWithOptional(int levelId, [FromBody] AddStagePayloadDto payload)
+        {
+            var success = await _levelService.AddStageWithOptionalExtrasAsync(levelId, payload);
+            if (!success)
+                return _responseHandler.NotFound("Level not found or inactive");
+
+            return _responseHandler.Success(message: "Stage(s) added successfully");
+
+           
         }
 
 

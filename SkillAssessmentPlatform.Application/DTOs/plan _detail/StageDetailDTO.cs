@@ -1,9 +1,6 @@
-﻿using SkillAssessmentPlatform.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Output;
+using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Application.DTOs
 {
@@ -17,7 +14,7 @@ namespace SkillAssessmentPlatform.Application.DTOs
         public int Order { get; set; }
         public bool IsActive { get; set; }
         public double PassingScore { get; set; }
-        public int NoOfattempts { get; set; } 
+        public int NoOfattempts { get; set; }
         public List<EvaluationCriteriaDTO> EvaluationCriteria { get; set; }
         public ExamDto Exam { get; set; }
         public InterviewDto Interview { get; set; }

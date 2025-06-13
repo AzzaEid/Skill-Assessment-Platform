@@ -3,7 +3,6 @@ using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
     public class TrackRepository : GenericRepository<Track>, ITrackRepository
@@ -14,7 +13,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             //_context = context; 
         }
+        public override async Task<Track> GetByIdAsync(int id)
+        {
+            return await _context.Tracks
+                     .Include(t => t.SeniorExaminer)
+                     .FirstOrDefaultAsync(t => t.Id == id);
 
+        }
         public async Task<Track> GetTrackWithDetailsAsync(int trackId)
         {
             var track = await _context.Tracks
@@ -66,11 +71,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
 
 
-        public async Task AddAsync(Track track)
-        {
-            await _context.Tracks.AddAsync(track);
-            _context.SaveChanges();
-        }
         public async Task<List<Track>> GetByExaminerIdAsync(string examinerId)
         {
             return await _context.Tracks
@@ -82,6 +82,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.Tracks
                 .Where(t => t.IsActive)
+                .Include(t => t.AssociatedSkills)
                 .ToListAsync();
         }
 
@@ -90,6 +91,16 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.Tracks
                 .Where(t => !t.IsActive)
+                   .Include(t => t.AssociatedSkills)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Stage>> GetStagesByTrackAndTypeAsync(int trackId, StageType type)
+        {
+            return await _context.Tracks
+                .Where(t => t.Id == trackId)
+                .SelectMany(t => t.Levels)
+                .SelectMany(l => l.Stages)
+                .Where(s => s.Type == type)
                 .ToListAsync();
         }
 
@@ -99,10 +110,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Include(t => t.Levels)
                     .ThenInclude(l => l.Stages)
                     .Include(t => t.AssociatedSkills)
+
                 //.Where(t => t.IsActive)
                 .ToListAsync();
         }
-      
+        public async Task<IEnumerable<Track>> GetBySeniorIdAsync(string seniorId)
+        {
+            return await _context.Tracks
+                .Where(t => t.SeniorExaminerID == seniorId && t.IsActive)
+                .ToListAsync();
+        }
+
 
 
         public async Task<bool> AddLevelToTrackAsync(int trackId, Level level)
@@ -116,7 +134,6 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
-
 
     }
 }

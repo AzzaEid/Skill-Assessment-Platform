@@ -96,28 +96,20 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             await _context.LevelProgresses.AddAsync(levelProgress);
             await _context.SaveChangesAsync();
 
-            // Get first stage of the next level
-            var firstStage = await _context.Stages
-                .Where(s => s.LevelId == nextLevel.Id && s.Order == 1 && s.IsActive)
-                .FirstOrDefaultAsync();
 
-            if (firstStage != null)
-            {
-                // Create progress for the first stage
-                var stageProgress = new StageProgress
-                {
-                    //EnrollmentId = enrollmentId,
-                    StageId = firstStage.Id,
-                    Status = ProgressStatus.InProgress,
-                    StartDate = DateTime.Now,
-                    Attempts = 1
-                };
-
-                await _context.StageProgresses.AddAsync(stageProgress);
-                await _context.SaveChangesAsync();
-            }
 
             return levelProgress;
         }
+
+        public async Task<LevelProgress> GetByIdWithLevelAndTrack(int levelProgressId)
+        {
+            return await _context.LevelProgresses
+                .Include(lp => lp.Level)
+                    .ThenInclude(l => l.Track)
+                .FirstOrDefaultAsync(lp => lp.Id == levelProgressId);
+        }
+
+
+
     }
 }

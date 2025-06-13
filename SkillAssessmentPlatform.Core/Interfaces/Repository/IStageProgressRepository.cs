@@ -20,6 +20,8 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<StageProgress> GetByApplicantAndStageAsync(string applicantId, int stageId);
         Task<StageProgress> GetDetailedStageProgressAsync(int stageProgressId);
         Task<IEnumerable<StageProgress>> GetDetailedByLevelProgressIdAsync(int levelProgressId);
+        Task<IEnumerable<StageProgress>> GetPendingByExaminerIdAsync(string examinerId);
+        Task<IEnumerable<StageProgress>> GetByPendingExaminerIdAndTypeAsync(string examinerId, StageType stageType);
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -10,13 +11,15 @@ namespace SkillAssessmentPlatform.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
+        private readonly TaskApplicantService _taskApplicantService;
         public LevelProgressService(
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+             TaskApplicantService taskApplicantService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _taskApplicantService = taskApplicantService;
         }
 
         public async Task<LevelProgressDTO> GetByIdAsync(int id)
@@ -47,7 +50,7 @@ namespace SkillAssessmentPlatform.Application.Services
             {
                 var enrollment = await _unitOfWork.EnrollmentRepository.GetByIdAsync(levelProgress.EnrollmentId);
 
-              
+
                 var certificate = new AppCertificate
                 {
                     ApplicantId = enrollment.ApplicantId,
@@ -57,10 +60,44 @@ namespace SkillAssessmentPlatform.Application.Services
                 };
                 await _unitOfWork.AppCertificateRepository.AddAsync(certificate);
 
-                
+
                 var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
                     levelProgress.EnrollmentId,
                     levelProgress.LevelId);
+                var firstStage = await _unitOfWork.StageRepository.GetFirstStageByLevelIdAsync(result.LevelId);
+                if (firstStage != null)
+                {
+                    var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(enrollment.TrackId, MapLoad(firstStage.Type));
+                    if (freeExaminerId == null)
+                        throw new InvalidOperationException("No available examiner found for this stage");
+
+                    var stageProgress = new StageProgress
+                    {
+                        LevelProgressId = result.Id,
+                        StageId = firstStage.Id,
+                        Status = ProgressStatus.InProgress,
+                        StartDate = DateTime.Now,
+                        Attempts = 1,
+                        ExaminerId = freeExaminerId.ToString()
+                    };
+                    await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(freeExaminerId, MapLoad(firstStage.Type));
+                    await _unitOfWork.StageProgressRepository.AddAsync(stageProgress);
+                    await _unitOfWork.SaveChangesAsync();
+                    if (firstStage.Type == StageType.Task)
+                    {
+                        try
+                        {
+                            await _taskApplicantService.AssignRandomTaskAsync(
+                                   new AssignTaskDTO { StageProgressId = stageProgress.Id });
+                        }
+                        catch (Exception ex)
+                        {
+                            //   _logger.LogError(ex, "Failed to assign task for StageProgressId: {StageProgressId}", stageProgress.Id);
+
+                        }
+
+                    }
+                }
 
                 //// No next level, track completed
                 if (result == null)
@@ -68,14 +105,20 @@ namespace SkillAssessmentPlatform.Application.Services
                     await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
                 }
 
-              
+
                 await _unitOfWork.SaveChangesAsync();
             }
 
             return _mapper.Map<LevelProgressDTO>(levelProgress);
         }
 
-       
+        private LoadType MapLoad(StageType stageType)
+        {
+            var type = LoadType.Task;
+            if (stageType == StageType.Exam) { type = LoadType.Exam; }
+            else if (stageType == StageType.Interview) { type = LoadType.Interview; }
+            return type;
+        }
 
         public async Task<IEnumerable<LevelProgressDTO>> GetByApplicantIdAsync(string applicantId)
         {

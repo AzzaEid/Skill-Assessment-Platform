@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Interfaces;
 
@@ -12,14 +7,18 @@ namespace SkillAssessmentPlatform.Application.Services
     public class AppTaskService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly CreationAssignmentService _creationAssignmentService;
 
-        public AppTaskService(IUnitOfWork unitOfWork)
+        public AppTaskService(IUnitOfWork unitOfWork, CreationAssignmentService creationAssignmentService)
         {
             _unitOfWork = unitOfWork;
+            _creationAssignmentService = creationAssignmentService;
         }
 
-        public async Task<AppTaskDto> CreateAsync(CreateAppTaskDto dto)
+        public async Task<AppTaskDto> CreateAsync(string examinerId, CreateAppTaskDto dto)
         {
+            var tasksPool = await _unitOfWork.TasksPoolRepository.GetByIdAsync(dto.TaskPoolId);
+            if (tasksPool == null) throw new Exception("no related taskPool Id");
             var task = new AppTask
             {
                 TaskPoolId = dto.TaskPoolId,
@@ -31,6 +30,8 @@ namespace SkillAssessmentPlatform.Application.Services
 
             await _unitOfWork.AppTaskRepository.AddAsync(task);
             await _unitOfWork.SaveChangesAsync();
+
+            await _creationAssignmentService.UpdateTaskCreationProgressAsync(dto.TaskPoolId, examinerId);
 
             return new AppTaskDto
             {
@@ -55,6 +56,21 @@ namespace SkillAssessmentPlatform.Application.Services
                 Requirements = t.Requirements,
                 Difficulty = t.Difficulty
             });
+        }
+        public async Task<AppTaskDto> GetByIdAsync(int taskId)
+        {
+            var task = await _unitOfWork.AppTaskRepository.GetByIdAsync(taskId);
+            if (task == null)
+                throw new KeyNotFoundException($"AppTask with id {taskId} not found");
+            return new AppTaskDto
+            {
+                Id = task.Id,
+                TaskPoolId = task.TaskPoolId,
+                Title = task.Title,
+                Description = task.Description,
+                Requirements = task.Requirements,
+                Difficulty = task.Difficulty
+            };
         }
 
         public async Task<AppTaskDto> UpdateAsync(UpdateAppTaskDto dto)

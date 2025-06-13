@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs;
@@ -19,7 +20,7 @@ public class TracksController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var track = await _trackService.GetTrackByIdAsync(id);
+        var track = await _trackService.GetTrackByIdAsync(id, _trackService.Get_mapper());
         return _responseHandler.Success(track);
     }
 
@@ -37,7 +38,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTrackDTO dto) =>
+    public async Task<IActionResult> Create([FromForm] CreateTrackDTO dto) =>
      _responseHandler.Created(await _trackService.CreateTrackAsync(dto));
 
     [HttpPost("structure")]
@@ -59,9 +60,27 @@ public class TracksController : ControllerBase
 
         }
     }
-
+    [HttpGet("{id}/structure")]
+    public async Task<IActionResult> GetStructureById(int id)
+    {
+        var track = await _trackService.GetTrackStructure(id);
+        return _responseHandler.Success(track);
+    }
+    [Authorize]
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetTracksSummary()
+    {
+        var result = await _trackService.GetAllTracksSummaryAsync();
+        return _responseHandler.Success(result);
+    }
+    [HttpGet("{trackId}/examiners-summary")]
+    public async Task<IActionResult> GetWorkingExaminersList(int trackId)
+    {
+        var result = await _trackService.GetTrackWorkingExaminersAsync(trackId);
+        return _responseHandler.Success(result, "Working examiners fetched successfully");
+    }
     [HttpPut("{trackId}")]
-    public async Task<IActionResult> Update([FromBody] CreateTrackDTO dto, int trackId) =>
+    public async Task<IActionResult> Update([FromForm] CreateTrackDTO dto, int trackId) =>
         _responseHandler.Success(await _trackService.UpdateTrackAsync(dto, trackId), "Track updated successfully");
 
 
@@ -71,12 +90,12 @@ public class TracksController : ControllerBase
         await _trackService.DeActivateTrackAsync(id);
         return _responseHandler.Deleted();
     }
-    [HttpPut("{id}")]
-    public async Task<IActionResult> ActivateTrackAsync(int id)
-    {
-        await _trackService.ActivateTrackAsync(id);
-        return _responseHandler.Deleted();
-    }
+    /* [HttpPut("{id}/active")]
+     public async Task<IActionResult> ActivateTrackAsync(int id)
+     {
+         await _trackService.ActivateTrackAsync(id);
+         return _responseHandler.Deleted();
+     }*/
     [HttpGet("active")]
     public async Task<IActionResult> GetOnlyActiveTracks()
     {
@@ -125,6 +144,12 @@ public class TracksController : ControllerBase
         return _responseHandler.Success(result);
     }
 
+    [HttpGet("{trackId}/exam-stages")]
+    public async Task<IActionResult> GetExamStages(int trackId)
+    {
+        var result = await _trackService.GetExamStagesByTrackId(trackId);
+        return _responseHandler.Success(result);
+    }
 
     [HttpPost("{trackId}/levels")]
     public async Task<IActionResult> AddLevelToTrack(int trackId, [FromBody] CreateLevelDTO dto)

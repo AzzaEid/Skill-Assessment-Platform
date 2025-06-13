@@ -9,6 +9,6 @@
         public decimal Score { get; set; }
         // Navigation properties
         public Feedback Feedback { get; set; }
-        public EvaluationCriteria EvaluationCriteria { get; set; } = new EvaluationCriteria();
+        public EvaluationCriteria EvaluationCriteria { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 
@@ -52,6 +53,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.TaskSubmissions
                 .Where(ts => ts.TaskApplicantId == taskApplicantId)
                 .OrderByDescending(ts => ts.SubmissionDate)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<TaskSubmission> GetPendingByApplicantIdAsync(string applicantId)
+        {
+            return await _context.TaskSubmissions
+                .Include(s => s.TaskApplicant)
+                .Where(s => s.TaskApplicant.ApplicantId == applicantId &&
+                            (s.Status == TaskSubmissionStatus.Submitted ||
+                            s.Status == TaskSubmissionStatus.UnderReview ||
+                            s.Status == TaskSubmissionStatus.Late) &&
+                            !s.FeedbackId.HasValue)
                 .FirstOrDefaultAsync();
         }
     }

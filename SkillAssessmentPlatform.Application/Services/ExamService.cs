@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs.Exam.Input;
+using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
-using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -65,7 +61,7 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<ExamDto> GetByStageIdAsync(int stageId)
         {
             var exam = await _unitOfWork.ExamRepository.GetByStageIdAsync(stageId);
-            if (exam == null || !exam.IsActive) return null;
+            if (exam == null /*|| !exam.IsActive*/) return null;
 
             return new ExamDto
             {
@@ -116,10 +112,10 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<bool> SoftDeleteExamAsync(int id)
         {
             var exam = await _unitOfWork.ExamRepository.GetByIdAsync(id);
-            if (exam == null || !exam.IsActive)
+            if (exam == null/* || !exam.IsActive*/)
                 return false;
 
-            exam.IsActive = false;
+            /* exam.IsActive = false;/*/
             await _unitOfWork.SaveChangesAsync();
             return true;
         }

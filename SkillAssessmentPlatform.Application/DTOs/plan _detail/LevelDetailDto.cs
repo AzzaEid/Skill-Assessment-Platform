@@ -1,4 +1,4 @@
-﻿namespace SkillAssessmentPlatform.Application.DTOs
+﻿namespace SkillAssessmentPlatform.Application.DTOs.Level.Output
 {
     public class LevelDetailDto
     {

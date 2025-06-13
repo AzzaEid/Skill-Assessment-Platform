@@ -4,7 +4,8 @@ using SkillAssessmentPlatform.Application.Services;
 namespace SkillAssessmentPlatform.API.Controllers
 {
     using SkillAssessmentPlatform.API.Common;
-
+    [ApiController]
+    [Route("api/[controller]")]
     public class FeedbackController : ControllerBase
     {
         private readonly FeedbackService _feedbackService;
@@ -17,7 +18,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateFeedbackDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateFeedbackDTO dto)
         {
             var result = await _feedbackService.CreateAsync(dto);
             return _responseHandler.Success(result);
