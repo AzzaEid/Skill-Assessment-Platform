@@ -52,5 +52,21 @@ namespace SkillAssessmentPlatform.Application.Services
             };
         }
 
+        public async Task<TaskSubmissionDTO?> GetByIdAsync(int id)
+        {
+            var submission = await _unitOfWork.TaskSubmissionRepository.GetByIdAsync(id);
+            if (submission == null)
+                return null;
+
+            return new TaskSubmissionDTO
+            {
+                Id = submission.Id,
+                TaskApplicantId = submission.TaskApplicantId,
+                SubmissionUrl = submission.SubmissionUrl,
+                SubmissionDate = submission.SubmissionDate
+            };
+        }
+
+
     }
 }

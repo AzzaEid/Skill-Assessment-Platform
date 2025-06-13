@@ -22,6 +22,20 @@ namespace SkillAssessmentPlatform.API.Controllers
             var result = await _service.SubmitTaskAsync(dto);
             return Ok(result);
         }
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTaskSubmissionById(int id)
+        {
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+
+
     }
 
 }
