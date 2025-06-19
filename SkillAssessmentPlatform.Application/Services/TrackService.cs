@@ -576,7 +576,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 FullName = e.FullName,
                 Email = e.Email,
                 Image = e.Image,
-                Specialization = e.Specialization,
+                Bio = e.Bio,
                 UserType = e.UserType,
                 ExaminerLoads = e.ExaminerLoads?.Select(load => new ExaminerLoadDTO
                 {

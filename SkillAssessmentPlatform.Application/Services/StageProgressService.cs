@@ -3,7 +3,6 @@ using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
 using SkillAssessmentPlatform.Application.DTOs.StageProgress.Output;
 using SkillAssessmentPlatform.Core.Entities;
-using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -73,8 +72,8 @@ namespace SkillAssessmentPlatform.Application.Services
             if (dto.Status == ProgressStatus.Successful)
             {
                 dto.ActionStatus = StageActionStatus.Completed;
-
                 await SetCompletionDataAsync(dto);
+                return;
             }
 
             if (dto.Status == ProgressStatus.Failed)
@@ -170,7 +169,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     dto.AdditionalData = new
                     {
                         InterviewBookId = interviewBook.Id,
-                        ScheduledDate = interviewBook.ScheduledDate,
+                        ScheduledDate = interviewBook.Appointment.StartTime,
                         MeetingLink = interviewBook.MeetingLink
                     };
                     break;
@@ -276,6 +275,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     {
                         dto.AdditionalData = new
                         {
+                            ExamId = examRequest.ExamId,
                             ExamRequestId = examRequest.Id,
                             FeedbackId = examRequest.FeedbackId
                         };
@@ -368,22 +368,33 @@ namespace SkillAssessmentPlatform.Application.Services
                 await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(
                                                                             stageProgress.ExaminerId,
                                                                             MapLoad(latestStage.Stage.Type));
-                // free examiner workload
-                var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(trackId, MapLoad(stage.Type));
-                if (freeExaminerId == null)
-                    throw new InvalidOperationException("No available examiner found for this stage");
+                ///-----
+                var nextStage = await _unitOfWork.StageRepository.GetNextStageInLevelAsync(stageProgress.StageId);
 
-                //Create progress for next stage
-                var nextStageProgress = await _unitOfWork.StageProgressRepository.CreateNextStageProgressAsync(
-                    stageProgress.LevelProgressId,
-                    stageProgress.StageId,
-                    freeExaminerId);
+                StageProgress? nextStageProgress = null;
 
-
-                // If no next stage, level is completed
-                if (nextStageProgress == null)
+                if (nextStage != null)
                 {
+                    var nextStageLoad = MapLoad(nextStage.Type);
+                    var freeExaminerId = await _unitOfWork.ExaminerRepository
+                        .GetAvailableExaminerAsync(trackId, nextStageLoad);
 
+                    if (freeExaminerId == null)
+                        throw new InvalidOperationException("No available examiner found for the next stage");
+
+                    nextStageProgress = await _unitOfWork.StageProgressRepository.CreateNextStageProgressAsync(
+                           stageProgress.LevelProgressId,
+                           nextStage.Id,
+                           freeExaminerId);
+
+                    if (nextStage.Type == StageType.Task)
+                    {
+                        await _taskApplicantService.AssignRandomTaskAsync(
+                            new AssignTaskDTO { StageProgressId = nextStageProgress.Id });
+                    }
+                }
+                else
+                {
                     var levelProgressId = stageProgress.LevelProgressId;
                     var updateLevelDto = new UpdateLevelStatusDTO
                     {
@@ -392,11 +403,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
                     await _levelProgressService.UpdateStatusAsync(levelProgressId, updateLevelDto);
                 }
-                if (nextStageProgress.Stage.Type == StageType.Task)
-                {
-                    await _taskApplicantService.AssignRandomTaskAsync(
-                                    new AssignTaskDTO { StageProgressId = nextStageProgress.Id });
-                }
+
 
             }
             else if (updateDto.Status == ApplicantResultStatus.Failed)
@@ -415,42 +422,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<StageProgressDTO>(stageProgress);
         }
-        public async Task<LevelProgressDTO> UpdateStatusAsync(int levelProgressId, UpdateLevelStatusDTO updateDto)
-        {
-            var levelProgress = await _unitOfWork.LevelProgressRepository.UpdateStatusAsync(levelProgressId, updateDto.Status);
 
-            // If level completed successfully, create progress for next level
-            if (updateDto.Status == ProgressStatus.Successful)
-            {
-                var enrollment = await _unitOfWork.EnrollmentRepository.GetByIdAsync(levelProgress.EnrollmentId);
-
-
-                var certificate = new AppCertificate
-                {
-                    ApplicantId = enrollment.ApplicantId,
-                    LeveProgressId = levelProgress.Id,
-                    IssueDate = DateTime.UtcNow,
-                    VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
-                };
-                await _unitOfWork.AppCertificateRepository.AddAsync(certificate);
-
-
-                var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
-                    levelProgress.EnrollmentId,
-                    levelProgress.LevelId);
-
-                //// No next level, track completed
-                if (result == null)
-                {
-                    await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
-                }
-
-
-                await _unitOfWork.SaveChangesAsync();
-            }
-
-            return _mapper.Map<LevelProgressDTO>(levelProgress);
-        }
 
 
         public async Task<StageProgressDTO> AssignExaminerAsync(int stageProgressId, AssignExaminerDTO assignDto)

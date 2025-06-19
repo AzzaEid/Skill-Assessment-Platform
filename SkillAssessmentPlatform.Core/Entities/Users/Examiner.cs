@@ -6,10 +6,8 @@ namespace SkillAssessmentPlatform.Core.Entities.Users
 {
     public class Examiner : User
     {
-        public string Specialization { get; set; }
+        public string Bio { get; set; }
 
-        // Navigation properties
-        //public User User { get; set; }
         public ICollection<ExaminerLoad> ExaminerLoads { get; set; }
         public ICollection<Track> ManagedTracks { get; set; } = new HashSet<Track>();
         public ICollection<Track> WorkingTracks { get; set; } = new List<Track>();

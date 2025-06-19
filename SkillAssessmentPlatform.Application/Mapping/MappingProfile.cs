@@ -32,6 +32,7 @@ namespace SkillAssessmentPlatform.Application.Mapping
     {
         public MappingProfile()
         {
+
             //User
             CreateMap<UserRegisterDTO, User>().ReverseMap();
             CreateMap<UserRegisterDTO, User>()

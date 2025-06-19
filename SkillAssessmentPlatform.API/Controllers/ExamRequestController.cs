@@ -36,7 +36,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         [HttpGet("{id}/info")]
         public async Task<IActionResult> GetInfoById(int id)
         {
-            var result = await _examRequestService.GetExamRequestByIdAsync(id);
+            var result = await _examRequestService.GetExamRequestInfoByIdAsync(id);
             return _responseHandler.Success(result);
         }
 

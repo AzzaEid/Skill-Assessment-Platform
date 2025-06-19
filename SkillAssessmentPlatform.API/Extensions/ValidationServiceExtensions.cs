@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Applicant.Input;
 using SkillAssessmentPlatform.Application.DTOs.Appointment.Inputs;
 using SkillAssessmentPlatform.Application.DTOs.Auth.Inputs;
 using SkillAssessmentPlatform.Application.DTOs.Exam.Input;
+using SkillAssessmentPlatform.Application.Validators.Applicant;
 using SkillAssessmentPlatform.Application.Validators.Appointment;
 using SkillAssessmentPlatform.Application.Validators.Auth;
 using SkillAssessmentPlatform.Application.Validators.Exam;
@@ -23,6 +25,7 @@ namespace SkillAssessmentPlatform.API.Extensions
             services.AddScoped<ValidationActionFilter>();
 
             // Add all validators explicitly for better control
+            RegisterApplicantValidators(services);
             RegisterAuthValidators(services);
             RegisterAppointmentValidators(services);
             RegisterExamValidators(services);
@@ -32,7 +35,10 @@ namespace SkillAssessmentPlatform.API.Extensions
 
             return services;
         }
-
+        private static void RegisterApplicantValidators(IServiceCollection services)
+        {
+            services.AddScoped<IValidator<UpdateStatusDTO>, UpdateStatusDTOValidator>();
+        }
         private static void RegisterAuthValidators(IServiceCollection services)
         {
             services.AddScoped<IValidator<LoginDTO>, LoginDTOValidator>();

@@ -56,6 +56,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<EnrollmentDTO> EnrollApplicantInTrackAsync(string applicantId, EnrollmentCreateDTO enrollmentDto)
         {
+            #region Validation 
             var applicant = await _unitOfWork.ApplicantRepository.GetByIdAsync(applicantId);
             if (applicant == null)
                 throw new KeyNotFoundException($"Applicant with id {applicantId} not found");
@@ -67,7 +68,7 @@ namespace SkillAssessmentPlatform.Application.Services
             var existingEnrollment = await _unitOfWork.EnrollmentRepository.GetByApplicantAndTrackAsync(applicantId, enrollmentDto.TrackId);
             if (existingEnrollment != null)
                 throw new BadRequestException("Applicant is already enrolled in this track");
-
+            #endregion
             var enrollment = new Enrollment
             {
                 ApplicantId = applicantId,

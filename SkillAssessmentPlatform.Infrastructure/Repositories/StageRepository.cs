@@ -22,7 +22,22 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .OrderBy(s => s.Order)
                 .ToListAsync();
         }
+        public async Task<Stage?> GetNextStageInLevelAsync(int currentStageId)
+        {
+            // Get current stage
+            var currentStage = await _context.Stages.FindAsync(currentStageId);
+            if (currentStage == null)
+                throw new KeyNotFoundException($"Stage with id {currentStageId} not found");
 
+            // Get next stage based on order in same level
+            var nextStage = await _context.Stages
+                .Where(s => s.LevelId == currentStage.LevelId &&
+                            s.Order == currentStage.Order + 1 &&
+                            s.IsActive)
+                .FirstOrDefaultAsync();
+
+            return nextStage;
+        }
         public async Task AddAsync(Stage stage)
         {
             await _context.Stages.AddAsync(stage);

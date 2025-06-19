@@ -5,9 +5,8 @@ namespace SkillAssessmentPlatform.Application.DTOs.Examiner.Output
 {
     public class ExaminerDTO : UserDTO
     {
-        public string Specialization { get; set; }
+        public string Bio { get; set; }
         public IEnumerable<ExaminerLoadDTO> ExaminerLoads { get; set; }
-        // public ICollection<TrackDto> WorkingTracks { get; set; }
         public List<TrackBaseDTO> WorkingTracks { get; set; }
     }
 }

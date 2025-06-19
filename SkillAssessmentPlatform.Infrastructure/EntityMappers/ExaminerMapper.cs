@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SkillAssessmentPlatform.Core.Entities.Users;
 
-namespace YourNamespace.EntityMapper
+namespace SkillAssessmentPlatform.Infrastructure.EntityMappers
 {
     public class ExaminerMapper : IEntityTypeConfiguration<Examiner>
     {
@@ -11,9 +11,9 @@ namespace YourNamespace.EntityMapper
             builder.ToTable("Examiners")
                    .HasBaseType<User>();
 
-            builder.Property(e => e.Specialization)
+            builder.Property(e => e.Bio)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(250);
 
             builder.HasMany(e => e.ExaminerLoads)
                 .WithOne(el => el.Examiner)
@@ -23,7 +23,7 @@ namespace YourNamespace.EntityMapper
             builder.HasMany(e => e.ManagedTracks)
                 .WithOne(t => t.SeniorExaminer)
                 .HasForeignKey(t => t.SeniorExaminerID)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasMany(e => e.SupervisedStages)
                     .WithOne(sp => sp.Examiner)
@@ -33,7 +33,8 @@ namespace YourNamespace.EntityMapper
             builder.HasMany(e => e.Appointments)
                 .WithOne(a => a.Examiner)
                 .HasForeignKey(a => a.ExaminerId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
+
 
             builder.HasMany(e => e.Feedbacks)
                 .WithOne(f => f.Examiner)

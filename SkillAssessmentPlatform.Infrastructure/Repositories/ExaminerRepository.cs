@@ -29,6 +29,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.Users
                 .OfType<Examiner>()
+                .Where(e => e.IsActive == true)
                 .Include(e => e.ExaminerLoads)
                 .ToListAsync();
         }
@@ -37,6 +38,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return _context.Users
                 .OfType<Examiner>()
+                .Where(e => e.IsActive == true)
                 .Include(e => e.ExaminerLoads)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
@@ -46,6 +48,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             var examiner = await _context.Users
                 .OfType<Examiner>()
+                .Where(a => a.IsActive == true)
                 .Include(e => e.ExaminerLoads)
                 .Include(e => e.WorkingTracks)
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -70,7 +73,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<Examiner> UpdateSpecializationAsync(string id, string specialization)
         {
             var examiner = await GetByIdAsync(id);
-            examiner.Specialization = specialization;
+            examiner.Bio = specialization;
 
             var result = await _userManager.UpdateAsync(examiner);
             if (!result.Succeeded)
@@ -160,6 +163,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                     .AsNoTracking()
                     .Where(l => l.Type == type &&
                                 l.CurrWorkLoad < l.MaxWorkLoad &&
+                                l.Examiner.IsActive == true &&
                                  l.Examiner.WorkingTracks.Any(t => t.Id == trackId))
                     .OrderBy(l => l.CurrWorkLoad)
                     .Select(l => l.ExaminerID)
@@ -169,7 +173,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<IEnumerable<Examiner>> GetWorkingExaminersByTrackIdAsync(int trackId)
         {
             return await _context.Examiners
-                .Where(e => e.WorkingTracks.Any(t => t.Id == trackId))
+                .Where(e => e.IsActive == true &&
+                            e.WorkingTracks.Any(t => t.Id == trackId))
                 .Include(e => e.ExaminerLoads)
                 .ToListAsync();
         }

@@ -50,7 +50,7 @@ namespace SkillAssessmentPlatform.Application.Services
         {
             var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(id);
 
-           // examiner.Specialization = examinerDto.Specialization;
+           // examiner.Bio = examinerDto.Bio;
             //examiner.Bio = examinerDto.Bio;
             var mapped = _mapper.Map<Examiner>(examinerDto);
             var updatedExaminer = await _unitOfWork.ExaminerRepository.UpdateAsync(mapped);

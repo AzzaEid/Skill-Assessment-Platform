@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs.Applicant.Input;
 using SkillAssessmentPlatform.Application.Services;
-using SkillAssessmentPlatform.Core.Entities.Users;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
@@ -46,47 +44,8 @@ namespace SkillAssessmentPlatform.API.Controllers
             var updatedApplicant = await _applicantService.UpdateApplicantStatusAsync(id, updateStatusDto);
             return _responseHandler.Success(updatedApplicant, "Applicant status updated");
         }
-        /*
-        [HttpGet("{applicantId}/enrollments")]
-        public async AppTask<IActionResult> GetEnrollments(
-            string applicantId,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
-        {
-            var result = await _applicantService.GetApplicantEnrollmentsAsync(applicantId, page, pageSize);
-            return _responseHandler.Success(result);
-        }
 
-        [HttpGet("{applicantId}/certificates")]
-        public async AppTask<IActionResult> GetCertificates(
-            string applicantId,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
-        {
-            var result = await _applicantService.GetApplicantCertificatesAsync(applicantId, page, pageSize);
-            return _responseHandler.Success(result);
-        }
 
-        [HttpPost("{applicantId}/enrollments")]
-        public async AppTask<IActionResult> EnrollInTrack(
-            string applicantId,
-            [FromBody] EnrollmentCreateDTO enrollmentDto)
-        {
-            var enrollment = await _applicantService.EnrollApplicantInTrackAsync(applicantId, enrollmentDto);
-            return _responseHandler.Created(enrollment, "Enrollment created successfully");
-        }
-
-        [HttpGet("{applicantId}/progress")]
-        public async AppTask<IActionResult> GetProgress(
-            string applicantId,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
-        {
-            var result = await _applicantService.GetApplicantProgressAsync(applicantId, page, pageSize);
-            return _responseHandler.Success(result);
-        }
-        */
-        
     }
 
 }

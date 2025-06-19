@@ -19,6 +19,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         #region DbSets
         public DbSet<Examiner> Examiners { get; set; }
         public DbSet<Applicant> Applicants { get; set; }
+        // DbSets for all tables
+        #region cont. dbSets
         public DbSet<ExaminerLoad> ExaminerLoads { get; set; }
         public DbSet<Track> Tracks { get; set; }
         public DbSet<Level> Levels { get; set; }
@@ -46,7 +48,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
 
 
         #endregion
-
+        #endregion
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -55,12 +57,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
-
-
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-
-            // No additional conversion needed for AssociatedSkills (handled manually via NotMapped)
         }
     }
 }
