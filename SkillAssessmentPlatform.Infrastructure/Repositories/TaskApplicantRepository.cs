@@ -39,9 +39,7 @@ public class TaskApplicantRepository : ITaskApplicantRepository
     public async Task<TaskApplicant> GetByStageProgressIdAsync(int stageProgressId)
     {
         return await _context.TaskApplicants
-            .Where(ta => ta.Task.TasksPool.Stage.StageProgresses
-                .Any(sp => sp.Id == stageProgressId && sp.LevelProgress.Enrollment.ApplicantId == ta.ApplicantId))
-            .OrderByDescending(ta => ta.Id)
+            .Where(ta => ta.StageProgressId == stageProgressId)
             .FirstOrDefaultAsync();
     }
 }

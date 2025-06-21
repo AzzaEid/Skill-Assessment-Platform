@@ -47,7 +47,7 @@ namespace SkillAssessmentPlatform.API.Middleware
                         break;
 
                     case ValidationException validationEx:
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        responseModel.StatusCode = HttpStatusCode.BadRequest;
                         responseModel.Message = "Validation failed";
                         responseModel.Errors = validationEx.Errors
                             .Select(e => $"{e.PropertyName}: {e.ErrorMessage}").ToList();

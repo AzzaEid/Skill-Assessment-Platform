@@ -48,7 +48,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             var examiner = await _context.Users
                 .OfType<Examiner>()
-                .Where(a => a.IsActive == true)
+                // .Where(a => a.IsActive == true)
                 .Include(e => e.ExaminerLoads)
                 .Include(e => e.WorkingTracks)
                 .FirstOrDefaultAsync(e => e.Id == id);

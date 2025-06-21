@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Application.DTOs.ExamReques.Input;
 using SkillAssessmentPlatform.Application.DTOs.ExamReques.Output;
-using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
@@ -15,7 +15,7 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<ExamRequestService> _logger;
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
         private readonly NotificationService _notificationService;
         private readonly StageProgressService _stageProgressService;
 
@@ -23,7 +23,7 @@ namespace SkillAssessmentPlatform.Application.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<ExamRequestService> logger,
-            EmailService emailService,
+            IEmailService emailService,
             NotificationService notificationService,
             StageProgressService stageProgressService)
         {
@@ -51,15 +51,20 @@ namespace SkillAssessmentPlatform.Application.Services
             var existingRequests = await _unitOfWork.ExamRequestRepository.GetByApplicantIdAsync(requestDTO.ApplicantId);
             if (existingRequests.Any(er => er.Exam.StageId == requestDTO.StageId && er.Status == ExamRequestStatus.Pending))
                 throw new BadRequestException("There is already a pending request for this exam");
+            var stageProgress = await _unitOfWork.StageProgressRepository.GetByIdAsync(requestDTO.StageProgressId);
+            if (stageProgress == null)
+                throw new Exception("StageProgress not found.");
+
 
             // Create new exam request
             var examRequest = new ExamRequest
             {
                 ExamId = exam.Id,
                 ApplicantId = requestDTO.ApplicantId,
+                StageProgressId = stageProgress.Id,
                 Status = ExamRequestStatus.Pending,
-                ScheduledDate = DateTime.Now, // will be updated when approved
-                Instructions = "--",
+                ScheduledDate = DateTime.UtcNow, // will be updated when approved
+                Instructions = requestDTO.Instructions,
 
             };
 
@@ -161,8 +166,8 @@ namespace SkillAssessmentPlatform.Application.Services
          */
         public async Task<ExamRequestDTO> ApproveExamRequestAsync(int requestId, ExamRequestUpdateDTO updateDTO)
         {
-            if (!updateDTO.ScheduledDate.HasValue || updateDTO.ScheduledDate < DateTime.UtcNow)
-                throw new BadRequestException("Scheduled date is required and must be in the future");
+            if (!updateDTO.ScheduledDate.HasValue || updateDTO.ScheduledDate <= DateTime.UtcNow.AddMinutes(1))
+                throw new BadRequestException("Scheduled date must be at least 1 minute in the future");
 
             if (string.IsNullOrWhiteSpace(updateDTO.Instructions))
                 throw new BadRequestException("Instructions are required");
@@ -232,8 +237,10 @@ namespace SkillAssessmentPlatform.Application.Services
                 throw new Exception("error in update applicant progress");
             }
             // تحديث الستيج بروغريس
+            /*
             await _stageProgressService.UpdateStatusAsync(sp.Id,
                 new UpdateStageStatusDTO { Score = 0, Status = ApplicantResultStatus.Failed });
+            */
             await SendExamRejectionEmailAsync(examRequest, message);
 
             // Create notification for applicant
@@ -262,7 +269,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
             if (bulkUpdateDTO.Status == ExamRequestStatus.Approved)
             {
-                if (!bulkUpdateDTO.ScheduledDate.HasValue || bulkUpdateDTO.ScheduledDate < DateTime.Now)
+                if (!bulkUpdateDTO.ScheduledDate.HasValue || bulkUpdateDTO.ScheduledDate <= DateTime.UtcNow.AddMinutes(1))
                     throw new BadRequestException("Scheduled date is required and must be in the future");
 
                 if (string.IsNullOrWhiteSpace(bulkUpdateDTO.Instructions))

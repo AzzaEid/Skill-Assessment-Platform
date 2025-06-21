@@ -41,6 +41,8 @@ namespace SkillAssessmentPlatform.Application.Mapping
 
             CreateMap<UserDTO, User>().ReverseMap();
             CreateMap<ExaminerRegisterDTO, User>().ReverseMap();
+            CreateMap<SeniorDTO, Examiner>().ReverseMap();
+
 
             CreateMap<Examiner, ExaminerDTO>()
             .ForMember(dest => dest.WorkingTracks, opt => opt.MapFrom(src => src.WorkingTracks));
@@ -63,6 +65,7 @@ namespace SkillAssessmentPlatform.Application.Mapping
                 .ForMember(dest => dest.TrackName, op => op.MapFrom(src => src.Track.Name))
                 .ForMember(dest => dest.TrackImage, op => op.MapFrom(src => src.Track.Image));
             CreateMap<Enrollment, EnrollmentCreateDTO>().ReverseMap();
+
             CreateMap<LevelProgressDTO, LevelProgress>().ReverseMap()
                 .ForMember(dest => dest.LevelName, opt => opt.MapFrom(src => src.Level.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Level.Description))
@@ -87,7 +90,8 @@ namespace SkillAssessmentPlatform.Application.Mapping
             .ForMember(dest => dest.ExamInfo, opt => opt.MapFrom(src => src.ExamRequest));
 
             CreateMap<DetailedFeedbackDTO, DetailedFeedback>().ReverseMap()
-                .ForMember(dest => dest.CriterionName, opt => opt.MapFrom(src => src.EvaluationCriteria.Name));
+                .ForMember(dest => dest.CriterionName, opt => opt.MapFrom(src => src.EvaluationCriteria.Name))
+                .ForMember(dest => dest.CriterionWeight, opt => opt.MapFrom(src => src.EvaluationCriteria.Weight));
 
             CreateMap<Exam, ExamDto>().ReverseMap();
             CreateMap<Interview, InterviewDto>().ReverseMap();

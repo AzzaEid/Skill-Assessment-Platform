@@ -20,10 +20,10 @@ namespace SkillAssessmentPlatform.Application.Services
             _logger = logger;
         }
 
-        public async Task<List<ExaminerDTO>> GetAllSeniorsAsync()
+        public async Task<List<SeniorDTO>> GetAllSeniorsAsync()
         {
             var seniors = await _unitOfWork.SeniorRepository.GetSeniorListAsync();
-            return _mapper.Map<List<ExaminerDTO>>(seniors);
+            return _mapper.Map<List<SeniorDTO>>(seniors);
         }
         public async Task<List<TrackBaseDTO>> GetTracksBySeniorIdAsync(string seniorId)
         {

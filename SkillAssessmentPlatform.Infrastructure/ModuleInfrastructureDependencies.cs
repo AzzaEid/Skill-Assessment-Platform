@@ -1,10 +1,12 @@
 ﻿// Updated ModuleInfrastructureDependencies.cs
 
 using Microsoft.Extensions.DependencyInjection;
+using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 using SkillAssessmentPlatform.Infrastructure.ExternalServices;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
 using SkillAssessmentPlatform.Infrastructure.Repositories;
 
 namespace SkillAssessmentPlatform.Infrastructure
@@ -14,8 +16,11 @@ namespace SkillAssessmentPlatform.Infrastructure
         public static IServiceCollection AddInfrastructureDependencies(this IServiceCollection services)
         {
             services.AddSingleton<IFileService, FileService>();
-            services.AddTransient<EmailSettings>();
+            services.AddTransient<IMeetingService, ZoomMeetService>();
+            services.AddTransient<IPdfGeneratorService, PdfGeneratorService>();
+            services.AddTransient<IEmailService, EmailService>();
 
+            services.AddTransient<EmailSettings>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 

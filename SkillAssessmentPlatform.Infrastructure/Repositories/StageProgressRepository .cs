@@ -31,6 +31,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.StageProgresses
                 .Where(sp => sp.LevelProgressId == levelProgressId && sp.Status == ProgressStatus.InProgress)
                 .Include(sp => sp.Stage)
+                .ThenInclude(s => s.Level)
                 .FirstOrDefaultAsync();
         }
         public async Task<StageProgress> GetCurrentStageProgressByEnrollmentAsync(int enrollmentId)
@@ -52,7 +53,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             stageProgress.Score = score;
 
             if (status == ProgressStatus.Successful || status == ProgressStatus.Failed)
-                stageProgress.CompletionDate = DateTime.Now;
+                stageProgress.CompletionDate = DateTime.UtcNow;
 
             _context.StageProgresses.Update(stageProgress);
             await _context.SaveChangesAsync();

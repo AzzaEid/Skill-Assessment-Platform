@@ -94,7 +94,7 @@ namespace SkillAssessmentPlatform.Application.Services
             //نغير حالة الاسسمنت - نقلل الكرنت وورك لود
             await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignment.Id, AssignmentStatus.Completed);
 
-            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(assignment.ExaminerId, LoadType.TaskCreation);
+            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(assignment.ExaminerId, LoadType.TaskCreation);
 
             // نخبر السينيور
             await _notificationService.SendNotificationAsync(
@@ -108,14 +108,14 @@ namespace SkillAssessmentPlatform.Application.Services
 
             var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, AssignmentStatus.Completed);
 
-            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
+            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
         }
         public async Task CancelCreationAssignmentStatusAsync(int assignmentId)
         {
 
             var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, AssignmentStatus.Cancelled);
 
-            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
+            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
         }
     }
 }

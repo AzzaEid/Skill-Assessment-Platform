@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.Enrollment;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Entities;
@@ -13,13 +14,16 @@ namespace SkillAssessmentPlatform.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly TaskApplicantService _taskApplicantService;
 
         public EnrollmentService(
             IUnitOfWork unitOfWork,
+            TaskApplicantService taskApplicantService,
             IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _taskApplicantService = taskApplicantService;
         }
 
         public async Task<PagedResponse<EnrollmentDTO>> GetAllEnrollmentsAsync(int page = 1, int pageSize = 10)
@@ -116,9 +120,15 @@ namespace SkillAssessmentPlatform.Application.Services
                         await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(freeExaminerId, MapLoad(firstStage.Type));
                         await _unitOfWork.StageProgressRepository.AddAsync(stageProgress);
                         await _unitOfWork.SaveChangesAsync();
+                        if (firstStage.Type == StageType.Task)
+                        {
+                            await _taskApplicantService.AssignRandomTaskAsync(
+                                new AssignTaskDTO { StageProgressId = stageProgress.Id });
+                        }
                     }
                 }
-
+                await _unitOfWork.ApplicantRepository.UpdateStatusAsync(applicantId, ApplicantStatus.Active);
+                await _unitOfWork.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
             catch
@@ -137,9 +147,16 @@ namespace SkillAssessmentPlatform.Application.Services
             return type;
         }
 
-        public async Task<EnrollmentDTO> UpdateEnrollmentStatusAsync(int enrollmentId, UpdateEnrollmentStatusDTO updateDto)
+        public async Task<EnrollmentDTO?> UpdateEnrollmentStatusAsync(int enrollmentId, UpdateEnrollmentStatusDTO updateDto)
         {
             var enrollment = await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(enrollmentId, updateDto.Status);
+            if (enrollment == null) return null;
+            var applicantErnolments = await _unitOfWork.EnrollmentRepository.GetByApplicantIdAsync(enrollment.ApplicantId);
+            if (updateDto.Status == EnrollmentStatus.Completed &&
+                (applicantErnolments == null || !applicantErnolments.Any()))
+            {
+                await _unitOfWork.ApplicantRepository.UpdateStatusAsync(enrollment.ApplicantId, ApplicantStatus.Inactive);
+            }
             return _mapper.Map<EnrollmentDTO>(enrollment);
         }
     }

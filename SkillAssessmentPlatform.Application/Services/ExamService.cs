@@ -1,9 +1,9 @@
-﻿using SkillAssessmentPlatform.Application.DTOs.Exam.Input;
+﻿using SkillAssessmentPlatform.Application.Abstract;
+using SkillAssessmentPlatform.Application.DTOs.Exam.Input;
 using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
 namespace SkillAssessmentPlatform.Application.Services
 {

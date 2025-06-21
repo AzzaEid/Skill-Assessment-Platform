@@ -18,7 +18,7 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly IMapper _mapper;
         private readonly ILogger<InterviewBookService> _logger;
         private readonly NotificationService _notificationService;
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
         private readonly IMeetingService _meetingService;
         private readonly StageProgressService _stageProgressService;
 
@@ -28,7 +28,7 @@ namespace SkillAssessmentPlatform.Application.Services
             IMapper mapper,
             ILogger<InterviewBookService> logger,
             NotificationService notificationService,
-            EmailService emailService,
+            IEmailService emailService,
             IMeetingService meetingService,
             StageProgressService stageProgressService)
         {
@@ -129,6 +129,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 {
                     InterviewId = bookingDto.InterviewId,
                     AppointmentId = bookingDto.AppointmentId,
+                    StageProgressId = bookingDto.StageProgressId,
                     ApplicantId = applicantId,
                     Status = InterviewStatus.Pending
                 };
@@ -264,7 +265,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 NotificationType.InterviewConfirmed,
                 $"An interview with {applicant.FullName} has been confirmed for {appointment.StartTime:dd/MM/yyyy HH:mm}."
             );
-            //emal
+            //email
             await _emailService.SendEmailAsync(
                 applicant.Email,
                 "Interview Scheduled",

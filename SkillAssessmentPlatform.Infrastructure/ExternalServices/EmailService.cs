@@ -3,11 +3,12 @@ using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
+using SkillAssessmentPlatform.Application.Abstract;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
 
-namespace SkillAssessmentPlatform.Application.Services
+namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
 {
-    public class EmailService
+    public class EmailService : IEmailService
     {
         private readonly ILogger<EmailService> _logger;
         private readonly EmailSettings _emailConfig;
@@ -49,5 +50,4 @@ namespace SkillAssessmentPlatform.Application.Services
             }
         }
     }
-
 }

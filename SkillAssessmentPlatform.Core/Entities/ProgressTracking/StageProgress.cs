@@ -1,4 +1,5 @@
-﻿using SkillAssessmentPlatform.Core.Entities.Users;
+﻿using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Core.Entities
@@ -22,6 +23,9 @@ namespace SkillAssessmentPlatform.Core.Entities
         public Examiner Examiner { get; set; }
         public Stage Stage { get; set; }
         public LevelProgress LevelProgress { get; set; }
+        public ICollection<ExamRequest> ExamRequests { get; set; } = new HashSet<ExamRequest>();
+        public TaskApplicant TaskApplicant { get; set; }
+        public ICollection<InterviewBook> InterviewsBooks { get; set; } = new HashSet<InterviewBook>();
         // public Applicant Applicant { get; set; } // Optional nav property (useful if needed later)
     }
 }

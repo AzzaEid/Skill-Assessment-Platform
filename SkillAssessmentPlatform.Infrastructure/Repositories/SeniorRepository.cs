@@ -51,6 +51,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<List<Examiner>> GetSeniorListAsync()
         {
             return await _context.Tracks
+                 .Include(t => t.SeniorExaminer!.ManagedTracks)
                  .Where(t => t.SeniorExaminer != null)
                  .Select(t => t.SeniorExaminer!)
                  .Distinct()

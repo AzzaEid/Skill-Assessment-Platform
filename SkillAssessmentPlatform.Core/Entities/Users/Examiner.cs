@@ -8,7 +8,7 @@ namespace SkillAssessmentPlatform.Core.Entities.Users
     {
         public string Bio { get; set; }
 
-        public ICollection<ExaminerLoad> ExaminerLoads { get; set; }
+        public ICollection<ExaminerLoad> ExaminerLoads { get; set; } = new HashSet<ExaminerLoad>();
         public ICollection<Track> ManagedTracks { get; set; } = new HashSet<Track>();
         public ICollection<Track> WorkingTracks { get; set; } = new List<Track>();
         public ICollection<StageProgress> SupervisedStages { get; set; } = new HashSet<StageProgress>();

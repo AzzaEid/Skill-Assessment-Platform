@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.Examiner.Input;
 using SkillAssessmentPlatform.Application.DTOs.Examiner.Output;
@@ -13,7 +14,6 @@ using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
 //using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
 
 namespace SkillAssessmentPlatform.Application.Services

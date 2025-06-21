@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
 using System.Text;
 
 namespace SkillAssessmentPlatform.Infrastructure

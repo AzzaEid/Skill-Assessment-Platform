@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SkillAssessmentPlatform.Application\SkillAssessmentPlatform.Application.csproj" />
+    <ProjectReference Include="..\SkillAssessmentPlatform.Infrastructure\SkillAssessmentPlatform.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

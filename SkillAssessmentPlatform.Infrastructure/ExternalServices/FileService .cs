@@ -1,15 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using SkillAssessmentPlatform.Application.Abstract;
 
 namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
 {
-    
+
     public class FileService : IFileService
     {
         private readonly IWebHostEnvironment _environment;
@@ -86,5 +82,5 @@ namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
             return allowedFileTypes.Contains(fileExtension);
         }
     }
-    
+
 }
