@@ -83,6 +83,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.Tracks
                 .Where(t => t.IsActive)
                 .Include(t => t.AssociatedSkills)
+                .AsNoTracking()                 // Read-only optimization
                 .ToListAsync();
         }
 

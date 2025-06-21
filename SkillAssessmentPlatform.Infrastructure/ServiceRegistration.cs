@@ -6,20 +6,32 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
 using System.Text;
 
 namespace SkillAssessmentPlatform.Infrastructure
 {
     public static class ServiceRegistration
     {
-        public static IServiceCollection AddServiceRegistration(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddServiceRegistration(this IServiceCollection services,
+                                                                    IConfiguration configuration)
         {
             // Identity configuration
             services.AddIdentity<User, IdentityRole>(options =>
             {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
                 options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+
+                // Account lockout for security
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+
+                // Email confirmation requirement
                 options.SignIn.RequireConfirmedEmail = false;
+
             })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
@@ -49,7 +61,8 @@ namespace SkillAssessmentPlatform.Infrastructure
                     ValidateAudience = true,
                     ValidAudience = configuration["JWT:Audience"],
                     ValidIssuer = configuration["JWT:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:key"]))
+                    IssuerSigningKey = new SymmetricSecurityKey
+                                        (Encoding.UTF8.GetBytes(configuration["JWT:key"]))
                 };
             });
             // Swagger

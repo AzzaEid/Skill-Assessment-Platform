@@ -11,6 +11,8 @@ namespace SkillAssessmentPlatform.Core.Entities.Users
         public Actors UserType { get; set; }
         public string? Image { get; set; }
         public Gender? Gender { get; set; }
+        public bool IsActive { get; set; } = true;
+
 
         public ICollection<Notification> Notifications { get; set; }
     }

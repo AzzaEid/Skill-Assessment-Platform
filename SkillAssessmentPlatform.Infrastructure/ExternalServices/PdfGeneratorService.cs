@@ -1,10 +1,11 @@
 ﻿using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Hosting;
+using SkillAssessmentPlatform.Application.Abstract;
 
-namespace SkillAssessmentPlatform.Application.Services
+namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
 {
-    public class PdfGeneratorService
+    public class PdfGeneratorService : IPdfGeneratorService
     {
         private readonly IConverter _converter;
         private readonly IWebHostEnvironment _environment;

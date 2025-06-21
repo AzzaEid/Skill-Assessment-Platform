@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SkillAssessmentPlatform.Application.DTOs.Auth.Inputs;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs.Auth.Inputs;
 
 namespace SkillAssessmentPlatform.Application.DTOs.Examiner.Input
 {
@@ -12,6 +7,6 @@ namespace SkillAssessmentPlatform.Application.DTOs.Examiner.Input
     {
         [Required]
         [MaxLength(100)]
-        public string Specialization { get; set; }
+        public string Bio { get; set; }
     }
 }

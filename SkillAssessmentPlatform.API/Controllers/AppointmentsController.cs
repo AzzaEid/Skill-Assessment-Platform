@@ -30,13 +30,7 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Success(appointment);
         }
 
-        /*  [HttpGet("examiner/{examinerId}/available")]
-          public async Task<IActionResult> GetAvailableByExaminer(string examinerId)
-          {
-              var appointments = await _appointmentService.GetAvailableAppointmentsByExaminerAsync(examinerId);
-              return _responseHandler.Success(appointments);
-          }
-        */
+
         [HttpGet("slots/applicant/{applicantId}/stage/{stageId}")]
         [Authorize(Roles = "Applicant")]
         public async Task<IActionResult> GetApplicantAvailableSlots(string applicantId, int stageId)

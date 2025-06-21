@@ -116,8 +116,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<ExamRequest> GetByStageProgressIdAsync(int stageProgressId)
         {
             return await _context.ExamRequests
-                .Where(er => er.Exam.Stage.StageProgresses
-                    .Any(sp => sp.Id == stageProgressId && sp.LevelProgress.Enrollment.ApplicantId == er.ApplicantId))
+                .Where(er => er.StageProgressId == stageProgressId)
                 .OrderByDescending(er => er.Id)
                 .FirstOrDefaultAsync();
         }
@@ -127,7 +126,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.ExamRequests
                 .Where(er => er.ApplicantId == applicantId
                             && er.Status == ExamRequestStatus.Approved
-                            && er.ScheduledDate < DateTime.Now)
+                            && er.ScheduledDate < DateTime.UtcNow)
                 .FirstOrDefaultAsync();
         }
     }

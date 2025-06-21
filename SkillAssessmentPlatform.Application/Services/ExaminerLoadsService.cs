@@ -66,6 +66,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     Type = loadDto.Type,
                     MaxWorkLoad = loadDto.MaxWorkLoad
                 };
+                // if (loadDto.Type == LoadType.ExamCreation || )
 
                 await _unitOfWork.ExaminerLoadRepository.AddAsync(load);
                 result.Add(_mapper.Map<ExaminerLoadDTO>(load));

@@ -55,47 +55,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .OrderByDescending(ib => ib.ScheduledDate)
                 .ToListAsync();
         }
-        /*
-        public async Task<InterviewBook> CreateInterviewBookAsync(string applicantId, int interviewId, int appointmentId)
-        {
 
-            // Check if appointment is available نقل على السيرفس
-            bool isAvailable = await _appointmentRepository.IsAppointmentAvailableAsync(appointmentId);
-            if (!isAvailable)
-                throw new BadRequestException("The selected appointment is not available");
 
-            // Get appointment to set scheduled date
-            var appointment = await _context.Appointments.FindAsync(appointmentId);
-            if (appointment == null)
-                throw new KeyNotFoundException($"Appointment with id {appointmentId} not found");
-
-            // Check if the interview exists
-            var interview = await _context.Interviews.FindAsync(interviewId);
-            if (interview == null)
-                throw new KeyNotFoundException($"Interview with id {interviewId} not found");
-
-            // Create the interview booking
-            var interviewBook = new InterviewBook
-            {
-                InterviewId = interviewId,
-                AppointmentId = appointmentId,
-                ApplicantId = applicantId,
-                ScheduledDate = appointment.StartTime,
-                Status = InterviewStatus.Pending
-            };
-
-            // Mark the appointment as booked
-            await _appointmentRepository.MarkAppointmentAsBookedAsync(appointmentId);
-
-            // Save the booking
-            await _context.InterviewBooks.AddAsync(interviewBook);
-            await _context.SaveChangesAsync();
-
-            // Generate meeting link
-            return await GenerateMeetingLinkAsync(interviewBook.Id);
-
-        }
-        */
         public async Task<InterviewBook> UpdateInterviewStatusAsync(int interviewBookId, InterviewStatus status)
         {
 
@@ -138,39 +99,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
             return interviewBook;
         }
-        public async Task<InterviewBook> GenerateMeetingLinkAsync(int interviewBookId)
-        {
-            try
-            {
-                var interviewBook = await _context.InterviewBooks
-                    .Include(ib => ib.Interview)
-                    .Include(ib => ib.Appointment)
-                    .FirstOrDefaultAsync(ib => ib.Id == interviewBookId);
-
-                if (interviewBook == null)
-                    throw new KeyNotFoundException($"Interview booking with id {interviewBookId} not found");
-
-                // Generate a Google Meet link
-                // In a real application this would integrate with Google Calendar API
-                // For now, create a placeholder link
-                string meetingId = Guid.NewGuid().ToString("N").Substring(0, 12);
-                interviewBook.MeetingLink = $"https://meet.google.com/{meetingId}";
-
-                await _context.SaveChangesAsync();
-                return interviewBook;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error generating meeting link for booking {interviewBookId}");
-                throw;
-            }
-        }
 
         public async Task<InterviewBook> GetByStageProgressIdAsync(int stageProgressId)
         {
             return await _context.InterviewBooks
-                .Where(ib => ib.Interview.Stage.StageProgresses
-                    .Any(sp => sp.Id == stageProgressId && sp.LevelProgress.Enrollment.ApplicantId == ib.ApplicantId))
+                .Where(ib => ib.StageProgressId == stageProgressId)
+                .Include(ib => ib.Appointment)
                 .OrderByDescending(ib => ib.Id)
                 .FirstOrDefaultAsync();
         }

@@ -17,8 +17,6 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         void DeleteEntity(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
-
-        // AppTask<int> GetTotalCountAsync();
         void RemoveRange(IEnumerable<T> entities);
 
     }

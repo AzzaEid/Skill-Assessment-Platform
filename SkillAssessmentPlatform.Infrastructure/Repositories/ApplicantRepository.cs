@@ -31,6 +31,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return await _context.Users
                 .OfType<Applicant>()
+                .Where(a => a.IsActive == true)
                 .ToListAsync();
         }
 
@@ -38,6 +39,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             return _context.Users
                 .OfType<Applicant>()
+                .Where(a => a.IsActive == true)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
         }
@@ -46,6 +48,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             var applicant = await _context.Users
                 .OfType<Applicant>()
+                .Where(a => a.IsActive == true)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (applicant == null)

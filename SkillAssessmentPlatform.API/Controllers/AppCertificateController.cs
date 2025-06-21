@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.API.Helpers;
+using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Application.Services;
 
 namespace SkillAssessmentPlatform.API.Controllers
@@ -11,14 +12,14 @@ namespace SkillAssessmentPlatform.API.Controllers
     {
         private readonly AppCertificateService _certificateService;
         private readonly IResponseHandler _responseHandler;
-        private readonly PdfGeneratorService _pdfService;
+        private readonly IPdfGeneratorService _pdfService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ViewRender _viewRender;
 
         public CertificatesController(
             AppCertificateService certificateService,
             IResponseHandler responseHandler,
-            PdfGeneratorService pdfService,
+            IPdfGeneratorService pdfService,
             IServiceProvider serviceProvider,
             ViewRender viewRender)
         {

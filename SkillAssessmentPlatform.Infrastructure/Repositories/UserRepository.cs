@@ -2,16 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Core.Entities.Users;
-using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
@@ -37,6 +30,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 _logger.LogWarning("User with ID {UserId} not found", id);
                 throw new UserNotFoundException($"No user with id: {id}");
             }
+            if (user.IsActive == false)
+            {
+                throw new BadRequestException($"user with id: {id} is deactive");
+
+            }
             return user;
         }
 
@@ -49,13 +47,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 _logger.LogWarning("User with email {Email} not found", email);
                 throw new UserNotFoundException($"No user with email: {email}");
             }
+            if (user.IsActive == false)
+            {
+                throw new BadRequestException($"user with id: {email} is deactive");
+
+            }
             return user;
         }
 
         public async Task<IEnumerable<User>> GetUsersByTypeAsync(Actors userType, int page = 1, int pageSize = 10)
         {
             return await _userManager.Users
-                .Where(u => u.UserType == userType)
+                .Where(u => u.UserType == userType && u.IsActive == true)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -63,7 +66,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<int> GetCountByTypeAsync(Actors userType)
         {
             return await _userManager.Users
-                .Where(u => u.UserType == userType)
+                .Where(u => u.IsActive == true && u.UserType == userType)
                 .CountAsync();
         }
 
@@ -74,6 +77,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 query = query.Where(u =>
+                    u.IsActive == true &&
                     u.Email.Contains(searchTerm) ||
                     u.FullName.Contains(searchTerm)
                 );
@@ -103,10 +107,11 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         public override async Task<bool> DeleteAsync(string id)
         {
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
                 throw new UserNotFoundException($"No User with id: {id}");
-
+            /*
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
@@ -114,8 +119,19 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 throw new BadRequestException($"Failed to delete user", result.Errors);
             }
             return result.Succeeded;
+            */
+            /// soft delete 
+            /// alrady deleted
+            if (!user.IsActive)
+                throw new InvalidOperationException($"User with id: {id} is already deactivated.");
+
+            user.IsActive = false;
+            var res = await _userManager.UpdateAsync(user);
+            return res.Succeeded;
+
         }
-     
+
+
 
         public async Task<bool> UpdateUserRoleAsync(string Id, Actors newRole)
         {

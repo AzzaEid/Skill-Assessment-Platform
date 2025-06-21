@@ -47,6 +47,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 //StageProgressId = dto.StageProgressId,
                 TaskId = selectedTask.Id,
                 ApplicantId = enrollment.ApplicantId,
+                StageProgressId = stageProgress.Id,
                 AssignedDate = DateTime.UtcNow,
                 DueDate = DateTime.UtcNow.AddDays(pool.DaysToSubmit)
             };

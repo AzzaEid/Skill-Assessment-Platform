@@ -4,11 +4,11 @@ using Newtonsoft.Json;
 using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Core.Responses;
 using SkillAssessmentPlatform.Core.Results;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
+using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace SkillAssessmentPlatform.Application.Services
+namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
 {
     public class ZoomMeetService : IMeetingService
     {
@@ -23,32 +23,6 @@ namespace SkillAssessmentPlatform.Application.Services
             _settings = settings.Value;
         }
 
-        public async Task<string> CreateMeetingAsync(DateTime startTime, DateTime endTime, string hostId, string participantId, string title)
-        {
-            try
-            {
-                // التنفيذ الفعلي سيحتاج إلى استخدامZoom API
-                // هذا تنفيذ بسيط لإظهار الفكرة
-
-                // في بيئة الإنتاج، ستحتاج إلى:
-                // 1. استخدام Google OAuth للوصول إلى حساب المضيف
-                // 2. إنشاء حدث في Google Calendar مع دعوة المشارك
-                // 3. إعداد اجتماع Google Meet وإرجاع الرابط
-
-                // نموذج بسيط لرابط اجتماع
-                var meetingId = Guid.NewGuid().ToString("N").Substring(0, 12);
-                var meetingLink = $"https://meet.google.com/{meetingId}";
-
-                _logger.LogInformation($"Created meeting: {meetingLink} for host {hostId} and participant {participantId} at {startTime}");
-
-                return meetingLink;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Failed to create meeting for host {hostId} and participant {participantId}");
-                throw;
-            }
-        }
 
         public async Task<string> GetAccessTokenAsync()
         {

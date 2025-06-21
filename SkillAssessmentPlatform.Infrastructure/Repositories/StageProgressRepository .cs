@@ -31,6 +31,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.StageProgresses
                 .Where(sp => sp.LevelProgressId == levelProgressId && sp.Status == ProgressStatus.InProgress)
                 .Include(sp => sp.Stage)
+                .ThenInclude(s => s.Level)
                 .FirstOrDefaultAsync();
         }
         public async Task<StageProgress> GetCurrentStageProgressByEnrollmentAsync(int enrollmentId)
@@ -52,7 +53,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             stageProgress.Score = score;
 
             if (status == ProgressStatus.Successful || status == ProgressStatus.Failed)
-                stageProgress.CompletionDate = DateTime.Now;
+                stageProgress.CompletionDate = DateTime.UtcNow;
 
             _context.StageProgresses.Update(stageProgress);
             await _context.SaveChangesAsync();
@@ -75,26 +76,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return stageProgress;
         }
 
-        public async Task<StageProgress> CreateNextStageProgressAsync(int levelProgressId, int currentStageId, string freeExaminerId)
+        public async Task<StageProgress> CreateNextStageProgressAsync(int levelProgressId, int nextStageId, string freeExaminerId)
         {
-            // Get the current stage
-            var currentStage = await _context.Stages.FindAsync(currentStageId);
-            if (currentStage == null)
-                throw new KeyNotFoundException($"Stage with id {currentStageId} not found");
-
-            // Get the next stage
-            var nextStage = await _context.Stages
-                .Where(s => s.LevelId == currentStage.LevelId && s.Order == currentStage.Order + 1 && s.IsActive)
-                .FirstOrDefaultAsync();
-
-            if (nextStage == null)
-                return null; // No next stage, level completed
 
             // Create progress for the next stage
             var stageProgress = new StageProgress
             {
                 LevelProgressId = levelProgressId,
-                StageId = nextStage.Id,
+                StageId = nextStageId,
                 Status = ProgressStatus.InProgress,
                 StartDate = DateTime.Now,
                 Attempts = 1,
@@ -106,6 +95,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
             return stageProgress;
         }
+
+
 
         public async Task<int> GetAttemptCountAsync(int stageId)
         {

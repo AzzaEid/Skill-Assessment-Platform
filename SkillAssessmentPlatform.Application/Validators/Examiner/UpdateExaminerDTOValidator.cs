@@ -10,9 +10,9 @@ namespace SkillAssessmentPlatform.Application.Validators.Examiner
         {
             Include(new UpdateUserDTOValidator());
 
-            RuleFor(x => x.Specialization)
+            RuleFor(x => x.Bio)
                 .NotEmpty().WithMessage("Specialization is required")
-                .MaximumLength(100).WithMessage("Specialization must not exceed 100 characters");
+                .MaximumLength(250).WithMessage("Bio must not exceed 250 characters");
         }
     }
 }

@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SkillAssessmentPlatform.Application\SkillAssessmentPlatform.Application.csproj" />
     <ProjectReference Include="..\SkillAssessmentPlatform.Core\SkillAssessmentPlatform.Core.csproj" />
   </ItemGroup>
 	<ItemGroup>

@@ -10,6 +10,7 @@ namespace SkillAssessmentPlatform.Application.DTOs.StageProgress.Output
         public StageType StageType { get; set; }
         public ProgressStatus Status { get; set; }
         public int Score { get; set; }
+        public int StagePassingScore { get; set; }
         public string ApplicantId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? CompletionDate { get; set; }

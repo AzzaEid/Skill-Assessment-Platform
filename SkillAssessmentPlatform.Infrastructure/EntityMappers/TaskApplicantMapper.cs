@@ -18,6 +18,11 @@ namespace SkillAssessmentPlatform.Infrastructure.EntityMappers
             builder.HasMany(ta => ta.TaskSubmissions)
                 .WithOne(ts => ts.TaskApplicant)
                 .HasForeignKey(ts => ts.TaskApplicantId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(ta => ta.StageProgress)
+                .WithOne(sp => sp.TaskApplicant)
+                .HasForeignKey<TaskApplicant>(ta => ta.StageProgressId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
