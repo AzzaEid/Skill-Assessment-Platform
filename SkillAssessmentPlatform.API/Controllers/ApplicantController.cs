@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
 using SkillAssessmentPlatform.Core.Entities.Users;
+using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
@@ -46,6 +48,19 @@ namespace SkillAssessmentPlatform.API.Controllers
             var updatedApplicant = await _applicantService.UpdateApplicantStatusAsync(id, updateStatusDto);
             return _responseHandler.Success(updatedApplicant, "Applicant status updated");
         }
+
+        [HttpPut("{id}/suspend")]
+        [Authorize(Roles = "Admin")] 
+        public async Task<IActionResult> SuspendApplicant(string id)
+        {
+            var updatedApplicant = await _applicantService.UpdateApplicantStatusAsync(id, new UpdateStatusDTO
+            {
+                Status = ApplicantStatus.Suspended
+            });
+
+            return _responseHandler.Success(updatedApplicant, "Applicant suspended successfully");
+        }
+
         /*
         [HttpGet("{applicantId}/enrollments")]
         public async AppTask<IActionResult> GetEnrollments(
@@ -86,7 +101,7 @@ namespace SkillAssessmentPlatform.API.Controllers
             return _responseHandler.Success(result);
         }
         */
-        
+
     }
 
 }
