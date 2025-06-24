@@ -5,9 +5,10 @@ using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Core.Interfaces;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
 using SkillAssessmentPlatform.Infrastructure.Repositories;
+using SkillAssessmentPlatform.Infrastructure.Services;
+using SkillAssessmentPlatform.Infrastructure.Services.ExternalServices;
+using SkillAssessmentPlatform.Infrastructure.Services.ExternalServices.Settings;
 
 namespace SkillAssessmentPlatform.Infrastructure
 {
@@ -19,6 +20,7 @@ namespace SkillAssessmentPlatform.Infrastructure
             services.AddTransient<IMeetingService, ZoomMeetService>();
             services.AddTransient<IPdfGeneratorService, PdfGeneratorService>();
             services.AddTransient<IEmailService, EmailService>();
+            services.AddSingleton<ICacheService, CacheService>();
 
             services.AddTransient<EmailSettings>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();

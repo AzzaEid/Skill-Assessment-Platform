@@ -4,11 +4,11 @@ using Newtonsoft.Json;
 using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Core.Responses;
 using SkillAssessmentPlatform.Core.Results;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
+using SkillAssessmentPlatform.Infrastructure.Services.ExternalServices.Settings;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
+namespace SkillAssessmentPlatform.Infrastructure.Services.ExternalServices
 {
     public class ZoomMeetService : IMeetingService
     {

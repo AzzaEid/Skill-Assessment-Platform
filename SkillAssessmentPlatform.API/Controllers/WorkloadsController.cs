@@ -144,6 +144,15 @@ namespace SkillAssessmentPlatform.API.Controllers
             var assignments = await _workloadService.GetExaminerTaskAssignmentsAsync(examinerId);
             return _responseHandler.Success(assignments);
         }
+        [HttpGet("progresses")]
+        public async Task<IActionResult> Getpendding()
+        {
+            var examinerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (examinerId == null)
+                return _responseHandler.Unauthorized();
+            var assignments = await _workloadService.GetPendingAsync(examinerId);
+            return _responseHandler.Success(assignments);
+        }
 
         [HttpGet("exam-creations")]
         public async Task<IActionResult> GetExamCreationAssignments()

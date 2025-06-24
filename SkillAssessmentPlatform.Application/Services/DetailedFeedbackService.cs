@@ -21,6 +21,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 FeedbackId = df.FeedbackId,
                 EvaluationCriteriaId = df.CriterionId,
                 CriterionName = df.EvaluationCriteria.Name,
+                CriterionWeight = df.EvaluationCriteria.Weight,
                 Comments = df.Comments,
                 Score = df.Score
             });

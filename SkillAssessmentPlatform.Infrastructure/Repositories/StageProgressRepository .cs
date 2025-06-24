@@ -151,7 +151,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Where(sp => sp.LevelProgressId == levelProgressId)
                 .Include(sp => sp.Stage)
                     .ThenInclude(s => s.Level)
-                .OrderByDescending(e => e.StartDate)
+                 .OrderByDescending(sp => sp.Id)
                 .FirstOrDefaultAsync();
         }
 
@@ -215,6 +215,17 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .Where(sp => sp.ExaminerId == examinerId
                         && sp.Status == ProgressStatus.InProgress
                         && sp.Stage.Type == stageType)
+                .Include(sp => sp.Stage)
+                .Include(sp => sp.LevelProgress)
+                    .ThenInclude(lp => lp.Enrollment)
+                        .ThenInclude(e => e.Track)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<StageProgress>> GetByPendingExaminerIdAsync(string examinerId)
+        {
+            return await _context.StageProgresses
+                .Where(sp => sp.ExaminerId == examinerId
+                        && sp.Status == ProgressStatus.InProgress)
                 .Include(sp => sp.Stage)
                 .Include(sp => sp.LevelProgress)
                     .ThenInclude(lp => lp.Enrollment)

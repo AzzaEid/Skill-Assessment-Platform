@@ -119,13 +119,13 @@ namespace SkillAssessmentPlatform.Application.Services
                     }
                     else if (examRequest.ScheduledDate > DateTime.UtcNow)
                     {
-                        dto.ActionStatus = StageActionStatus.RequestApproved;
+                        dto.ActionStatus = StageActionStatus.ExamCompleted;
                         dto.AdditionalData = new { ExamRequestId = examRequest.Id };
                     }
                     else
                     {
-                        dto.ActionStatus = StageActionStatus.ExamCompleted;
-                        dto.AdditionalData = new { ExamRequestId = examRequest.Id };
+                        dto.ActionStatus = StageActionStatus.RequestApproved;
+                        dto.AdditionalData = new { ExamRequestId = examRequest.Id, ExamId = examRequest.ExamId };
                     }
                     break;
                 case ExamRequestStatus.Rejected:

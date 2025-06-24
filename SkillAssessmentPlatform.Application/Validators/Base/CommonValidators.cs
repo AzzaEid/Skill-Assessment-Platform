@@ -54,14 +54,14 @@ namespace SkillAssessmentPlatform.Application.Validators.Base
         public static IRuleBuilder<T, DateTime> IsValidFutureDate<T>(this IRuleBuilder<T, DateTime> ruleBuilder)
         {
             return ruleBuilder
-                .GreaterThan(DateTime.Now).WithMessage("Date must be in the future");
+                .GreaterThan(DateTime.UtcNow).WithMessage("Date must be in the future");
         }
 
         public static IRuleBuilder<T, DateTime?> IsValidFutureDate<T>(this IRuleBuilder<T, DateTime?> ruleBuilder)
         {
             return ruleBuilder
-                .Must(date => !date.HasValue || date.Value > DateTime.Now)
-                .WithMessage("Date must be in the future");
+                .Must(date => !date.HasValue || date.Value > DateTime.UtcNow)
+                .WithMessage("Date must be in the future2");
         }
 
         public static IRuleBuilder<T, decimal> IsValidScore<T>(this IRuleBuilder<T, decimal> ruleBuilder,

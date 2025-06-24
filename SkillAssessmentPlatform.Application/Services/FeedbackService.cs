@@ -45,6 +45,9 @@ namespace SkillAssessmentPlatform.Application.Services
                 }).ToList() ?? new List<DetailedFeedback>()
             };
 
+            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
+            await _unitOfWork.SaveChangesAsync();
+
             // Assign to the right entity
             if (dto.TaskSubmissionId.HasValue)
             {
@@ -66,15 +69,17 @@ namespace SkillAssessmentPlatform.Application.Services
                 if (request == null)
                     throw new Exception($"ExamRequest with ID {dto.ExamRequestId.Value} not found.");
 
-                request.Feedback = feedback;
+
+                request.FeedbackId = feedback.Id;
+                await _unitOfWork.SaveChangesAsync();
             }
             else if (dto.InterviewBookId.HasValue)
             {
                 var interview = await _unitOfWork.InterviewBookRepository.GetByIdAsync(dto.InterviewBookId.Value);
                 interview.Feedback = feedback;
+                interview.Status = InterviewStatus.Completed;
             }
 
-            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
 
             // update applicant progress

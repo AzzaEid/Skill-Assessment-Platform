@@ -68,28 +68,32 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         }
         public async Task<IEnumerable<Appointment>> CreateBulkAppointmentsAsync(AppointmentCreateDTO createDto)
         {
-            var appointments = new List<Appointment>();
+            if (createDto.SlotDurationMinutes <= 0)
+                throw new ArgumentException("Slot duration must be greater than 0.");
 
-            // حساب الفترة الزمنية للمواعيد
+            if (createDto.WeeklySchedule == null || !createDto.WeeklySchedule.Any())
+                return Enumerable.Empty<Appointment>();
+
+            var appointments = new List<Appointment>();
             var currentDate = createDto.StartDate.Date;
             var endDate = createDto.EndDate.Date;
 
             while (currentDate <= endDate)
             {
-                // البحث عن جدول اليوم المناسب
                 var daySchedule = createDto.WeeklySchedule
                     .FirstOrDefault(d => d.DayOfWeek == currentDate.DayOfWeek);
 
                 if (daySchedule != null)
                 {
-                    // إنشاء مواعيد لهذا اليوم
                     var startTimeOfDay = new DateTime(
                         currentDate.Year, currentDate.Month, currentDate.Day,
-                        daySchedule.StartTime.Hours, daySchedule.StartTime.Minutes, 0);
+                        daySchedule.StartTime.Hours, daySchedule.StartTime.Minutes, 0,
+                        DateTimeKind.Local).ToUniversalTime();
 
                     var endTimeOfDay = new DateTime(
                         currentDate.Year, currentDate.Month, currentDate.Day,
-                        daySchedule.EndTime.Hours, daySchedule.EndTime.Minutes, 0);
+                        daySchedule.EndTime.Hours, daySchedule.EndTime.Minutes, 0,
+                        DateTimeKind.Local).ToUniversalTime();
 
                     var currentSlotStart = startTimeOfDay;
 
@@ -105,16 +109,14 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
                         appointments.Add(appointment);
 
-                        // الانتقال إلى الموعد التالي
-                        currentSlotStart = currentSlotStart.AddMinutes(createDto.SlotDurationMinutes);
+                        currentSlotStart = currentSlotStart
+                            .AddMinutes(createDto.SlotDurationMinutes + 10);
                     }
                 }
 
-                // الانتقال إلى اليوم التالي
                 currentDate = currentDate.AddDays(1);
             }
 
-            // إضافة المواعيد إلى قاعدة البيانات
             await _context.Appointments.AddRangeAsync(appointments);
             await _context.SaveChangesAsync();
 

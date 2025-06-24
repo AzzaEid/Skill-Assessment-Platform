@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using SkillAssessmentPlatform.Application.Abstract;
+using SkillAssessmentPlatform.Application.CachedServices;
 using SkillAssessmentPlatform.Application.DTOs.Appointment.Inputs;
 using SkillAssessmentPlatform.Application.DTOs.Appointment.Outputs;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
@@ -15,15 +17,18 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<AppointmentService> _logger;
+        private readonly ICacheService _cacheService;
 
         public AppointmentService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
+            ICacheService cacheService,
             ILogger<AppointmentService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<IEnumerable<AppointmentDTO>> GetAvailableAppointmentsAsync(string examinerId, DateTime startDate, DateTime endDate)
@@ -95,6 +100,9 @@ namespace SkillAssessmentPlatform.Application.Services
 
             var appointment = _mapper.Map<Appointment>(appointmentDTO);
             appointment.IsBooked = false;
+            appointment.EndTime = appointmentDTO.EndTime.ToUniversalTime();
+            appointment.StartTime = appointmentDTO.StartTime.ToUniversalTime();
+
 
             await _unitOfWork.AppointmentRepository.AddAsync(appointment);
             await _unitOfWork.SaveChangesAsync();
@@ -108,13 +116,11 @@ namespace SkillAssessmentPlatform.Application.Services
         {
             try
             {
-                // الحصول على Stage Progress للمتقدم
                 var stageProgress = await _unitOfWork.StageProgressRepository.GetByApplicantAndStageAsync(applicantId, stageId);
 
                 if (stageProgress == null)
                     throw new KeyNotFoundException($"No stage progress found for applicant {applicantId} and stage {stageId}");
 
-                // الحصول على معلومات المقابلة المرتبطة بالمرحلة
                 var stage = await _unitOfWork.StageRepository.GetByIdAsync(stageId);
 
                 if (stage == null || stage.Type != StageType.Interview)
@@ -125,18 +131,21 @@ namespace SkillAssessmentPlatform.Application.Services
                 if (interview == null)
                     throw new KeyNotFoundException($"No interview configuration found for stage {stageId}");
 
-                // حساب تاريخ انتهاء الفترة المسموح بها للحجز
                 var startDate = stageProgress.StartDate;
                 var endDate = startDate.AddDays(interview.MaxDaysToBook);
 
-                // الحصول على المختبر المسؤول عن هذه المرحلة
                 var examiner = stageProgress.ExaminerId;
 
                 if (string.IsNullOrEmpty(examiner))
                     throw new BadRequestException("No examiner assigned for this stage");
 
-                // الحصول على المواعيد المتاحة
-                return await _unitOfWork.AppointmentRepository.GetAvailableSlotsAsync(examiner, startDate, endDate);
+                var cacheKey = string.Format(CacheKeys.AVAILABLE_SLOTS, examiner, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+
+                return await _cacheService.GetOrCreateAsync(
+                    cacheKey,
+                    () => _unitOfWork.AppointmentRepository.GetAvailableSlotsAsync(examiner, startDate, endDate),
+                    CacheKeys.SLOTS_CACHE_DURATION
+                );
             }
             catch (Exception ex)
             {

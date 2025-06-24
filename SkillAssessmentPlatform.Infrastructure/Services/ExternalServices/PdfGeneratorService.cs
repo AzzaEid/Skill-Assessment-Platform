@@ -3,7 +3,7 @@ using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Hosting;
 using SkillAssessmentPlatform.Application.Abstract;
 
-namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
+namespace SkillAssessmentPlatform.Infrastructure.Services.ExternalServices
 {
     public class PdfGeneratorService : IPdfGeneratorService
     {

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.Abstract;
+using SkillAssessmentPlatform.Application.CachedServices;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.Examiner.Input;
 using SkillAssessmentPlatform.Application.DTOs.Examiner.Output;
@@ -24,15 +25,17 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly IFileService _fileService;
         private readonly IMapper _mapper;
         private readonly ILogger<TrackService> _logger;
-
+        private readonly ICacheService _cacheService;
         public TrackService(IUnitOfWork unitOfWork,
-            IFileService fileService, IMapper mapper
+            IFileService fileService, IMapper mapper,
+            ICacheService cacheService
             , ILogger<TrackService> logger)
         {
             _unitOfWork = unitOfWork;
             _fileService = fileService;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public IMapper Get_mapper()
@@ -78,6 +81,17 @@ namespace SkillAssessmentPlatform.Application.Services
         }
         public async Task<IEnumerable<TrackShortDto>> GetAllTracksSummaryAsync()
         {
+            return await _cacheService.GetOrCreateAsync(
+            CacheKeys.ALL_TRACKS_SUMMARY_KEY,
+            async () =>
+            {
+                return await LogicGetAllTracksSummaryAsync();
+            },
+            CacheKeys.TRACKS_CACHE_DURATION
+        );
+        }
+        private async Task<IEnumerable<TrackShortDto>> LogicGetAllTracksSummaryAsync()
+        {
             var traks = await _unitOfWork.TrackRepository.GetAllAsync();
 
             return _mapper.Map<List<TrackShortDto>>(traks);
@@ -120,6 +134,17 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
         public async Task<TrackDetialDto> GetTrackStructure(int id)
+        {
+            var cacheKey = string.Format(CacheKeys.TRACK_STRUCTURE_KEY, id);
+            return await _cacheService.GetOrCreateAsync(cacheKey,
+                async () =>
+                {
+                    return await LogicGetTrackStructure(id);
+                },
+                CacheKeys.TRACK_STRUCTURE_CACHE_DURATION
+                );
+        }
+        private async Task<TrackDetialDto> LogicGetTrackStructure(int id)
         {
             var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(id);
             if (track == null) throw new KeyNotFoundException($"No thrack with id = {id} ");
@@ -595,6 +620,14 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
         public async Task<IEnumerable<TrackShortDto>> GetActiveTrackListAsync()
+        {
+            return await _cacheService.GetOrCreateAsync(CacheKeys.ACTIVE_TRACKS_KEY, async () =>
+            {
+                return await LogicGetActiveTrackListAsync();
+
+            }, CacheKeys.TRACKS_CACHE_DURATION);
+        }
+        public async Task<IEnumerable<TrackShortDto>> LogicGetActiveTrackListAsync()
         {
             var tracks = await _unitOfWork.TrackRepository.GetOnlyActiveTracksAsync();
 
