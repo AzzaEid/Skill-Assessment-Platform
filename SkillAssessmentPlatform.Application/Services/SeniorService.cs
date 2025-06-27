@@ -45,6 +45,7 @@ namespace SkillAssessmentPlatform.Application.Services
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(trackId);
             if (track == null) return false;
             return await _unitOfWork.SeniorRepository.AssignSeniorToTrackAsync(examiner, track);
+            return true;
         }
 
         public async Task<bool> UpdateSeniorAsync(string newExaminerId, int trackId)

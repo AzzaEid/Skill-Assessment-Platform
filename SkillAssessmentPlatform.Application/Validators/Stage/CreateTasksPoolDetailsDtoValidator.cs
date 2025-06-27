@@ -18,7 +18,7 @@ namespace SkillAssessmentPlatform.Application.Validators.Stage
 
             RuleFor(x => x.Requirements)
                 .NotEmpty().WithMessage("Requirements are required")
-                .IsValidDescription(1000);
+                .IsValidDescription(500);
         }
     }
 }

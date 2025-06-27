@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.DTOs.CreateAssignment;
 using SkillAssessmentPlatform.Application.DTOs.Examiner.Input;
 using SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Output;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
@@ -194,7 +195,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 .GetByPendingExaminerIdAndTypeAsync(examinerId, StageType.Interview);
 
             var result = new List<ExaminerInterviewRequestDTO>();
-
             foreach (var stageProgress in supervisedStages)
             {
                 var applicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
@@ -279,12 +279,13 @@ namespace SkillAssessmentPlatform.Application.Services
 
             foreach (var stageProgress in supervisedStages)
             {
+
                 var applicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
                 var request = await _unitOfWork.ExamRequestRepository
                     .GetCompletedPendingReviewByApplicantAsync(applicantId);
-
                 if (request != null)
                 {
+                    _logger.LogError($"======> nowUTC{DateTime.UtcNow} Now {DateTime.Now} -- {DateTime.UtcNow - request.ScheduledDate}");
                     var exam = await _unitOfWork.ExamRepository.GetByIdAsync(request.ExamId);
                     var applicant = await _unitOfWork.ApplicantRepository.GetByIdAsync(applicantId);
                     var dto = new ExaminerExamReviewDTO
@@ -294,8 +295,8 @@ namespace SkillAssessmentPlatform.Application.Services
                         ExamId = exam.Id,
                         ApplicantId = applicantId,
                         ApplicantName = applicant.FullName,
-                        ScheduledDate = request.ScheduledDate,
-                        DaysWaiting = (DateTime.Now - request.ScheduledDate).Days,
+                        ScheduledDate = DateTime.UtcNow,
+                        DaysWaiting = (DateTime.UtcNow - request.ScheduledDate).Days,
                         Status = request.Status,
                         StageId = stageProgress.StageId,
                         StageName = stageProgress.Stage.Name,
@@ -308,6 +309,13 @@ namespace SkillAssessmentPlatform.Application.Services
             }
 
             return result.OrderBy(x => x.ScheduledDate);
+        }
+        public async Task<IEnumerable<StageProgressDTO>> GetPendingAsync(string examinerId)
+        {
+            _logger.LogError($"Id============================{examinerId}");
+            var progresses = await _unitOfWork.StageProgressRepository.GetByPendingExaminerIdAndTypeAsync(examinerId, StageType.Exam);
+            return _mapper.Map<IEnumerable<StageProgressDTO>>(progresses);
+
         }
 
         public async Task<IEnumerable<CreationAssignmentDTO>> GetExaminerTaskAssignmentsAsync(string examinerId)

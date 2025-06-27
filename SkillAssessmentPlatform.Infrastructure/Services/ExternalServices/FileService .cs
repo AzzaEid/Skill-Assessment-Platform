@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Application.Abstract;
 
-namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
+namespace SkillAssessmentPlatform.Infrastructure.Services.ExternalServices
 {
 
     public class FileService : IFileService

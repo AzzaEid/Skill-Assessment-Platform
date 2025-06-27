@@ -1,4 +1,4 @@
-﻿namespace SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings
+﻿namespace SkillAssessmentPlatform.Infrastructure.Services.ExternalServices.Settings
 {
     public class ZoomSettings
     {

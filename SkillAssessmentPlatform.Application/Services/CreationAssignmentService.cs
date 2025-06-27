@@ -44,8 +44,8 @@ namespace SkillAssessmentPlatform.Application.Services
                 StageId = createDto.StageId,
                 Type = createDto.Type,
                 Status = AssignmentStatus.Assigned,
-                AssignedDate = DateTime.Now,
-                DueDate = createDto.DueDate,
+                AssignedDate = DateTime.UtcNow,
+                DueDate = createDto.DueDate.ToUniversalTime(),
                 AssignedBySeniorId = createDto.AssignedBySeniorId,
                 Notes = createDto.Notes
             };
@@ -53,6 +53,9 @@ namespace SkillAssessmentPlatform.Application.Services
             await _unitOfWork.CreationAssignmentRepository.AddAsync(assignment);
             await _unitOfWork.SaveChangesAsync();
 
+            // update current wirk load (increase)
+            var loadType = MapLoad(createDto.Type);
+            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(createDto.ExaminerId, loadType);
             var dto = _mapper.Map<CreationAssignmentDTO>(assignment);
             if (createDto.Type == CreationType.Exam)
             {
@@ -66,7 +69,12 @@ namespace SkillAssessmentPlatform.Application.Services
             }
             return dto;
         }
-
+        private LoadType MapLoad(CreationType creationType)
+        {
+            var type = LoadType.TaskCreation;
+            if (creationType == CreationType.Exam) { type = LoadType.ExamCreation; }
+            return type;
+        }
         // جلب التكليفات للمختبر
         public async Task<IEnumerable<CreationAssignmentDTO>> GetExaminerAssignmentsAsync(string examinerId)
         {
@@ -94,9 +102,9 @@ namespace SkillAssessmentPlatform.Application.Services
             //نغير حالة الاسسمنت - نقلل الكرنت وورك لود
             await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignment.Id, AssignmentStatus.Completed);
 
-            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(assignment.ExaminerId, LoadType.TaskCreation);
+            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(assignment.ExaminerId, LoadType.TaskCreation);
 
-            // نخبر السينيور
+            // نخبّر السينيور
             await _notificationService.SendNotificationAsync(
                 assignment.AssignedBySeniorId,
                 NotificationType.TaskCreationCompleted,
@@ -108,14 +116,14 @@ namespace SkillAssessmentPlatform.Application.Services
 
             var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, AssignmentStatus.Completed);
 
-            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
+            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
         }
         public async Task CancelCreationAssignmentStatusAsync(int assignmentId)
         {
 
             var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, AssignmentStatus.Cancelled);
 
-            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
+            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
         }
     }
 }

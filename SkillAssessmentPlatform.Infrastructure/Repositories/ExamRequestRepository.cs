@@ -126,7 +126,8 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.ExamRequests
                 .Where(er => er.ApplicantId == applicantId
                             && er.Status == ExamRequestStatus.Approved
-                            && er.ScheduledDate < DateTime.UtcNow)
+                            && er.ScheduledDate < DateTime.Now)
+                .OrderByDescending(e => e.Id)
                 .FirstOrDefaultAsync();
         }
     }

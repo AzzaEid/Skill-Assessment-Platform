@@ -1,4 +1,4 @@
-﻿using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
+﻿using SkillAssessmentPlatform.Application.DTOs.Exam.Input;
 using SkillAssessmentPlatform.Core.Enums;
 
 namespace SkillAssessmentPlatform.Application.DTOs.Structure
@@ -11,9 +11,9 @@ namespace SkillAssessmentPlatform.Application.DTOs.Structure
         public int? Order { get; set; }
         public int? PassingScore { get; set; }
         public int? NoOfAttempts { get; set; }
-        public CreateInterviewDto? Interview { get; set; }
-        public ExamDto? Exam { get; set; }
-        public TasksPoolDto? TasksPool { get; set; }
+        public CreateInterviewDetailsDto? Interview { get; set; }
+        public CreateExamDetailsDto? Exam { get; set; }
+        public CreateTasksPoolDetailsDto? TasksPool { get; set; }
         public List<EvaluationStructureCriteriaDTO?> EvaluationCriteria { get; set; }
     }
 

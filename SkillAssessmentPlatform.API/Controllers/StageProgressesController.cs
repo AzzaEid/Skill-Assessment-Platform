@@ -46,6 +46,10 @@ namespace SkillAssessmentPlatform.API.Controllers
         public async Task<IActionResult> GetCurrentStageProgressbyEnrollment(int enrollmentId)
         {
             var currentStageProgress = await _stageProgressService.GetByCurrEnrollmentIdAsync(enrollmentId);
+            if (currentStageProgress == null)
+            {
+                return _responseHandler.Success(null, "There's no current stage!");
+            }
             return _responseHandler.Success(currentStageProgress);
         }
 

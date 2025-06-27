@@ -18,7 +18,7 @@ namespace SkillAssessmentPlatform.Infrastructure.EntityMappers
                 .HasMaxLength(1000);
 
             builder.Property(t => t.Requirements)
-                .HasMaxLength(500);
+                .HasMaxLength(1000);
 
             builder.Property(t => t.Difficulty)
                 .HasMaxLength(20);

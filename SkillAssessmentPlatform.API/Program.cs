@@ -49,6 +49,13 @@ public class Program
         {
             options.Filters.Add<ValidationActionFilter>();
         });
+        // caching
+        builder.Services.AddMemoryCache();
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetConnectionString("Redis");
+            options.InstanceName = "Ratify";
+        });
         // Controllers & Enums
         builder.Services.AddControllers()
                         .AddJsonOptions(options =>

@@ -1,5 +1,6 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
+using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
 
 namespace SkillAssessmentPlatform.Application.Services
@@ -18,7 +19,7 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<AppTaskDto> CreateAsync(string examinerId, CreateAppTaskDto dto)
         {
             var tasksPool = await _unitOfWork.TasksPoolRepository.GetByIdAsync(dto.TaskPoolId);
-            if (tasksPool == null) throw new Exception("no related taskPool Id");
+            if (tasksPool == null) throw new BadRequestException("no related taskPool Id");
             var task = new AppTask
             {
                 TaskPoolId = dto.TaskPoolId,

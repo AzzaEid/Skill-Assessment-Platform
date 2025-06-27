@@ -14,9 +14,10 @@ namespace SkillAssessmentPlatform.Application.Validators.Stage
             RuleFor(x => x.Difficulty)
                 .NotEmpty().WithMessage("Difficulty is required")
                 .Must(BeValidDifficulty).WithMessage("Difficulty must be one of: Easy, Medium, Hard");
-
+            /*
             RuleFor(x => x.QuestionsType)
                 .IsInEnum().WithMessage("Invalid question type");
+            /*/
         }
 
         private bool BeValidDifficulty(string difficulty)

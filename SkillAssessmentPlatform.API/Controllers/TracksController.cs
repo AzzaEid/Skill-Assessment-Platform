@@ -63,14 +63,14 @@ public class TracksController : ControllerBase
     [HttpGet("{id}/structure")]
     public async Task<IActionResult> GetStructureById(int id)
     {
-        var track = await _trackService.GetTrackStructure(id);
+        var track = await _trackService.LogicGetTrackStructure(id);
         return _responseHandler.Success(track);
     }
     [Authorize]
     [HttpGet("summary")]
     public async Task<IActionResult> GetTracksSummary()
     {
-        var result = await _trackService.GetAllTracksSummaryAsync();
+        var result = await _trackService.LogicGetAllTracksSummaryAsync();
         return _responseHandler.Success(result);
     }
     [HttpGet("{trackId}/examiners-summary")]

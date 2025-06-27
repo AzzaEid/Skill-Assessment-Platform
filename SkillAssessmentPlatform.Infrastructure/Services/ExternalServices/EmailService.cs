@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using SkillAssessmentPlatform.Application.Abstract;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
+using SkillAssessmentPlatform.Infrastructure.Services.ExternalServices.Settings;
 
-namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
+namespace SkillAssessmentPlatform.Infrastructure.Services.ExternalServices
 {
     public class EmailService : IEmailService
     {

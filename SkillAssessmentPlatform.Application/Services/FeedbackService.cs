@@ -4,6 +4,7 @@ using SkillAssessmentPlatform.Application.DTOs.Feedback.Output;
 using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Enums;
+using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
 
 
@@ -45,36 +46,44 @@ namespace SkillAssessmentPlatform.Application.Services
                 }).ToList() ?? new List<DetailedFeedback>()
             };
 
+            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
+            await _unitOfWork.SaveChangesAsync();
+
             // Assign to the right entity
             if (dto.TaskSubmissionId.HasValue)
             {
                 var submission = await _unitOfWork.TaskSubmissionRepository.GetByIdAsync(dto.TaskSubmissionId.Value);
                 if (submission == null)
-                    throw new Exception("Task Submission not found.");  // أو رجع BadRequest
+                    throw new BadRequestException("Task Submission not found.");  // أو رجع BadRequest
 
-                submission.Feedback = feedback;
+                submission.FeedbackId = feedback.Id;
+
 
                 // if Status is ResubmissionAllowed change TaskSubmission status
                 if (dto.ResultStatus == ApplicantResultStatus.ResubmissionAllowed)
                 {
                     submission.Status = TaskSubmissionStatus.Rejected;
                 }
+                await _unitOfWork.SaveChangesAsync();
             }
             else if (dto.ExamRequestId.HasValue)
             {
                 var request = await _unitOfWork.ExamRequestRepository.GetByIdAsync(dto.ExamRequestId.Value);
                 if (request == null)
-                    throw new Exception($"ExamRequest with ID {dto.ExamRequestId.Value} not found.");
+                    throw new BadRequestException($"ExamRequest with ID {dto.ExamRequestId.Value} not found.");
 
-                request.Feedback = feedback;
+
+                request.FeedbackId = feedback.Id;
+                await _unitOfWork.SaveChangesAsync();
             }
             else if (dto.InterviewBookId.HasValue)
             {
                 var interview = await _unitOfWork.InterviewBookRepository.GetByIdAsync(dto.InterviewBookId.Value);
-                interview.Feedback = feedback;
+                interview.FeedbackId = feedback.Id;
+                interview.Status = InterviewStatus.Completed;
+                await _unitOfWork.SaveChangesAsync();
             }
 
-            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
 
             // update applicant progress

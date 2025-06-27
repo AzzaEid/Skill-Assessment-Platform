@@ -382,3 +382,4 @@ appsettings.Development.json
 appsettings.Local.json
 appsettings.*.json
 !appsettings.json
+/SkillAssessmentPlatform.API/appsettings.Local.json

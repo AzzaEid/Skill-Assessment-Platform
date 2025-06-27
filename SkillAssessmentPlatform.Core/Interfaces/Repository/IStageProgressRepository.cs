@@ -22,6 +22,7 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
         Task<IEnumerable<StageProgress>> GetDetailedByLevelProgressIdAsync(int levelProgressId);
         Task<IEnumerable<StageProgress>> GetPendingByExaminerIdAsync(string examinerId);
         Task<IEnumerable<StageProgress>> GetByPendingExaminerIdAndTypeAsync(string examinerId, StageType stageType);
+        Task<IEnumerable<StageProgress>> GetByPendingExaminerIdAsync(string examinerId);
 
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings
+﻿namespace SkillAssessmentPlatform.Infrastructure.Services.ExternalServices.Settings
 {  /// need to enhance !!
     public class EmailSettings
     {

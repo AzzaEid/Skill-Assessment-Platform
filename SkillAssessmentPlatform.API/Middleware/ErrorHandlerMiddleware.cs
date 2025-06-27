@@ -36,7 +36,7 @@ namespace SkillAssessmentPlatform.API.Middleware
                     Succeeded = false,
                     Message = error.Message,
                     Errors = new List<string>(),
-                    StatusCode = HttpStatusCode.InternalServerError // Default
+                    StatusCode = HttpStatusCode.InternalServerError // default
                 };
 
                 switch (error)

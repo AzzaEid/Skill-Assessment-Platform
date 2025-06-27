@@ -4,11 +4,11 @@ using Newtonsoft.Json;
 using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Core.Responses;
 using SkillAssessmentPlatform.Core.Results;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices.Settings;
+using SkillAssessmentPlatform.Infrastructure.Services.ExternalServices.Settings;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
+namespace SkillAssessmentPlatform.Infrastructure.Services.ExternalServices
 {
     public class ZoomMeetService : IMeetingService
     {
@@ -58,21 +58,23 @@ namespace SkillAssessmentPlatform.Infrastructure.ExternalServices
 
         public async Task<ZoomMeetingResponse> CreateMeetingAsync(DateTime startTime, DateTime endTime, string topic)
         {
+            // Access Token Request based on ClientId & ClientSecret
             var accessToken = await GetAccessTokenAsync();
             var duration = (int)(endTime - startTime).TotalMinutes;
 
+            // once authenticated
+            // ->  the system sends a request to create a meeting in the selected time slot
             var meetingRequest = new ZoomMeetingRequest
             {
                 Topic = topic,
                 StartTime = startTime.ToUniversalTime(),
                 Duration = duration
             };
-
             using var request = new HttpRequestMessage(HttpMethod.Post, $"{_settings.BaseUrl}/users/me/meetings");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             request.Content = new StringContent(JsonConvert.SerializeObject(meetingRequest), Encoding.UTF8, "application/json");
-
             var response = await _httpClient.SendAsync(request);
+
             var meetingRequestJson = JsonConvert.SerializeObject(meetingRequest);
             _logger.LogInformation("Meeting request body: {0}", meetingRequestJson);
 

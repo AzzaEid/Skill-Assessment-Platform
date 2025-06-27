@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
+using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 
@@ -52,14 +53,29 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .FirstOrDefaultAsync(el => el.ExaminerID == examinerId && el.Type == type);
 
             if (examinerLoad == null)
-                throw new KeyNotFoundException($"Examiner load for examiner {examinerId} and type {type} not found");
+            {
+                examinerLoad = new ExaminerLoad
+                {
+                    ExaminerID = examinerId,
+                    Type = type,
+                    MaxWorkLoad = 1,
+                    CurrWorkLoad = 1
+                };
+                await _context.ExaminerLoads.AddAsync(examinerLoad);
+            }
+            else
+            {
+                if (examinerLoad.CurrWorkLoad == examinerLoad.MaxWorkLoad)
+                    throw new BadRequestException($"Cannot assign more work to examiner {examinerId} for load type '{type}': maximum workload ({examinerLoad.MaxWorkLoad}) reached.");
 
-            examinerLoad.CurrWorkLoad += 1;
-            _context.ExaminerLoads.Update(examinerLoad);
+                examinerLoad.CurrWorkLoad += 1;
+                _context.ExaminerLoads.Update(examinerLoad);
+            }
+
             await _context.SaveChangesAsync();
-
             return examinerLoad;
         }
+
 
         public async Task<ExaminerLoad>? DecrementWorkloadAsync(string examinerId, LoadType type)
         {
