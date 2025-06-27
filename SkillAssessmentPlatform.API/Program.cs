@@ -50,10 +50,7 @@ public class Program
             options.Filters.Add<ValidationActionFilter>();
         });
         // caching
-        builder.Services.AddMemoryCache(options =>
-        {
-            options.SizeLimit = 2000; // based on available memory
-        });
+        builder.Services.AddMemoryCache();
         builder.Services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = builder.Configuration.GetConnectionString("Redis");

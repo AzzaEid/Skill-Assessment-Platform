@@ -163,9 +163,11 @@ namespace SkillAssessmentPlatform.Application.Services
                 var interview = await _unitOfWork.InterviewRepository.GetByIdAsync(booking.InterviewId);
 
 
-
+                // after examiner approved appplicant's interview book
+                // => generate zoom meeting in the slot time 
                 var meetingTopic = $"Interview for Stage {interview.StageId}";
-                var zoomMeeting = await _meetingService.CreateMeetingAsync(appointment.StartTime, appointment.EndTime, meetingTopic);
+                var zoomMeeting = await _meetingService
+                            .CreateMeetingAsync(appointment.StartTime, appointment.EndTime, meetingTopic);
 
 
                 booking.Status = InterviewStatus.Scheduled;

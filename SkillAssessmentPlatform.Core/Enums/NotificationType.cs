@@ -17,6 +17,7 @@
         ReviewExam = 12,
         TaskSubmitted = 9,
         TaskCreationCompleted,
+        NoAvailableExaminer
     }
 
 }

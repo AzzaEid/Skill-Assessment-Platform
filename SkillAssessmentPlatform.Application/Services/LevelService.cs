@@ -272,6 +272,7 @@ namespace SkillAssessmentPlatform.Application.Services
                                 Weight = (float)criteriaDto.Weight
                             };
                             await _unitOfWork.EvaluationCriteriaRepository.AddAsync(criteria);
+                            await _unitOfWork.SaveChangesAsync();
                         }
                     }
 
@@ -294,15 +295,32 @@ namespace SkillAssessmentPlatform.Application.Services
             switch (dto.Type)
             {
                 case StageType.Exam:
+                    if (dto.Exam == null)
+                        throw new Exception("Exam details must be provided for exam stages.");
+
+                    if (dto.Exam.QuestionsType == null || !dto.Exam.QuestionsType.Any())
+                        throw new Exception("QuestionsType is required and cannot be empty");
+
+                    QuestionType combinedTypes = QuestionType.None;
+                    foreach (var type in dto.Exam.QuestionsType)
+                    {
+                        if (!Enum.TryParse(type, true, out QuestionType parsed))
+                        {
+                            throw new Exception($"Invalid question type '{type}'. Allowed values: {string.Join(", ", Enum.GetNames(typeof(QuestionType)))}");
+                        }
+                        combinedTypes |= parsed;
+                    }
+
                     var exam = new Exam
                     {
                         StageId = stageId,
                         DurationMinutes = dto.Exam.DurationMinutes,
                         Difficulty = dto.Exam.Difficulty,
-                        QuestionsType = dto.Exam.QuestionsType,
+                        QuestionsType = combinedTypes,
                         IsActive = true
                     };
                     await _unitOfWork.ExamRepository.AddAsync(exam);
+                    await _unitOfWork.SaveChangesAsync();
                     break;
 
                 case StageType.Interview:
@@ -315,6 +333,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         IsActive = true
                     };
                     await _unitOfWork.InterviewRepository.AddAsync(interview);
+                    await _unitOfWork.SaveChangesAsync();
                     break;
 
                 case StageType.Task:
@@ -329,6 +348,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         DaysToSubmit = dto.TasksPool.DaysToSubmit
                     };
                     await _unitOfWork.TasksPoolRepository.AddAsync(pool);
+                    await _unitOfWork.SaveChangesAsync();
                     break;
             }
         }

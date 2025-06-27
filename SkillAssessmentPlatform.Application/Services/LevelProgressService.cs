@@ -12,14 +12,17 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly TaskApplicantService _taskApplicantService;
+        private readonly NotificationService _notificationService;
         public LevelProgressService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
+            NotificationService notificationService,
              TaskApplicantService taskApplicantService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _taskApplicantService = taskApplicantService;
+            _notificationService = notificationService;
         }
 
         public async Task<LevelProgressDTO> GetByIdAsync(int id)
@@ -72,18 +75,32 @@ namespace SkillAssessmentPlatform.Application.Services
                     VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
                 };
                 await _unitOfWork.AppCertificateRepository.AddAsync(certificate);
-
+                await _unitOfWork.SaveChangesAsync();
 
                 var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
                     levelProgress.EnrollmentId,
                     levelProgress.LevelId);
+
+                //// No next level, track completed
+                if (result == null)
+                {
+                    await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
+                    return _mapper.Map<LevelProgressDTO>(levelProgress);
+                }
+
                 var firstStage = await _unitOfWork.StageRepository.GetFirstStageByLevelIdAsync(result.LevelId);
                 if (firstStage != null)
                 {
                     var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(enrollment.TrackId, MapLoad(firstStage.Type));
                     if (freeExaminerId == null)
+                    {
+                        var senior = await _unitOfWork.SeniorRepository.GetSeniorByTrackIdAsync(enrollment.TrackId);
+                        await _notificationService.SendNotificationAsync(
+                                senior.Id,
+                                NotificationType.NoAvailableExaminer,
+                                $"No available examiner found for stage {firstStage.Name} load type {firstStage.Type}");
                         throw new InvalidOperationException("No available examiner found for this stage");
-
+                    }
                     var stageProgress = new StageProgress
                     {
                         LevelProgressId = result.Id,
@@ -110,12 +127,6 @@ namespace SkillAssessmentPlatform.Application.Services
                         }
 
                     }
-                }
-
-                //// No next level, track completed
-                if (result == null)
-                {
-                    await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
                 }
 
 

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Users;
+using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
 
@@ -30,7 +31,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 if (!addRoleRes.Succeeded)
                 {
                     _logger.LogError($"Failed to add role: {string.Join(", ", addRoleRes.Errors.Select(e => e.Description))}");
-                    return false;
+                    throw new BadRequestException($"Failed to add role", addRoleRes.Errors);
                 }
             }
             examiner.UserType = Actors.SeniorExaminer;

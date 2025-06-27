@@ -15,15 +15,18 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly TaskApplicantService _taskApplicantService;
+        private readonly NotificationService _notificationService;
 
         public EnrollmentService(
             IUnitOfWork unitOfWork,
             TaskApplicantService taskApplicantService,
+            NotificationService notificationService,
             IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _taskApplicantService = taskApplicantService;
+            _notificationService = notificationService;
         }
 
         public async Task<PagedResponse<EnrollmentDTO>> GetAllEnrollmentsAsync(int page = 1, int pageSize = 10)
@@ -106,8 +109,14 @@ namespace SkillAssessmentPlatform.Application.Services
                     {
                         var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(enrollmentDto.TrackId, MapLoad(firstStage.Type));
                         if (freeExaminerId == null)
+                        {
+                            var senior = await _unitOfWork.SeniorRepository.GetSeniorByTrackIdAsync(enrollmentDto.TrackId);
+                            await _notificationService.SendNotificationAsync(
+                                    senior.Id,
+                                    NotificationType.NoAvailableExaminer,
+                                    $"No available examiner found for stage {firstStage.Name} load type {firstStage.Type}");
                             throw new InvalidOperationException("No available examiner found for this stage");
-
+                        }
                         var stageProgress = new StageProgress
                         {
                             LevelProgressId = levelProgress.Id,

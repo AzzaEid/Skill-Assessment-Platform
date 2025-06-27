@@ -15,17 +15,20 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly IMapper _mapper;
         private readonly LevelProgressService _levelProgressService;
         private readonly TaskApplicantService _taskApplicantService;
+        private readonly NotificationService _notificationService;
 
         public StageProgressService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             LevelProgressService levelProgressService,
+            NotificationService notificationService,
             TaskApplicantService taskApplicantService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _levelProgressService = levelProgressService;
             _taskApplicantService = taskApplicantService;
+            _notificationService = notificationService;
         }
 
         public async Task<StageProgressDTO> GetByIdWithActionStatusAsync(int id)
@@ -317,12 +320,12 @@ namespace SkillAssessmentPlatform.Application.Services
         }
 
         #endregion
-        public async Task<StageProgressDTO> GetByCurrEnrollmentIdAsync(int enrollmentId)
+        public async Task<StageProgressDTO?> GetByCurrEnrollmentIdAsync(int enrollmentId)
         {
             var stageProgresses = await _unitOfWork.StageProgressRepository.GetCurrentStageProgressByEnrollmentAsync(enrollmentId);
             if (stageProgresses == null)
             {
-                throw new KeyNotFoundException($"There is no stage progresses in level with id = {enrollmentId} ");
+                return null;
             }
             return _mapper.Map<StageProgressDTO>(stageProgresses);
         }
@@ -383,7 +386,14 @@ namespace SkillAssessmentPlatform.Application.Services
                         .GetAvailableExaminerAsync(trackId, nextStageLoad);
 
                     if (freeExaminerId == null)
-                        throw new InvalidOperationException("No available examiner found for the next stage");
+                    {
+                        var senior = await _unitOfWork.SeniorRepository.GetSeniorByTrackIdAsync(trackId);
+                        await _notificationService.SendNotificationAsync(
+                                senior.Id,
+                                NotificationType.NoAvailableExaminer,
+                                $"No available examiner found for stage {stage.Name} load type {stage.Type}");
+                        throw new InvalidOperationException("No available examiner found for this stage");
+                    }
 
                     nextStageProgress = await _unitOfWork.StageProgressRepository.CreateNextStageProgressAsync(
                            stageProgress.LevelProgressId,
@@ -425,8 +435,14 @@ namespace SkillAssessmentPlatform.Application.Services
                 {
                     var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(trackId, MapLoad(stage.Type));
                     if (freeExaminerId == null)
+                    {
+                        var senior = await _unitOfWork.SeniorRepository.GetSeniorByTrackIdAsync(trackId);
+                        await _notificationService.SendNotificationAsync(
+                                senior.Id,
+                                NotificationType.NoAvailableExaminer,
+                                $"No available examiner found for stage {stage.Name} load type {stage.Type}");
                         throw new InvalidOperationException("No available examiner found for this stage");
-
+                    }
                     var newAttempt = await _unitOfWork.StageProgressRepository
                        .CreateNewAttemptAsync(stagePById.LevelProgressId, stage.Id, freeExaminerId);
 

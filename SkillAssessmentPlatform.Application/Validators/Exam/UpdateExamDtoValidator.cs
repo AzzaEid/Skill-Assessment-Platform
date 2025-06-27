@@ -19,11 +19,12 @@ namespace SkillAssessmentPlatform.Application.Validators.Exam
                 .NotEmpty().WithMessage("Difficulty level is required")
                 .Must(d => new[] { "Easy", "Medium", "Hard" }.Contains(d))
                 .WithMessage("Difficulty must be Easy, Medium, or Hard");
-
+            /*
             RuleFor(x => x.QuestionsType)
                 .NotEmpty().WithMessage("At least one question type must be selected")
                 .Must(types => types.All(t => !string.IsNullOrWhiteSpace(t)))
                 .WithMessage("Question types cannot be empty");
+            */
         }
     }
 }

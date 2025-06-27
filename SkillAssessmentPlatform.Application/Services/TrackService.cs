@@ -90,7 +90,8 @@ namespace SkillAssessmentPlatform.Application.Services
             CacheKeys.TRACKS_CACHE_DURATION
         );
         }
-        private async Task<IEnumerable<TrackShortDto>> LogicGetAllTracksSummaryAsync()
+        ////******************************
+        public async Task<IEnumerable<TrackShortDto>> LogicGetAllTracksSummaryAsync()
         {
             var traks = await _unitOfWork.TrackRepository.GetAllAsync();
 
@@ -144,7 +145,10 @@ namespace SkillAssessmentPlatform.Application.Services
                 CacheKeys.TRACK_STRUCTURE_CACHE_DURATION
                 );
         }
-        private async Task<TrackDetialDto> LogicGetTrackStructure(int id)
+        /// <summary>
+        /// **************************
+
+        public async Task<TrackDetialDto> LogicGetTrackStructure(int id)
         {
             var track = await _unitOfWork.TrackRepository.GetTrackWithDetailsAsync(id);
             if (track == null) throw new KeyNotFoundException($"No thrack with id = {id} ");
@@ -224,7 +228,6 @@ namespace SkillAssessmentPlatform.Application.Services
         }
         public async Task<bool> CreateTrackStructureAsync(TrackStructureDTO structureDTO)
         {
-
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(structureDTO.TrackId);
             if (track == null)
                 throw new KeyNotFoundException($"Track with ID {structureDTO.TrackId} not found");
@@ -233,7 +236,6 @@ namespace SkillAssessmentPlatform.Application.Services
             {
                 try
                 {
-
                     foreach (var levelDTO in structureDTO.Levels)
                     {
                         var level = new Level
@@ -286,6 +288,18 @@ namespace SkillAssessmentPlatform.Application.Services
                     }
 
                     await transaction.CommitAsync();
+                    var cacheKey = $"track_structure_{structureDTO.TrackId}";
+                    try
+                    {
+                        // يمكنك استدعاء أي كود يولّد البيانات المراد تخزينها في الكاش
+                        var updatedTrackStructure = await GetTrackStructure(structureDTO.TrackId);
+                        await _cacheService.CreateAsync(cacheKey, updatedTrackStructure, TimeSpan.FromHours(1));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to update cache for track ID {TrackId}", structureDTO.TrackId);
+                    }
+
                     return true;
                 }
                 /* catch (Exception ex)
@@ -308,6 +322,23 @@ namespace SkillAssessmentPlatform.Application.Services
             {
                 case StageType.Exam:
                     // Convert List<string> to enum flags
+                    if (stageDTO.Exam == null)
+                        throw new Exception("Exam details must be provided for exam stages.");
+
+                    if (stageDTO.Exam.QuestionsType == null || !stageDTO.Exam.QuestionsType.Any())
+                        throw new Exception("QuestionsType is required and cannot be empty");
+
+                    QuestionType combinedTypes = QuestionType.None;
+                    foreach (var type in stageDTO.Exam.QuestionsType)
+                    {
+                        if (!Enum.TryParse(type, true, out QuestionType parsed))
+                        {
+                            throw new Exception($"Invalid question type '{type}'. Allowed values: {string.Join(", ", Enum.GetNames(typeof(QuestionType)))}");
+                        }
+                        combinedTypes |= parsed;
+                    }
+                    /*
+
                     QuestionType combinedTypes = QuestionType.None;
                     foreach (var type in stageDTO.Exam.QuestionsType)
                     {
@@ -315,7 +346,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         {
                             combinedTypes |= parsed;
                         }
-                    }
+                    }/*/
                     if (stageDTO.Exam != null)
                     {
                         var exam = new Exam

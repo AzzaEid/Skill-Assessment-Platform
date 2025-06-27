@@ -140,12 +140,14 @@ namespace SkillAssessmentPlatform.Application.Services
                     throw new BadRequestException("No examiner assigned for this stage");
 
                 var cacheKey = string.Format(CacheKeys.AVAILABLE_SLOTS, examiner, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
-
+                /*
                 return await _cacheService.GetOrCreateAsync(
                     cacheKey,
                     () => _unitOfWork.AppointmentRepository.GetAvailableSlotsAsync(examiner, startDate, endDate),
                     CacheKeys.SLOTS_CACHE_DURATION
                 );
+                /*/
+                return await _unitOfWork.AppointmentRepository.GetAvailableSlotsAsync(examiner, startDate, endDate);
             }
             catch (Exception ex)
             {
