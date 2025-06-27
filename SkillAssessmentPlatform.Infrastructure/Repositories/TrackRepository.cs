@@ -13,7 +13,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         {
             //_context = context; 
         }
+        public override async Task<Track> GetByIdAsync(int id)
+        {
+            return await _context.Tracks
+                     .Include(t => t.SeniorExaminer)
+                     .FirstOrDefaultAsync(t => t.Id == id);
 
+        }
         public async Task<Track> GetTrackWithDetailsAsync(int trackId)
         {
             var track = await _context.Tracks
@@ -77,6 +83,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.Tracks
                 .Where(t => t.IsActive)
                 .Include(t => t.AssociatedSkills)
+                .AsNoTracking()                 // Read-only optimization
                 .ToListAsync();
         }
 
@@ -106,6 +113,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                     .Include(t => t.AssociatedSkills)
 
                 //.Where(t => t.IsActive)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Track>> GetBySeniorIdAsync(string seniorId)
+        {
+            return await _context.Tracks
+                .Where(t => t.SeniorExaminerID == seniorId && t.IsActive)
                 .ToListAsync();
         }
 

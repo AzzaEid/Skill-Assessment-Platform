@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
-using SkillAssessmentPlatform.Application.DTOs.StageProgress;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
 using SkillAssessmentPlatform.Application.Services;
 
 namespace SkillAssessmentPlatform.API.Controllers
@@ -8,7 +8,7 @@ namespace SkillAssessmentPlatform.API.Controllers
 
     [ApiController]
     [Route("api/stage-progresses")]
-    [Produces("application/json")]
+    //  [Produces("application/json")]
     public class StageProgressesController : ControllerBase
     {
         private readonly StageProgressService _stageProgressService;
@@ -99,14 +99,7 @@ namespace SkillAssessmentPlatform.API.Controllers
             var attemptCount = await _stageProgressService.GetAttemptCountAsync(stageId);
             return _responseHandler.Success(new { attemptCount });
         }
-        /*
-        [HttpPost("enrollment/{enrollmentId}/stage/{currentStageId}/next")]
-        public async AppTask<IActionResult> CreateNextStageProgress(int enrollmentId, int currentStageId)
-        {
-            var nextStageProgress = await _stageProgressService.CreateNextStageProgressAsync(enrollmentId, currentStageId);
-            return _responseHandler.Created(nextStageProgress, "Next stage progress created successfully");
-        }
-        /*/
+
         [HttpPut("{id}/examiner")]
         public async Task<IActionResult> AssignExaminer(
             int id,

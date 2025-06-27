@@ -31,7 +31,20 @@ namespace SkillAssessmentPlatform.Application.Services
         public async Task<IEnumerable<LevelProgressDTO>> GetByEnrollmentIdAsync(int enrollmentId)
         {
             var levelProgresses = await _unitOfWork.LevelProgressRepository.GetByEnrollmentIdAsync(enrollmentId);
-            return _mapper.Map<IEnumerable<LevelProgressDTO>>(levelProgresses);
+
+            var levelProgressDTOs = new List<LevelProgressDTO>();
+
+            foreach (var levelProgress in levelProgresses)
+            {
+                var lastStageProgress = await _unitOfWork.StageProgressRepository.GetLatestSPinLPAsync(levelProgress.Id);
+
+                var dto = _mapper.Map<LevelProgressDTO>(levelProgress);
+                dto.StagesProgressesCount = lastStageProgress?.Stage.Order ?? 0;
+
+                levelProgressDTOs.Add(dto);
+            }
+
+            return levelProgressDTOs;
         }
 
         public async Task<LevelProgressDTO> GetCurrentLevelProgressAsync(int enrollmentId)

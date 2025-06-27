@@ -72,7 +72,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 UserName = user.Email,
                 UserType = Actors.Examiner,
                 FullName = user.FullName,
-                Specialization = "----",
+                Bio = "----",
                 WorkingTracks = new List<Track>()
             };
 

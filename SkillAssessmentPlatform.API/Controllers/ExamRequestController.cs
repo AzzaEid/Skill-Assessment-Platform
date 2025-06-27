@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
-using SkillAssessmentPlatform.Application.DTOs.ExamReques;
+using SkillAssessmentPlatform.Application.DTOs.ExamReques.Input;
 using SkillAssessmentPlatform.Application.Services;
 
 namespace SkillAssessmentPlatform.API.Controllers
@@ -36,7 +36,7 @@ namespace SkillAssessmentPlatform.API.Controllers
         [HttpGet("{id}/info")]
         public async Task<IActionResult> GetInfoById(int id)
         {
-            var result = await _examRequestService.GetExamRequestByIdAsync(id);
+            var result = await _examRequestService.GetExamRequestInfoByIdAsync(id);
             return _responseHandler.Success(result);
         }
 

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Application.DTOs;
+﻿using SkillAssessmentPlatform.Application.DTOs.Certificate.Input;
+using SkillAssessmentPlatform.Application.DTOs.Certificate.Output;
 using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Interfaces;
 
@@ -55,19 +51,19 @@ namespace SkillAssessmentPlatform.Application.Services
             });
         }
 
-        public async Task<VerifyCertificateResultDTO?> VerifyByCodeAsync(string code)
+        public async Task<CertificateViewModel?> VerifyByCodeAsync(string code)
         {
-            var cert = await _unitOfWork.AppCertificateRepository.GetByVerificationCodeAsync(code);
-            if (cert == null)
+            var certificate = await _unitOfWork.AppCertificateRepository.GetByVerificationCodeAsync(code);
+            if (certificate == null)
                 return null;
 
-            return new VerifyCertificateResultDTO
+            return new CertificateViewModel
             {
-                ApplicantFullName = cert.Applicant.FullName,
-                TrackName = cert.LevelProgress.Level.Track.Name,
-                LevelName = cert.LevelProgress.Level.Name,
-                IssueDate = cert.IssueDate,
-                VerificationCode = cert.VerificationCode
+                ApplicantName = certificate.Applicant.FullName,
+                TrackName = certificate.LevelProgress.Level.Track.Name,
+                LevelName = certificate.LevelProgress.Level.Name,
+                IssueDate = certificate.IssueDate,
+                VerificationCode = certificate.VerificationCode
             };
         }
         public async Task<AppCertificateDTO?> GetByIdAsync(int id)
@@ -83,6 +79,13 @@ namespace SkillAssessmentPlatform.Application.Services
                 IssueDate = cert.IssueDate,
                 VerificationCode = cert.VerificationCode
             };
+        }
+        public async Task<string> GetByLevelIdAndApplicantId(int levelId, string applicantId)
+        {
+            var certificate = await _unitOfWork.AppCertificateRepository.GetByLevelIdAndApplicantId(levelId, applicantId);
+            if (certificate == null) return null;
+
+            return certificate.VerificationCode;
         }
 
     }

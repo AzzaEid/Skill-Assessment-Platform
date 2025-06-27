@@ -2,6 +2,7 @@
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.Services;
 using SkillAssessmentPlatform.API.Common;
+using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Input;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {

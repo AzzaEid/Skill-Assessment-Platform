@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
-using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Enrollment;
 using SkillAssessmentPlatform.Application.Services;
 
 namespace SkillAssessmentPlatform.API.Controllers
 {
-   
+
     [ApiController]
     [Route("api/[controller]")]
     public class EnrollmentsController : ControllerBase

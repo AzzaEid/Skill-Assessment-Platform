@@ -1,4 +1,6 @@
 ﻿using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Output;
+using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;

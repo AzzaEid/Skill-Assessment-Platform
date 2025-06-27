@@ -13,16 +13,14 @@ namespace SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews
         public DateTime AssignedDate { get; set; }
 
         public DateTime DueDate { get; set; }
-
-        //public int StageProgressId { get; set; } // ✅ مضاف حديثًا
+        public int StageProgressId { get; set; }
 
         // Navigation properties
         public AppTask Task { get; set; }
 
         public Applicant Applicant { get; set; }
 
-        //public StageProgress StageProgress { get; set; } // ✅ مضاف حديثًا
-
         public ICollection<TaskSubmission> TaskSubmissions { get; set; } = new List<TaskSubmission>();
+        public StageProgress StageProgress { get; set; }
     }
 }

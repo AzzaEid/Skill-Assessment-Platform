@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
-using SkillAssessmentPlatform.Application.DTOs.StageProgress;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Input;
+using SkillAssessmentPlatform.Application.DTOs.StageProgress.Output;
 using SkillAssessmentPlatform.Core.Entities;
-using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -38,7 +38,6 @@ namespace SkillAssessmentPlatform.Application.Services
 
             var dto = _mapper.Map<StageProgressDTO>(stageProgress);
             dto.ApplicantId = stageProgress.LevelProgress.Enrollment.ApplicantId;
-            // حساب الـ Action Status
             await SetActionStatusAsync(dto);
 
             return dto;
@@ -54,7 +53,6 @@ namespace SkillAssessmentPlatform.Application.Services
 
             var dtos = _mapper.Map<IEnumerable<StageProgressDTO>>(stageProgresses);
 
-            // حساب الـ Action Status لكل مرحلة
             foreach (var dto in dtos)
             {
                 await SetActionStatusAsync(dto);
@@ -68,20 +66,20 @@ namespace SkillAssessmentPlatform.Application.Services
         #region status mapping
         private async Task SetActionStatusAsync(StageProgressDTO dto)
         {
-            // إذا كانت المرحلة مكتملة بنجاح أو فاشلة
             if (dto.Status == ProgressStatus.Successful)
             {
                 dto.ActionStatus = StageActionStatus.Completed;
+                await SetCompletionDataAsync(dto);
                 return;
             }
 
             if (dto.Status == ProgressStatus.Failed)
             {
                 dto.ActionStatus = StageActionStatus.Failed;
+                await SetCompletionDataAsync(dto);
                 return;
             }
 
-            // إذا كانت قيد التقدم، نحدد حسب النوع
             switch (dto.StageType)
             {
                 case StageType.Exam:
@@ -98,7 +96,6 @@ namespace SkillAssessmentPlatform.Application.Services
 
         private async Task SetExamActionStatusAsync(StageProgressDTO dto)
         {
-            // البحث عن طلب امتحان للمتقدم في هذه المرحلة
             var examRequest = await _unitOfWork.ExamRequestRepository
                 .GetByStageProgressIdAsync(dto.Id);
 
@@ -115,7 +112,6 @@ namespace SkillAssessmentPlatform.Application.Services
                     dto.AdditionalData = new { ExamRequestId = examRequest.Id };
                     break;
                 case ExamRequestStatus.Approved:
-                    // التحقق من وجود feedback
                     if (examRequest.FeedbackId.HasValue)
                     {
                         dto.ActionStatus = StageActionStatus.Reviewed;
@@ -134,7 +130,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     break;
                 case ExamRequestStatus.Rejected:
                     dto.ActionStatus = StageActionStatus.RequestRejected;
-                    dto.AdditionalData = new { ExamRequestId = examRequest.Id };
+                    dto.AdditionalData = new { ExamRequestId = examRequest.Id, ExamId = examRequest.ExamId };
                     break;
                 case ExamRequestStatus.Canceled:
                     dto.ActionStatus = StageActionStatus.ReadyToRequest;
@@ -144,13 +140,14 @@ namespace SkillAssessmentPlatform.Application.Services
 
         private async Task SetInterviewActionStatusAsync(StageProgressDTO dto)
         {
-            // البحث عن حجز مقابلة للمتقدم في هذه المرحلة
             var interviewBook = await _unitOfWork.InterviewBookRepository
                 .GetByStageProgressIdAsync(dto.Id);
 
             if (interviewBook == null)
             {
                 dto.ActionStatus = StageActionStatus.ReadyToBook;
+                var interview = await _unitOfWork.InterviewRepository.GetByStageIdAsync(dto.StageId);
+                dto.AdditionalData = new { InterviewId = interview.Id };
                 return;
             }
 
@@ -165,7 +162,7 @@ namespace SkillAssessmentPlatform.Application.Services
                     dto.AdditionalData = new
                     {
                         InterviewBookId = interviewBook.Id,
-                        ScheduledDate = interviewBook.ScheduledDate,
+                        ScheduledDate = interviewBook.Appointment.StartTime,
                         MeetingLink = interviewBook.MeetingLink
                     };
                     break;
@@ -183,14 +180,13 @@ namespace SkillAssessmentPlatform.Application.Services
                     break;
                 case InterviewStatus.Canceled:
                     dto.ActionStatus = StageActionStatus.BookingCanceled;
-                    dto.AdditionalData = new { InterviewBookId = interviewBook.Id };
+                    dto.AdditionalData = new { InterviewBookId = interviewBook.Id, InterviewId = interviewBook.InterviewId };
                     break;
             }
         }
 
         private async Task SetTaskActionStatusAsync(StageProgressDTO dto)
         {
-            // البحث عن المهمة المُخصصة للمتقدم
             var taskApplicant = await _unitOfWork.TaskApplicantRepository
                 .GetByStageProgressIdAsync(dto.Id);
 
@@ -207,7 +203,6 @@ namespace SkillAssessmentPlatform.Application.Services
                 TaskId = taskApplicant.TaskId
             };
 
-            // البحث عن آخر submission
             var latestSubmission = await _unitOfWork.TaskSubmissionRepository
                 .GetLatestByTaskApplicantIdAsync(taskApplicant.Id);
 
@@ -227,7 +222,9 @@ namespace SkillAssessmentPlatform.Application.Services
                         TaskApplicantId = taskApplicant.Id,
                         SubmissionId = latestSubmission.Id,
                         IsLate = false,
-                        SubmissionDate = latestSubmission.SubmissionDate
+                        SubmissionDate = latestSubmission.SubmissionDate,
+                        SubmissionUrl = latestSubmission.SubmissionUrl,
+                        TaskId = taskApplicant.TaskId
                     };
                     break;
                 case TaskSubmissionStatus.Accepted:
@@ -247,7 +244,10 @@ namespace SkillAssessmentPlatform.Application.Services
                     {
                         TaskApplicantId = taskApplicant.Id,
                         SubmissionId = latestSubmission.Id,
-                        FeedbackId = latestSubmission.FeedbackId
+                        FeedbackId = latestSubmission.FeedbackId,
+                        SubmissionDate = latestSubmission.SubmissionDate,
+                        SubmissionUrl = latestSubmission.SubmissionUrl,
+                        TaskId = taskApplicant.TaskId
                     };
                     break;
                 case TaskSubmissionStatus.Late:
@@ -256,11 +256,66 @@ namespace SkillAssessmentPlatform.Application.Services
                     {
                         TaskApplicantId = taskApplicant.Id,
                         SubmissionId = latestSubmission.Id,
+                        SubmissionDate = latestSubmission.SubmissionDate,
+                        SubmissionUrl = latestSubmission.SubmissionUrl,
+                        TaskId = taskApplicant.TaskId,
                         IsLate = true
                     };
                     break;
             }
         }
+        private async Task SetCompletionDataAsync(StageProgressDTO dto)
+        {
+            switch (dto.StageType)
+            {
+                case StageType.Exam:
+                    var examRequest = await _unitOfWork.ExamRequestRepository.GetByStageProgressIdAsync(dto.Id);
+                    if (examRequest != null)
+                    {
+                        dto.AdditionalData = new
+                        {
+                            ExamId = examRequest.ExamId,
+                            ExamRequestId = examRequest.Id,
+                            FeedbackId = examRequest.FeedbackId
+                        };
+                    }
+                    break;
+
+                case StageType.Interview:
+                    var interviewBook = await _unitOfWork.InterviewBookRepository.GetByStageProgressIdAsync(dto.Id);
+                    if (interviewBook != null)
+                    {
+                        dto.AdditionalData = new
+                        {
+                            InterviewBookId = interviewBook.Id,
+                            InterviewId = interviewBook.InterviewId,
+                            FeedbackId = interviewBook.FeedbackId
+                        };
+                    }
+                    break;
+
+                case StageType.Task:
+                    var taskApplicant = await _unitOfWork.TaskApplicantRepository.GetByStageProgressIdAsync(dto.Id);
+                    if (taskApplicant != null)
+                    {
+                        var latestSubmission = await _unitOfWork.TaskSubmissionRepository
+                            .GetLatestByTaskApplicantIdAsync(taskApplicant.Id);
+
+                        dto.AdditionalData = new
+                        {
+                            TaskApplicantId = taskApplicant.Id,
+                            SubmissionId = latestSubmission?.Id,
+                            SubmissionDate = latestSubmission.SubmissionDate,
+                            SubmissionUrl = latestSubmission.SubmissionUrl,
+                            FeedbackId = latestSubmission?.FeedbackId,
+                            TaskId = taskApplicant.TaskId
+
+                        };
+                    }
+                    break;
+            }
+        }
+
         #endregion
         public async Task<StageProgressDTO> GetByCurrEnrollmentIdAsync(int enrollmentId)
         {
@@ -316,22 +371,33 @@ namespace SkillAssessmentPlatform.Application.Services
                 await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(
                                                                             stageProgress.ExaminerId,
                                                                             MapLoad(latestStage.Stage.Type));
-                // free examiner workload
-                var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(trackId, MapLoad(stage.Type));
-                if (freeExaminerId == null)
-                    throw new InvalidOperationException("No available examiner found for this stage");
+                ///-----
+                var nextStage = await _unitOfWork.StageRepository.GetNextStageInLevelAsync(stageProgress.StageId);
 
-                //Create progress for next stage
-                var nextStageProgress = await _unitOfWork.StageProgressRepository.CreateNextStageProgressAsync(
-                    stageProgress.LevelProgressId,
-                    stageProgress.StageId,
-                    freeExaminerId);
+                StageProgress? nextStageProgress = null;
 
-
-                // If no next stage, level is completed
-                if (nextStageProgress == null)
+                if (nextStage != null)
                 {
+                    var nextStageLoad = MapLoad(nextStage.Type);
+                    var freeExaminerId = await _unitOfWork.ExaminerRepository
+                        .GetAvailableExaminerAsync(trackId, nextStageLoad);
 
+                    if (freeExaminerId == null)
+                        throw new InvalidOperationException("No available examiner found for the next stage");
+
+                    nextStageProgress = await _unitOfWork.StageProgressRepository.CreateNextStageProgressAsync(
+                           stageProgress.LevelProgressId,
+                           nextStage.Id,
+                           freeExaminerId);
+                    await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(freeExaminerId, nextStageLoad);
+                    if (nextStage.Type == StageType.Task)
+                    {
+                        await _taskApplicantService.AssignRandomTaskAsync(
+                            new AssignTaskDTO { StageProgressId = nextStageProgress.Id });
+                    }
+                }
+                else
+                {
                     var levelProgressId = stageProgress.LevelProgressId;
                     var updateLevelDto = new UpdateLevelStatusDTO
                     {
@@ -340,11 +406,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
                     await _levelProgressService.UpdateStatusAsync(levelProgressId, updateLevelDto);
                 }
-                if (nextStageProgress.Stage.Type == StageType.Task)
-                {
-                    await _taskApplicantService.AssignRandomTaskAsync(
-                                    new AssignTaskDTO { StageProgressId = nextStageProgress.Id });
-                }
+
 
             }
             else if (updateDto.Status == ApplicantResultStatus.Failed)
@@ -354,6 +416,28 @@ namespace SkillAssessmentPlatform.Application.Services
                                                                                stageProgressId,
                                                                                ProgressStatus.Failed,
                                                                                (int)updateDto.Score);
+                /*await CreateNewAttemptAsync(stagePById.LevelProgressId, stage.Id);*/
+                var attemptsCount = stagePById.Attempts;
+
+                var stageEntity = await _unitOfWork.StageRepository.GetByIdAsync(stageProgress.StageId);
+
+                if (attemptsCount < stageEntity.NoOfAttempts)
+                {
+                    var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(trackId, MapLoad(stage.Type));
+                    if (freeExaminerId == null)
+                        throw new InvalidOperationException("No available examiner found for this stage");
+
+                    var newAttempt = await _unitOfWork.StageProgressRepository
+                       .CreateNewAttemptAsync(stagePById.LevelProgressId, stage.Id, freeExaminerId);
+
+                    var stageLoad = MapLoad(stage.Type);
+                    await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(freeExaminerId, stageLoad);
+                    if (stage.Type == StageType.Task)
+                    {
+                        await _taskApplicantService.AssignRandomTaskAsync(
+                            new AssignTaskDTO { StageProgressId = newAttempt.Id });
+                    }
+                }
             }
             else if (updateDto.Status == ApplicantResultStatus.ResubmissionAllowed)
             {
@@ -363,42 +447,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<StageProgressDTO>(stageProgress);
         }
-        public async Task<LevelProgressDTO> UpdateStatusAsync(int levelProgressId, UpdateLevelStatusDTO updateDto)
-        {
-            var levelProgress = await _unitOfWork.LevelProgressRepository.UpdateStatusAsync(levelProgressId, updateDto.Status);
 
-            // If level completed successfully, create progress for next level
-            if (updateDto.Status == ProgressStatus.Successful)
-            {
-                var enrollment = await _unitOfWork.EnrollmentRepository.GetByIdAsync(levelProgress.EnrollmentId);
-
-
-                var certificate = new AppCertificate
-                {
-                    ApplicantId = enrollment.ApplicantId,
-                    LeveProgressId = levelProgress.Id,
-                    IssueDate = DateTime.UtcNow,
-                    VerificationCode = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()
-                };
-                await _unitOfWork.AppCertificateRepository.AddAsync(certificate);
-
-
-                var result = await _unitOfWork.LevelProgressRepository.CreateNextLevelProgressAsync(
-                    levelProgress.EnrollmentId,
-                    levelProgress.LevelId);
-
-                //// No next level, track completed
-                if (result == null)
-                {
-                    await _unitOfWork.EnrollmentRepository.UpdateStatusAsync(levelProgress.EnrollmentId, EnrollmentStatus.Completed);
-                }
-
-
-                await _unitOfWork.SaveChangesAsync();
-            }
-
-            return _mapper.Map<LevelProgressDTO>(levelProgress);
-        }
 
 
         public async Task<StageProgressDTO> AssignExaminerAsync(int stageProgressId, AssignExaminerDTO assignDto)
@@ -531,37 +580,36 @@ namespace SkillAssessmentPlatform.Application.Services
                 .GetAttemptCountAsync(stageId);
         }
 
-        public async Task<StageProgressDTO> CreateNewAttemptAsync(int enrollmentId, int stageId)
+        public async Task<StageProgressDTO> CreateNewAttemptAsync(int levelPregressId, int stageId)
         {
             // التحقق من أن المرحلة تنتمي للتسجيل الصحيح
-            var enrollment = await _unitOfWork.EnrollmentRepository.GetByIdAsync(enrollmentId);
+            var levelProgress = await _unitOfWork.LevelProgressRepository.GetByIdAsync(levelPregressId);
             var stage = await _unitOfWork.StageRepository.GetByIdAsync(stageId);
 
-            if (stage == null || enrollment == null)
-                throw new KeyNotFoundException("Enrollment or Stage not found");
+            if (stage == null || levelProgress == null)
+                throw new KeyNotFoundException("levelprogress or Stage not found");
 
             // check the no. of allowed attempts and existed attempts
             var attempts = await _unitOfWork.StageProgressRepository.GetAttemptCountAsync(stageId);
-            if (stage.NoOfAttempts <= attempts)
+            if (stage.NoOfAttempts >= attempts)
                 throw new BadRequestException("This stage does not allow more attempts");
 
             // التحقق من عدم وجود محاولة قيد التقدم
             var existingAttempt = await _unitOfWork.StageProgressRepository
-                .GetCurrentStageProgressByEnrollmentAsync(enrollmentId);
+                .GetCurrentStageProgressAsync(levelPregressId);
 
             if (existingAttempt != null && existingAttempt.StageId == stageId)
                 throw new BadRequestException("There is already an active attempt for this stage");
 
-            var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(enrollment.TrackId, MapLoad(stage.Type));
+            var freeExaminerId = await _unitOfWork.ExaminerRepository.GetAvailableExaminerAsync(levelProgress.Level.TrackId, MapLoad(stage.Type));
             if (freeExaminerId == null)
                 throw new InvalidOperationException("No available examiner found for this stage");
 
-            // get level progress ID 
-            var levelProgressId = await _unitOfWork.StageProgressRepository.GetLevelProgressIdofStageAsync(stage.Id);
-
             var newAttempt = await _unitOfWork.StageProgressRepository
-                .CreateNewAttemptAsync(levelProgressId, stageId, freeExaminerId);
+               .CreateNewAttemptAsync(levelPregressId, stageId, freeExaminerId);
 
+            var stageLoad = MapLoad(stage.Type);
+            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(freeExaminerId, stageLoad);
             return _mapper.Map<StageProgressDTO>(newAttempt);
         }
 

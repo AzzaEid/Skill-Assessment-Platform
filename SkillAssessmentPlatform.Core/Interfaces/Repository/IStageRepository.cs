@@ -1,10 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SkillAssessmentPlatform.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SkillAssessmentPlatform.Core.Entities;
 
 namespace SkillAssessmentPlatform.Core.Interfaces.Repository
 {
@@ -12,10 +6,11 @@ namespace SkillAssessmentPlatform.Core.Interfaces.Repository
     {
         Task<IEnumerable<Stage>> GetStagesByLevelIdAsync(int levelId);
         Task<Stage> GetFirstStageByLevelIdAsync(int levelId);
-        
-        Task AddAsync(Stage stage);
 
+        Task AddAsync(Stage stage);
+        Task<Stage> GetByInterviewId(int interviewId);
         Task<Stage> GetByIdWithCriteriaAsync(int stageId);
+        Task<Stage?> GetNextStageInLevelAsync(int currentStageId);
         Task<IEnumerable<Stage>> GetTaskStagesByTrackIdAsync(int trackId);
 
 

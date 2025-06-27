@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
-using SkillAssessmentPlatform.Core.Interfaces;
+﻿using AutoMapper;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Input;
+using SkillAssessmentPlatform.Application.DTOs.EvaluationCriteria.Output;
+using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Enums;
+using SkillAssessmentPlatform.Core.Exceptions;
+using SkillAssessmentPlatform.Core.Interfaces;
 
 namespace SkillAssessmentPlatform.Application.Services
 {
@@ -14,10 +13,12 @@ namespace SkillAssessmentPlatform.Application.Services
     public class EvaluationCriteriaService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public EvaluationCriteriaService(IUnitOfWork unitOfWork)
+        public EvaluationCriteriaService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<bool> CreateAsync(CreateEvaluationCriteriaDto dto)
@@ -36,9 +37,12 @@ namespace SkillAssessmentPlatform.Application.Services
             return true;
         }
 
-        public async Task<IEnumerable<EvaluationCriteria>> GetByStageIdAsync(int stageId)
+        public async Task<IEnumerable<EvaluationCriteriaDTO>> GetByStageIdAsync(int stageId)
         {
-            return await _unitOfWork.EvaluationCriteriaRepository.GetByStageIdAsync(stageId);
+
+            var list = await _unitOfWork.EvaluationCriteriaRepository.GetByStageIdAsync(stageId);
+            return _mapper.Map<IEnumerable<EvaluationCriteriaDTO>>(list);
+
         }
         public async Task<bool> UpdateAsync(UpdateEvaluationCriteriaDto dto)
         {
@@ -153,10 +157,27 @@ namespace SkillAssessmentPlatform.Application.Services
                 else if (payload.CriteriaIdToDelete.HasValue && payload.DeletionMode == DeletionHandlingMode.DistributeWeight)
                 {
                     var toDelete = allCurrent.FirstOrDefault(c => c.Id == payload.CriteriaIdToDelete);
-                    if (toDelete != null)
-                        toDelete.IsActive = false;
+                    if (toDelete == null)
+                        throw new BadRequestException("Criterion to delete not found.");
 
-                    // توزيع الوزن يتم من طرف الفرونت 
+                    toDelete.IsActive = false;
+                    float deletedWeight = toDelete.Weight;
+
+                    float redistributeFactor = 100f / (100f - deletedWeight);
+                    var saveLast = 0;
+                    foreach (var c in allCurrent)
+                    {
+                        if (c.IsActive)
+                        {
+                            c.Weight = c.Weight * redistributeFactor;
+                            saveLast = c.Id;
+                        }
+
+                        await _unitOfWork.EvaluationCriteriaRepository.UpdateAsync(c);
+                    }
+
+
+                    await _unitOfWork.SaveChangesAsync();
                 }
                 else
                 {

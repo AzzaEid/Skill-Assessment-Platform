@@ -1,6 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using SkillAssessmentPlatform.Application.Abstract;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Input;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Output;
+using SkillAssessmentPlatform.Application.DTOs.Level.Output;
+using SkillAssessmentPlatform.Application.DTOs.Structure;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Feedback_and_Evaluation;
 using SkillAssessmentPlatform.Core.Entities.Tasks__Exams__and_Interviews;
@@ -9,7 +14,6 @@ using SkillAssessmentPlatform.Core.Entities.TrackLevelStage;
 //using SkillAssessmentPlatform.Core.Entities.TrackLevelStage.SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
-using SkillAssessmentPlatform.Infrastructure.ExternalServices;
 
 
 namespace SkillAssessmentPlatform.Application.Services
@@ -572,7 +576,7 @@ namespace SkillAssessmentPlatform.Application.Services
                 FullName = e.FullName,
                 Email = e.Email,
                 Image = e.Image,
-                Specialization = e.Specialization,
+                Bio = e.Bio,
                 UserType = e.UserType,
                 ExaminerLoads = e.ExaminerLoads?.Select(load => new ExaminerLoadDTO
                 {

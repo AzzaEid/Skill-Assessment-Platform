@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using SkillAssessmentPlatform.Application.DTOs.Auth;
+using SkillAssessmentPlatform.Application.Abstract;
+using SkillAssessmentPlatform.Application.DTOs.Auth.Inputs;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -15,14 +16,14 @@ namespace SkillAssessmentPlatform.Application.Services
         private readonly IMapper _mapper;
         private readonly ILogger<AuthService> _logger;
         private readonly TokenService _tokenService;
-        private readonly EmailService _emailServices;
+        private readonly IEmailService _emailServices;
 
         public AuthService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<AuthService> logger,
             TokenService tokenService,
-            EmailService emailService)
+            IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkillAssessmentPlatform.API.Common;
-using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Applicant.Input;
 using SkillAssessmentPlatform.Application.Services;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Enums;
@@ -80,15 +80,6 @@ namespace SkillAssessmentPlatform.API.Controllers
         {
             var result = await _applicantService.GetApplicantCertificatesAsync(applicantId, page, pageSize);
             return _responseHandler.Success(result);
-        }
-
-        [HttpPost("{applicantId}/enrollments")]
-        public async AppTask<IActionResult> EnrollInTrack(
-            string applicantId,
-            [FromBody] EnrollmentCreateDTO enrollmentDto)
-        {
-            var enrollment = await _applicantService.EnrollApplicantInTrackAsync(applicantId, enrollmentDto);
-            return _responseHandler.Created(enrollment, "Enrollment created successfully");
         }
 
         [HttpGet("{applicantId}/progress")]

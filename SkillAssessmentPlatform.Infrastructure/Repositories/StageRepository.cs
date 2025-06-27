@@ -3,11 +3,6 @@ using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
@@ -27,7 +22,22 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .OrderBy(s => s.Order)
                 .ToListAsync();
         }
+        public async Task<Stage?> GetNextStageInLevelAsync(int currentStageId)
+        {
+            // Get current stage
+            var currentStage = await _context.Stages.FindAsync(currentStageId);
+            if (currentStage == null)
+                throw new KeyNotFoundException($"Stage with id {currentStageId} not found");
 
+            // Get next stage based on order in same level
+            var nextStage = await _context.Stages
+                .Where(s => s.LevelId == currentStage.LevelId &&
+                            s.Order == currentStage.Order + 1 &&
+                            s.IsActive)
+                .FirstOrDefaultAsync();
+
+            return nextStage;
+        }
         public async Task AddAsync(Stage stage)
         {
             await _context.Stages.AddAsync(stage);
@@ -39,6 +49,13 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             return await _context.Stages
                 .Include(s => s.EvaluationCriteria)
                 .FirstOrDefaultAsync(s => s.Id == stageId);
+        }
+        public async Task<Stage> GetByInterviewId(int interviewId)
+        {
+            return await _context.Interviews
+                .Where(i => i.Id == interviewId)
+                .Select(i => i.Stage)
+                .FirstOrDefaultAsync();
         }
 
         Task<IEnumerable<Stage>> IStageRepository.GetStagesByLevelIdAsync(int levelId)

@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("/ratifylogor.png")}")" />
+    <title> Certificate of Completion - @Model.ApplicantName</title>
+
+    <base href="@($"{Context.Request.Scheme}://{Context.Request.Host}/")" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+   
+    <link href="https://cbd5-203-89-108-174.ngrok-free.app/css/certificate.css" rel="stylesheet" />
+
+@*  <link href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("/css/certificate.css")}")" rel="stylesheet" />
+ *@
+</head>
+
+<body>
+    <div class="certificate-container">
+        <div class="decorative-elements">
+            <div class="decorative-circle circle-1"></div>
+            <div class="decorative-circle circle-2"></div>
+            <div class="decorative-circle circle-3"></div>
+        </div>
+
+        <div class="certificate-header">
+            <div class="logo">
+                <img src="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~/ratifylogo.png")}")" alt="Ratify logo" />
+            </div>
+            <div class="btm">
+                <div class="certificate-logo">
+                    <i class="fas fa-award"></i>
+                </div>
+                <h1 class="certificate-title"> Certificate of Completion </h1>
+              </div>
+           
+        </div>
+
+        <div class="certificate-body">
+            <p class="achievement-text">
+                This is to certify that
+            </p>
+
+            <h2 class="recipient-name">@Model.ApplicantName</h2>
+
+            <p class="achievement-text">
+                has successfully completed all the requirements of the training track
+            </p>
+
+            <div class="course-details">
+                <div class="course-name">@Model.TrackName</div>
+                <div class="course-level">Level: @Model.LevelName</div>
+            </div>
+
+            <div class="certificate-footer">
+                <div class="date-section">
+                    <div class="label">Issue Date</div>
+                    <div class="value">@Model.IssueDate.ToString("dd MMMM yyyy")</div>
+                </div>
+                
+                <div class="verification-section">
+                    <div class="label"> Verification Code</div>
+                    <div class="verification-code">@Model.VerificationCode</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="/api/Certificates/@Model.VerificationCode/pdf" class="btn btn-primary">
+            <i class="fas fa-download"></i>
+            Download PDF
+        </a>
+        <button onclick="window.print()" class="btn btn-secondary">
+            <i class="fas fa-print"></i>
+           Print
+        </button>
+    </div>
+
+    <script>
+        // إضافة تأثير hover للشهادة
+        document.addEventListener('DOMContentLoaded', function() {
+            const certificate = document.querySelector('.certificate-container');
+            
+            certificate.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            
+            certificate.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

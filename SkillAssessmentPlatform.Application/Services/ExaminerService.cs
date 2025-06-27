@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Input;
+using SkillAssessmentPlatform.Application.DTOs.Examiner.Output;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Exceptions;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -48,7 +50,7 @@ namespace SkillAssessmentPlatform.Application.Services
         {
             var examiner = await _unitOfWork.ExaminerRepository.GetByIdAsync(id);
 
-           // examiner.Specialization = examinerDto.Specialization;
+           // examiner.Bio = examinerDto.Bio;
             //examiner.Bio = examinerDto.Bio;
             var mapped = _mapper.Map<Examiner>(examinerDto);
             var updatedExaminer = await _unitOfWork.ExaminerRepository.UpdateAsync(mapped);

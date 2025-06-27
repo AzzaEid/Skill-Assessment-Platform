@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Entities.Certificates_and_Notifications;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
 using SkillAssessmentPlatform.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace SkillAssessmentPlatform.Infrastructure.Repositories
 {
@@ -46,5 +41,12 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.VerificationCode == code);
         }
 
+        public async Task<AppCertificate?> GetByLevelIdAndApplicantId(int levelId, string applicantId)
+        {
+            return await _context.Certificates
+                .Where(c => c.ApplicantId == applicantId &&
+                        c.LevelProgress.LevelId == levelId)
+                .FirstOrDefaultAsync();
+        }
     }
 }

@@ -66,6 +66,28 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             }
             return assignments;
         }
+        public async Task<IEnumerable<CreationAssignment>> GetOverdueBySeniorAsync(string seniorId)
+        {
+            var assignments = await _context.CreationAssignments
+                .Where(ca => ca.AssignedBySeniorId == seniorId &&
+                  (ca.DueDate < DateTime.UtcNow || ca.Status == AssignmentStatus.Overdue))
+                .Include(ca => ca.Examiner)
+                .Include(ca => ca.Stage)
+                    .ThenInclude(s => s.TasksPool)
+                .Include(ca => ca.Stage)
+                    .ThenInclude(s => s.Exam)
+                .OrderByDescending(ca => ca.AssignedDate)
+                .ToListAsync();
+
+            foreach (var assignment in assignments)
+            {
+                if (assignment.DueDate < DateTime.UtcNow)
+                {
+                    assignment.Status = AssignmentStatus.Overdue;
+                }
+            }
+            return assignments;
+        }
         public async Task<IEnumerable<CreationAssignment>> GetPendingExamsByExaminerIdAsync(string examinerId)
         {
             var assignments = await _context.CreationAssignments
@@ -156,6 +178,18 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             _context.CreationAssignments.Update(assignment);
             await _context.SaveChangesAsync();
             return assignment;
+        }
+        public async Task<CreationAssignment>? GetByExaminerAndStageAsync(string examinerId, int stageId)
+        {
+            return await _context.CreationAssignments
+               .Where(ca => ca.StageId == stageId &&
+                           ca.ExaminerId == examinerId &&
+                           ca.Type == CreationType.Task &&
+                           ca.Status != AssignmentStatus.Completed)
+               .Include(a => a.Examiner)
+               .Include(a => a.Stage)
+               .FirstOrDefaultAsync();
+
         }
 
     }

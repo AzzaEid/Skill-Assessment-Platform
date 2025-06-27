@@ -15,6 +15,7 @@ namespace SkillAssessmentPlatform.Application.DTOs.ExaminerDashboard
         public int DaysWaiting { get; set; }
         public bool IsLate { get; set; }
         public TaskSubmissionStatus Status { get; set; }
+        public int StageId { get; set; }
         public string StageName { get; set; }
         public string TrackName { get; set; }
     }

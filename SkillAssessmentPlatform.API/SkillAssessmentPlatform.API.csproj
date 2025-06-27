@@ -9,6 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="DinkToPdf" Version="1.0.8" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.13">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,10 +26,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SkillAssessmentPlatform.Application\SkillAssessmentPlatform.Application.csproj" />
+    <ProjectReference Include="..\SkillAssessmentPlatform.Infrastructure\SkillAssessmentPlatform.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="DependencyInjections\" />
+    <Folder Include="DinkToPdf\" />
     <Folder Include="wwwroot\profile-images\" />
   </ItemGroup>
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SkillAssessmentPlatform.Core.Entities;
 using SkillAssessmentPlatform.Core.Entities.Users;
 using SkillAssessmentPlatform.Core.Interfaces.Repository;
@@ -11,20 +12,30 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
     {
         private readonly AppDbContext _context;
         private readonly UserManager<User> _manager;
+        private readonly ILogger<SeniorRepository> _logger;
 
-        public SeniorRepository(AppDbContext context, UserManager<User> manager)
+        public SeniorRepository(AppDbContext context, UserManager<User> manager, ILogger<SeniorRepository> logger)
         {
             _context = context;
             _manager = manager;
+            _logger = logger;
         }
         public async Task<bool> AssignSeniorToTrackAsync(Examiner examiner, Track track)
         {
+            if (!await _manager.IsInRoleAsync(examiner, nameof(Actors.SeniorExaminer)))
+            {
+                _logger.LogError($"role not already existed");
+
+                var addRoleRes = await _manager.AddToRoleAsync(examiner, Actors.SeniorExaminer.ToString());
+                if (!addRoleRes.Succeeded)
+                {
+                    _logger.LogError($"Failed to add role: {string.Join(", ", addRoleRes.Errors.Select(e => e.Description))}");
+                    return false;
+                }
+            }
+            examiner.UserType = Actors.SeniorExaminer;
             track.SeniorExaminer = examiner;
             track.SeniorExaminerID = examiner.Id;
-
-            examiner.UserType = Actors.SeniorExaminer;
-            var addRoleRes = await _manager.AddToRoleAsync(examiner, Actors.SeniorExaminer.ToString());
-            if (!addRoleRes.Succeeded) return false;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -40,6 +51,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
         public async Task<List<Examiner>> GetSeniorListAsync()
         {
             return await _context.Tracks
+                 .Include(t => t.SeniorExaminer!.ManagedTracks)
                  .Where(t => t.SeniorExaminer != null)
                  .Select(t => t.SeniorExaminer!)
                  .Distinct()
@@ -48,38 +60,36 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
 
         public async Task<bool> RemoveSeniorFromTrackAsync(Track track)
         {
-
             Examiner? senior = track.SeniorExaminer;
             if (senior == null)
             {
+                _logger.LogError($"senior = null");
                 return false;
             }
-            var trans = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                // remove relation 
-                track.SeniorExaminer = null;
-                track.SeniorExaminerID = null;
                 // remove role  
                 senior.UserType = Actors.Examiner;
                 var result = await _manager.RemoveFromRoleAsync(senior, Actors.SeniorExaminer.ToString());
                 if (!result.Succeeded)
                 {
-                    await trans.RollbackAsync();
+                    _logger.LogError($"Error removing role: {result.Errors.Select(e => e.Description)}");
                     return false;
                 }
 
+                // remove relation 
+                track.SeniorExaminer = null;
+                track.SeniorExaminerID = null;
 
                 await _context.SaveChangesAsync();
-                await trans.CommitAsync();
                 return true;
             }
             catch (Exception ex)
             {
-                trans.Rollback();
+                _logger.LogError($"Exception in RemoveSeniorFromTrackAsync: {ex.Message}");
                 return false;
             }
-
         }
 
         public async Task<bool> ChangeTrackSeniorAsync(Examiner newSenior, Track track)
@@ -88,6 +98,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
             try
             {
                 // remove existing senior 
+                _logger.LogError($"remove ==========================");
                 bool removed = await RemoveSeniorFromTrackAsync(track);
                 if (!removed)
                 {
@@ -95,21 +106,25 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                     return false;
                 }
 
-                //add new senior 
+                // add new senior 
+                _logger.LogError($"add ==========================");
                 bool assigned = await AssignSeniorToTrackAsync(newSenior, track);
                 if (!assigned)
                 {
                     await trans.RollbackAsync();
                     return false;
                 }
+                _logger.LogError($"relation ==========================");
                 track.SeniorExaminer = newSenior;
                 track.SeniorExaminerID = newSenior.Id;
-                _context.SaveChanges();
+
+                await _context.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError($"Exception in ChangeTrackSeniorAsync: {ex.Message}");
                 await trans.RollbackAsync();
                 return false;
             }

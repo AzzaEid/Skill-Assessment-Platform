@@ -52,13 +52,14 @@ namespace SkillAssessmentPlatform.API.Controllers
             var result = await _assignmentService.GetExaminerAssignmentsAsync(examinerId);
             return _responseHandler.Success(result);
         }
-        [Authorize(Roles = "Examiner")]
-        [HttpPut("task-progress/{taskId}")]
-        public async Task<IActionResult> UpdateTaskCreationProgress(int taskId)
+        [HttpGet("senior/{seniorId}/overdue")]
+        public async Task<IActionResult> GetOverDueBySeniior(string seniorId)
         {
-            await _assignmentService.UpdateTaskCreationProgressAsync(taskId);
-            return _responseHandler.Success(null, "Task creation progress updated successfully");
+            var result = await _assignmentService.GetOverdueBySenior(seniorId);
+            return _responseHandler.Success(result);
         }
+
+
         [Authorize(Roles = "SeniorExaminer")]
         [HttpPut("exam-completed/{assignmentId}")]
         public async Task<IActionResult> UpdateExamStatus(int assignmentId)

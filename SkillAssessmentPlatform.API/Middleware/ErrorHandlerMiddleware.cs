@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Exceptions;
 using System.Net;
@@ -44,6 +45,14 @@ namespace SkillAssessmentPlatform.API.Middleware
                         responseModel.StatusCode = HttpStatusCode.BadRequest;
                         responseModel.Errors = e.Errors;
                         break;
+
+                    case ValidationException validationEx:
+                        responseModel.StatusCode = HttpStatusCode.BadRequest;
+                        responseModel.Message = "Validation failed";
+                        responseModel.Errors = validationEx.Errors
+                            .Select(e => $"{e.PropertyName}: {e.ErrorMessage}").ToList();
+                        break;
+
                     case ArgumentException:
                         responseModel.StatusCode = HttpStatusCode.BadRequest;
                         break;
@@ -52,7 +61,8 @@ namespace SkillAssessmentPlatform.API.Middleware
                         break;
 
                     case KeyNotFoundException or UserNotFoundException:
-                        responseModel.StatusCode = HttpStatusCode.NotFound;
+                        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                        responseModel.Message = "Resource not found";
                         break;
 
                     case DbUpdateException e:

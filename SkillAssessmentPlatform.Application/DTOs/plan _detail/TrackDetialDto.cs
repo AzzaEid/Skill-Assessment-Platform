@@ -1,4 +1,6 @@
-﻿namespace SkillAssessmentPlatform.Application.DTOs
+﻿using SkillAssessmentPlatform.Application.DTOs.Level.Output;
+
+namespace SkillAssessmentPlatform.Application.DTOs
 {
     public class TrackDetialDto
     {

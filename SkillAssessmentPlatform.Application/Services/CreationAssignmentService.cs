@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using SkillAssessmentPlatform.Application.DTOs;
 using SkillAssessmentPlatform.Application.DTOs.CreateAssignment;
+using SkillAssessmentPlatform.Application.DTOs.Exam.Output;
 using SkillAssessmentPlatform.Core.Entities.Management;
 using SkillAssessmentPlatform.Core.Enums;
 using SkillAssessmentPlatform.Core.Interfaces;
@@ -75,27 +75,26 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(assignments);
         }
-
-        public async Task UpdateTaskCreationProgressAsync(int taskId)
+        public async Task<IEnumerable<CreationAssignmentDTO>> GetOverdueBySenior(string seniorId)
         {
-            var task = await _unitOfWork.AppTaskRepository.GetByIdAsync(taskId);
-            var tasksPool = await _unitOfWork.TasksPoolRepository.GetByIdAsync(task.TaskPoolId);
+            var assignments = await _unitOfWork.CreationAssignmentRepository
+                .GetOverdueBySeniorAsync(seniorId);
 
-            var assignment = _unitOfWork.CreationAssignmentRepository
-                .GetAllQueryable()
-                .Where(ca => ca.StageId == tasksPool.StageId &&
-                            ca.Type == CreationType.Task &&
-                            ca.Status != AssignmentStatus.Completed)
-                .Include(a => a.Examiner)
-                .Include(a => a.Stage)
-                .FirstOrDefault();
+            return _mapper.Map<IEnumerable<CreationAssignmentDTO>>(assignments);
+        }
+
+        public async Task UpdateTaskCreationProgressAsync(int taskPoolId, string examinerId)
+        {
+            var tasksPool = await _unitOfWork.TasksPoolRepository.GetByIdAsync(taskPoolId);
+            if (tasksPool == null) throw new Exception("no related taskPool Id");
+            var assignment = await _unitOfWork.CreationAssignmentRepository.GetByExaminerAndStageAsync(examinerId, tasksPool.StageId);
 
             if (assignment == null)
                 throw new Exception("This Task id not related to any assignments!");
-            //نغير حالة الاسسمنت - نزيد الكرنت وورك لود
+            //نغير حالة الاسسمنت - نقلل الكرنت وورك لود
             await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignment.Id, AssignmentStatus.Completed);
 
-            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(assignment.ExaminerId, LoadType.TaskCreation);
+            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(assignment.ExaminerId, LoadType.TaskCreation);
 
             // نخبر السينيور
             await _notificationService.SendNotificationAsync(
@@ -109,14 +108,14 @@ namespace SkillAssessmentPlatform.Application.Services
 
             var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, AssignmentStatus.Completed);
 
-            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
+            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
         }
         public async Task CancelCreationAssignmentStatusAsync(int assignmentId)
         {
 
             var creation = await _unitOfWork.CreationAssignmentRepository.UpdateStatusAsync(assignmentId, AssignmentStatus.Cancelled);
 
-            await _unitOfWork.ExaminerLoadRepository.DecrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
+            await _unitOfWork.ExaminerLoadRepository.IncrementWorkloadAsync(creation.ExaminerId, LoadType.ExamCreation);
         }
     }
 }

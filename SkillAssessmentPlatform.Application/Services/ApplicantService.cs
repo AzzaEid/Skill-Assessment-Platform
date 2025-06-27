@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using SkillAssessmentPlatform.Application.DTOs;
+using SkillAssessmentPlatform.Application.DTOs.Applicant.Input;
+using SkillAssessmentPlatform.Application.DTOs.Applicant.Outputs;
 using SkillAssessmentPlatform.Core.Common;
 using SkillAssessmentPlatform.Core.Interfaces;
 
