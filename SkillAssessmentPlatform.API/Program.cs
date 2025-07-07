@@ -107,12 +107,12 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-
         app.UseStaticFiles();
 
+        app.UseCors("AllowAll");
         app.UseRouting();
 
-        app.UseCors("AllowAll");
+
         app.UseMiddleware<ErrorHandlerMiddleware>();
 
         app.UseAuthentication();

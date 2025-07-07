@@ -226,6 +226,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
             return trackDto;
         }
+
         public async Task<bool> CreateTrackStructureAsync(TrackStructureDTO structureDTO)
         {
             var track = await _unitOfWork.TrackRepository.GetByIdAsync(structureDTO.TrackId);
@@ -288,10 +289,10 @@ namespace SkillAssessmentPlatform.Application.Services
                     }
 
                     await transaction.CommitAsync();
+                    // update cach
                     var cacheKey = $"track_structure_{structureDTO.TrackId}";
                     try
                     {
-                        // يمكنك استدعاء أي كود يولّد البيانات المراد تخزينها في الكاش
                         var updatedTrackStructure = await GetTrackStructure(structureDTO.TrackId);
                         await _cacheService.CreateAsync(cacheKey, updatedTrackStructure, TimeSpan.FromHours(1));
                     }
@@ -302,16 +303,10 @@ namespace SkillAssessmentPlatform.Application.Services
 
                     return true;
                 }
-                /* catch (Exception ex)
-                 {
-                     await transaction.RollbackAsync();
-                     //_logger.LogError(ex, "Error creating track structure for track ID {TrackId}", structureDTO.TrackId);
-                     throw new Exception("Failed to create track structure, ", ex);
-                 } */
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new Exception($"Failed to create track structure: {ex.Message} | Inner: {ex.InnerException?.Message}", ex);
+                    throw new Exception($"Failed to create track structure: {ex.Message} - Inner: {ex.InnerException?.Message}", ex);
                 }
 
             }
