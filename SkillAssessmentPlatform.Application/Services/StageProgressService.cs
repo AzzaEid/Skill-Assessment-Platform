@@ -120,7 +120,7 @@ namespace SkillAssessmentPlatform.Application.Services
                         dto.ActionStatus = StageActionStatus.Reviewed;
                         dto.AdditionalData = new { FeedbackId = examRequest.FeedbackId };
                     }
-                    else if (examRequest.ScheduledDate > DateTime.UtcNow)
+                    else if (examRequest.ScheduledDate > DateTime.Now)
                     {
                         dto.ActionStatus = StageActionStatus.ExamCompleted;
                         dto.AdditionalData = new { ExamRequestId = examRequest.Id };

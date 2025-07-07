@@ -81,27 +81,27 @@ namespace SkillAssessmentPlatform.API.Controllers
                 ? _responseHandler.NotFound("Certificate not found")
                 : _responseHandler.Success(cert);
         }
+        /*
+            //  عرض الشهادة كرابط HTML مباشر
+            [HttpGet("html/{code}")]
+            public async Task<IActionResult> GetCertificateByCode(string code)
+            {
+                var certificate = await _certificateService.VerifyByCodeAsync(code);
 
-        //  عرض الشهادة كرابط HTML مباشر
-        [HttpGet("html/{code}")]
-        public async Task<IActionResult> GetCertificateByCode(string code)
-        {
-            var certificate = await _certificateService.VerifyByCodeAsync(code);
+                if (certificate == null)
+                    return NotFound("Invalid verification code");
 
-            if (certificate == null)
-                return NotFound("Invalid verification code");
+                var html = CertificateHtmlBuilder.Build(
+                    certificate.ApplicantName,
+                    certificate.TrackName,
+                    certificate.LevelName,
+                    certificate.IssueDate,
+                    certificate.VerificationCode
+                );
 
-            var html = CertificateHtmlBuilder.Build(
-                certificate.ApplicantName,
-                certificate.TrackName,
-                certificate.LevelName,
-                certificate.IssueDate,
-                certificate.VerificationCode
-            );
-
-            return Content(html, "text/html");
-        }
-
+                return Content(html, "text/html");
+            }
+        /*/
         // تحميل الشهادة كملف PDF
         [HttpGet("{code}/pdf")]
         public async Task<IActionResult> DownloadCertificatePdf(string code)
