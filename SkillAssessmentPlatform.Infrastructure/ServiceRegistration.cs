@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Amazon.S3;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -97,6 +98,20 @@ namespace SkillAssessmentPlatform.Infrastructure
             });
 
             services.AddAuthorization();
+
+            // Configure AWS credentials and S3 client
+            var awsConfig = configuration.GetSection("AWS").Get<AWSConfig>();
+
+            services.AddSingleton<IAmazonS3>(provider =>
+            {
+                var config = new AmazonS3Config
+                {
+                    RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(awsConfig.Region)
+                };
+
+                return new AmazonS3Client(awsConfig.AccessKey, awsConfig.SecretKey, config);
+            });
+
             return services;
         }
     }

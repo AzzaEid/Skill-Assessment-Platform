@@ -16,7 +16,9 @@ namespace SkillAssessmentPlatform.Infrastructure
     {
         public static IServiceCollection AddInfrastructureDependencies(this IServiceCollection services)
         {
-            services.AddSingleton<IFileService, FileService>();
+            //services.AddSingleton<IFileService, FileService>();
+            services.AddScoped<IFileService, S3FileService>();
+
             services.AddTransient<IMeetingService, ZoomMeetService>();
             services.AddTransient<IPdfGeneratorService, PdfGeneratorService>();
             services.AddTransient<IEmailService, EmailService>();

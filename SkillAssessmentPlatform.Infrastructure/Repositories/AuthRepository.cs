@@ -42,6 +42,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 UserType = Actors.Applicant,
                 FullName = user.FullName,
                 Status = ApplicantStatus.Inactive,
+                Image = "https://ratify-files.s3.us-east-1.amazonaws.com/defualt-user.png"
             };
 
             var result = await _userManager.CreateAsync(applicant, password);
@@ -73,6 +74,7 @@ namespace SkillAssessmentPlatform.Infrastructure.Repositories
                 UserType = Actors.Examiner,
                 FullName = user.FullName,
                 Bio = "----",
+                Image = "https://ratify-files.s3.us-east-1.amazonaws.com/defualt-user.png",
                 WorkingTracks = new List<Track>()
             };
 
