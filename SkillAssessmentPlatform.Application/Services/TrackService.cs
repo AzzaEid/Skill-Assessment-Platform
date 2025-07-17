@@ -177,7 +177,7 @@ namespace SkillAssessmentPlatform.Application.Services
 
         public async Task<CreateTrackDTO> CreateTrackAsync(CreateTrackDTO trackDto)
         {
-            string imagePath = "default-track.png";
+            string imagePath = "https://ratify-files.s3.us-east-1.amazonaws.com/default-track.png";
             if (trackDto.ImageFile != null && trackDto.ImageFile.Length > 0)
             {
                 imagePath = await _fileService.UploadFileAsync(trackDto.ImageFile, "track-images");
@@ -400,11 +400,24 @@ namespace SkillAssessmentPlatform.Application.Services
 
             if (trackDto.ImageFile != null && trackDto.ImageFile.Length > 0)
             {
-                // upload image
+                // delete existing image once it's not used
+                if (!string.IsNullOrEmpty(existingTrack.Image) &&
+                    !existingTrack.Image.Contains("default-track.png"))
+                {
+                    try
+                    {
+                        await _fileService.DeleteFileAsync(existingTrack.Image);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, $"Failed to delete old track image: {existingTrack.Image}");
+                    }
+                }
+
+                // uploade new image
                 var uploadedImagePath = await _fileService.UploadFileAsync(trackDto.ImageFile, "track-images");
                 existingTrack.Image = uploadedImagePath;
             }
-
 
             existingTrack.Name = trackDto.Name;
             existingTrack.Description = trackDto.Description;
